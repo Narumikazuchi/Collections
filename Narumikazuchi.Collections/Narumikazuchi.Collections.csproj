@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RepositoryUrl>https://github.com/Narumikazuchi/CSharp-Utilities</RepositoryUrl>
+    <Authors>Narumikazuchi</Authors>
+    <Copyright>©2021 Narumikazuchi</Copyright>
+    <Description>
+      A small framework containing some collections i wrote for my work.
+
+      Contents:
+      - EqualityComparison delegate
+      - IEnumerable extension methods for the introduced collections
+      - IEnumerable extension method for moving items within the collections
+      - ItemMoveDirection enum
+      - IFilterable interface
+      - IReadOnlyCollection2 interface, additionally exposing Contains(T) and CopyTo(T[], int)
+      - IReadOnlyList2 interface, additionally exposing Contains(T), CopyTo(T[], int) and IndexOf(T)
+      - ISearchableCollection interface
+      - ISerachableList interface
+      - ItemChangedEventArgs
+      - ISortable and IAutoSortable interface
+      - SortDirection enum
+      - ITree and ITreeNode interfaces
+      - BinaryTree and BinaryNode classes
+      - RadixTree and RadixNode classes
+      - Trie and TrieNode classes
+      - Register and ReadOnlyRegister classes
+      - ObservableList, ObservableCollection and ObservableRegister class
+      - IRegister interface
+      - several abstract Collection base classes to extend
+    </Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReleaseNotes>
+      Complete overhaul of the thread synchronization
+      Moved some properties around
+      Improved DebuggerView
+      Some minor optimizations
+      Included the FindExcept method to ISearchableCollection
+      Fixed an issue with ReadOnly on some base collections
+    </PackageReleaseNotes>
+    <Version>4.9.0.1</Version>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>..\Narumikazuchi.Collections.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>..\..\..\Managed Code Libraries\Custom\net5.0\Narumikazuchi.Collections.xml</DocumentationFile>
+    <OutputPath>..\..\..\Managed Code Libraries\Custom\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Narumikazuchi.Collections.Abstract" Version="1.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
