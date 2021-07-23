@@ -42,7 +42,7 @@ Contents:
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Narumikazuchi" Version="[3,4)" />
+    <PackageReference Include="Narumikazuchi" Version="[1,2)" />
     <PackageReference Include="Narumikazuchi.Collections.Abstract" Version="[1,2)" />
   </ItemGroup>
 
