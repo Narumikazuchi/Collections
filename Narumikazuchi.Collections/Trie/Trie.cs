@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Represents a very fast but memory costly word lookup data structure. Includes the attaching of objects of type <typeparamref name="T"/> to any individual <see cref="TrieNode{T}"/>.

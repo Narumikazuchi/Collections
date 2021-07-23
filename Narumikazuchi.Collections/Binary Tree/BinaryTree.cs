@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Represents a fast binary lookup data structure.

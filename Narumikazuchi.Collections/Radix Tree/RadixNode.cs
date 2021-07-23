@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Represents a node in a <see cref="RadixTree{T}"/>.

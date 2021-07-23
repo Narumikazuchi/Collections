@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
-    /// Represents a word lookup data structure, which is slower than the <see cref="Trie.Trie{T}"/> but less memory intensive. Includes the attaching of objects of type <typeparamref name="T"/> to any individual <see cref="RadixNode{T}"/>.
+    /// Represents a word lookup data structure, which is slower than the <see cref="Trie{T}"/> but less memory intensive. Includes the attaching of objects of type <typeparamref name="T"/> to any individual <see cref="RadixNode{T}"/>.
     /// </summary>
     [DebuggerDisplay("Words: {_words} | Items: {RootNode.Items.Count}")]
     public sealed class RadixTree<T> : ITree<RadixNode<T>>

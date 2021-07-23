@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Narumikazuchi.Collections.Abstract;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Represents a node in a <see cref="Trie{T}"/> data structure. Items of type <typeparamref name="T"/> can be attached to this <see cref="TrieNode{T}"/>.

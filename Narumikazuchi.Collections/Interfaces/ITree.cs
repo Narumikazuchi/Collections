@@ -1,4 +1,4 @@
-﻿namespace Narumikazuchi.Collections.Trees
+﻿namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Represents any tree data structure.

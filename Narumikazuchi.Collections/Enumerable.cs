@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Narumikazuchi.Collections
@@ -47,6 +48,12 @@ namespace Narumikazuchi.Collections
         /// </summary>
         public static ObservableRegister<T> ToObservableRegister<T>(this IEnumerable<T> source, EqualityComparison<T> comparison) where T : INotifyPropertyChanged =>
             source is ObservableRegister<T> register && register.Comparer is __FuncEqualityComparer<T> func && func.Comparison == comparison ? register : new ObservableRegister<T>(comparison, source);
+
+        /// <summary>
+        /// Creates a <see cref="BinaryTree{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        public static BinaryTree<T> ToBinaryTree<T>(this IEnumerable<T> source) where T : IComparable<T> =>
+            source is BinaryTree<T> tree ? tree : new BinaryTree<T>(source);
 
         #endregion
     }

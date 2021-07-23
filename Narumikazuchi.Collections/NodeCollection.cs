@@ -1,7 +1,6 @@
-﻿using Narumikazuchi.Collections.Abstract;
-using System;
+﻿using System;
 
-namespace Narumikazuchi.Collections.Trees
+namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Contains the <see cref="ITreeNode{TNode}"/> objects of any given <see cref="ITree{TNode}"/> as a colleciton of child-nodes.

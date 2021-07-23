@@ -1,4 +1,4 @@
-﻿namespace Narumikazuchi.Collections.Trees
+﻿namespace Narumikazuchi.Collections
 {
     /// <summary>
     /// Defines the Traversal method for a <see cref="BinaryTree{T}"/>.
