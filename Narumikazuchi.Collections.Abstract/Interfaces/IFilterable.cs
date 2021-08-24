@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a collection that can be filtered.
     /// </summary>
-    public interface IFilterable<out T> : System.Collections.Generic.IEnumerable<T>
+    public interface IFilterable<T> : System.Collections.Generic.IEnumerable<T>
     {
         #region Filtering Methods
 

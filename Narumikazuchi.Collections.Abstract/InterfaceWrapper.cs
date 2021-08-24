@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    partial interface IReadOnlyCollection2<T>
+    partial class Enumerable
     {
         #region Collection Wrapper
 
@@ -374,10 +374,7 @@ namespace Narumikazuchi.Collections.Abstract
         }
 
         #endregion
-    }
 
-    partial interface IReadOnlyList2<T>
-    {
         #region List Wrapper
 
         internal sealed class __CollectionIListWrapper<Type> : IReadOnlyList2<Type>

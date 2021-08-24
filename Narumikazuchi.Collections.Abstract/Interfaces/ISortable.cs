@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents an <see cref="System.Collections.Generic.IEnumerable{T}"/> that can be sorted.
     /// </summary>
-    public interface ISortable<out T> : System.Collections.Generic.IEnumerable<T>
+    public interface ISortable<T> : System.Collections.Generic.IEnumerable<T>
     {
         #region Sorting Methods
 

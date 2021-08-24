@@ -13,6 +13,12 @@ namespace Narumikazuchi.Collections.Abstract
     [DebuggerDisplay("Count = {_size}")]
     public abstract class ArrayBasedCollection<T> : IEnumerable<T>
     {
+        #region Constructor
+
+        private protected ArrayBasedCollection() { }
+
+        #endregion
+
         #region Capacity Management
 
         /// <summary>
