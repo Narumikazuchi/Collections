@@ -1,5 +1,4 @@
-﻿using Narumikazuchi.Collections.Abstract;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -350,10 +349,13 @@ namespace Narumikazuchi.Collections
         #region ICollection
 
         /// <inheritdoc/>
-        public override void Add([DisallowNull] T item)
+        public override Boolean Add([DisallowNull] T item)
         {
             this.OnPropertyChanging(nameof(this.Count));
-            base.Add(item);
+            if (!base.Add(item))
+            {
+                return false;
+            }
             if (this.AutoSort)
             {
                 this.Sort(this._autoSortDirection, this._autoSortComparer);
@@ -370,6 +372,7 @@ namespace Narumikazuchi.Collections
             }
             this.OnPropertyChanged(nameof(this.Count));
             this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            return true;
         }
 
         /// <inheritdoc />

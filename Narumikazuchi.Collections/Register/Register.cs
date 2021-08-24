@@ -1,9 +1,10 @@
-﻿using Narumikazuchi.Collections.Abstract;
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Narumikazuchi.Collections
 {
@@ -12,7 +13,7 @@ namespace Narumikazuchi.Collections
     /// with a corresponding <see cref="EqualityComparer{T}"/> or <see cref="EqualityComparison{T}"/> delegate.
     /// </summary>
 #pragma warning disable
-    public class Register<T> : ReadOnlyRegister<T>, ICollection<T>, IList<T>
+    public class Register<T> : ReadOnlyRegister<T>, IRegister<T>
 #pragma warning restore
     {
         #region Constructor
@@ -409,7 +410,7 @@ namespace Narumikazuchi.Collections
         /// </summary>
         /// <param name="array">
         /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
-        /// from <see cref="SearchableListBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// from <see cref="Register{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
@@ -423,17 +424,12 @@ namespace Narumikazuchi.Collections
             }
         }
 
-        /// <summary>
-        /// Adds an object to the end of the <see cref="SearchableListBase{T}"/>.
-        /// </summary>
-        /// <param name="item">The object to be added to the end of the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
-        /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual void Add([DisallowNull] T item) => this.AddInternal(item);
+        void ICollection<T>.Add(T item) => this.Add(item);
 #pragma warning restore
 
         /// <summary>
-        /// Removes all elements from the <see cref="SearchableListBase{T}"/>.
+        /// Removes all elements from the <see cref="Register{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException" />
         public virtual void Clear()
@@ -455,12 +451,12 @@ namespace Narumikazuchi.Collections
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="SearchableListBase{T}"/>.
+        /// Removes the first occurrence of a specific object from the <see cref="Register{T}"/>.
         /// </summary>
-        /// <param name="item">The object to remove from the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
+        /// <param name="item">The object to remove from the <see cref="Register{T}"/>. The value can be null for reference types.</param>
         /// <returns>
         /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
-        /// This method also returns <see langword="false"/> if item was not found in the original <see cref="SearchableListBase{T}"/>.
+        /// This method also returns <see langword="false"/> if item was not found in the original <see cref="Register{T}"/>.
         /// </returns>
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
@@ -558,6 +554,187 @@ namespace Narumikazuchi.Collections
                 }
                 this._items[this._size] = default;
                 this._version++;
+            }
+        }
+
+        #endregion
+
+        #region ISet
+
+        /// <summary>
+        /// Adds an object to the end of the <see cref="Register{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to be added to the end of the <see cref="Register{T}"/>. The value can be null for reference types.</param>
+        /// <exception cref="InvalidOperationException" />
+#pragma warning disable
+        public virtual Boolean Add([DisallowNull] T item) => this.AddInternal(item);
+#pragma warning restore
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual void ExceptWith(IEnumerable<T> other)
+        {
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (this._size == 0)
+            {
+                return;
+            }
+
+            if (other == this)
+            {
+                this.Clear();
+                return;
+            }
+
+            foreach (T item in other)
+            {
+#pragma warning disable
+                this.Remove(item);
+#pragma warning restore
+            }
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual void IntersectWith(IEnumerable<T> other)
+        {
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (other == this)
+            {
+                return;
+            }
+
+            if (other is ICollection<T> collection)
+            {
+                if (collection.Count == 0)
+                {
+                    this.Clear();
+                    return;
+                }
+            }
+
+            if (!other.Any())
+            {
+                this.Clear();
+                return;
+            }
+
+            BitArray arr = new(this._size);
+
+            foreach (T item in other)
+            {
+#pragma warning disable
+                Int32 index = this.IndexOf(item);
+#pragma warning restore
+                if (index >= 0)
+                {
+                    arr.Set(index, true);
+                }
+            }
+
+            for (Int32 i = this._size - 1; i > 0; i--)
+            {
+                if (!arr.Get(i))
+                {
+                    this.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual void SymmetricExceptWith(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (this._size == 0)
+            {
+                this.UnionWith(other);
+                return;
+            }
+
+            if (other == this)
+            {
+                this.Clear();
+                return;
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    foreach (T item in register)
+                    {
+                        if (!this.Remove(item))
+                        {
+                            this.Add(item);
+                        }
+                    }
+                    return;
+                }
+            }
+
+            Int32 current = this._size;
+            BitArray toRemove = new(current);
+            List<Int32> added = new();
+            
+            foreach (T item in other)
+            {
+                Int32 index = this.IndexOf(item);
+                if (index >= 0 &&
+                    !added.Contains(index))
+                {
+                    toRemove.Set(index, true);
+                    continue;
+                }
+                added.Add(this._size);
+                this.Add(item);
+            }
+
+            for (Int32 i = current - 1; i > 0; i--)
+            {
+                if (toRemove.Get(i))
+                {
+                    this.RemoveAt(i);
+                }
+            }
+#pragma warning restore
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual void UnionWith(IEnumerable<T> other)
+        {
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (other == this)
+            {
+                return;
+            }
+
+            foreach (T item in other)
+            {
+#pragma warning disable
+                this.AddInternal(item);
+#pragma warning restore
             }
         }
 

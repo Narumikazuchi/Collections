@@ -21,7 +21,7 @@ Contents:
 - Trie and TrieNode classes</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Version>5.0.0.1</Version>
+    <Version>5.0.0.10</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
@@ -43,7 +43,7 @@ Contents:
 
   <ItemGroup>
     <PackageReference Include="Narumikazuchi" Version="[1,2)" />
-    <PackageReference Include="Narumikazuchi.Collections.Abstract" Version="[1,2)" />
+    <PackageReference Include="Narumikazuchi.Collections.Abstract" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

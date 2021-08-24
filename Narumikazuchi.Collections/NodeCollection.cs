@@ -3,23 +3,23 @@
 namespace Narumikazuchi.Collections
 {
     /// <summary>
-    /// Contains the <see cref="ITreeNode{TNode}"/> objects of any given <see cref="ITree{TNode}"/> as a colleciton of child-nodes.
+    /// Contains the <see cref="ITreeNode{TNode, TConent}"/> objects of any given <see cref="ITree{TNode, TContent}"/> as a colleciton of child-nodes.
     /// </summary>
-    public class NodeCollection<T> : ReadOnlyRegister<T> where T : ITreeNode<T>
+    public sealed class NodeCollection<TNode, TContent> : ReadOnlyRegister<TNode> where TNode : ITreeNode<TNode, TContent>
     {
         #region Constructor
 
-        internal NodeCollection(EqualityComparison<T> comparison) : base(comparison) => this._items = new T[1];
+        internal NodeCollection(EqualityComparison<TNode> comparison) : base(comparison) => this._items = new TNode[1];
 
         #endregion
 
         #region Collection Management
 
-        internal void Add(in T item) => this.AddInternal(item);
+        internal void Add(in TNode item) => this.AddInternal(item);
 
-        internal void Insert(in Int32 index, in T item) => this.InsertInternal(index, item);
+        internal void Insert(in Int32 index, in TNode item) => this.InsertInternal(index, item);
 
-        internal Boolean Remove(in T item) => this.RemoveInternal(item);
+        internal Boolean Remove(in TNode item) => this.RemoveInternal(item);
 
         internal void Clear()
         {

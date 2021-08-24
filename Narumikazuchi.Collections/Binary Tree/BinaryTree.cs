@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Narumikazuchi.Collections.Abstract;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -10,8 +12,8 @@ namespace Narumikazuchi.Collections
     /// <summary>
     /// Represents a fast binary lookup data structure.
     /// </summary>
-    [DebuggerDisplay("Depth = {Depth}")]
-    public sealed class BinaryTree<T> : ITree<BinaryNode<T>> where T : IComparable<T>
+    [DebuggerDisplay("Depth = {GetDepth()}")]
+    public sealed class BinaryTree<TValue> : IEnumerable<TValue>, ITree<BinaryNode<TValue>, TValue> where TValue : IComparable<TValue>
     {
         #region Constructor
 
@@ -19,27 +21,31 @@ namespace Narumikazuchi.Collections
         /// Instantiates a new <see cref="BinaryTree{T}"/> with the <paramref name="rootValue"/> as root node.
         /// </summary>
         /// <param name="rootValue">The value of the root node.</param>
-        public BinaryTree([DisallowNull] T rootValue) => this._root = new BinaryNode<T>(rootValue);
+        public BinaryTree([DisallowNull] TValue rootValue) => this._root = new BinaryNode<TValue>(rootValue, null);
 
-        internal BinaryTree([DisallowNull] IEnumerable<T> collection)
+#pragma warning disable
+        internal BinaryTree([DisallowNull] IEnumerable<TValue> collection)
+#pragma warning restore
         {
             if (collection is null)
             {
                 throw new ArgumentNullException(nameof(collection));
             }
-            T? first = collection.FirstOrDefault();
-            if (first is null)
+            if (!collection.Any())
             {
                 throw new ArgumentException("Passed Collection was empty!");
             }
-            this._root = new BinaryNode<T>(first);
-            foreach (T item in collection)
+
+            IOrderedEnumerable<TValue> distinct = collection.Distinct().OrderBy(i => i);
+            TValue median = distinct.Median();
+            this._root = new(median, null);
+            foreach (TValue item in distinct)
             {
-                if (item.Equals(first))
+                if (item.CompareTo(median) == 0)
                 {
                     continue;
                 }
-                this._root.Add(item, false);
+                this.Insert(item);
             }
         }
 
@@ -48,43 +54,32 @@ namespace Narumikazuchi.Collections
         #region Node Management
 
         /// <summary>
-        /// Adds the specified item <typeparamref name="T"/> to the <see cref="BinaryTree{T}"/>.
+        /// Gets the depth of the <see cref="BinaryTree{T}"/>.
         /// </summary>
-        /// <param name="value">The value to add to the <see cref="BinaryTree{T}"/>.</param>
-        /// <exception cref="ArgumentException"></exception>
-        public void Add([DisallowNull] in T value) => this._root.Add(value, this.ThrowExceptionOnDuplicate);
+        /// <returns>The depth of the deepest node in the tree</returns>
+        public UInt32 GetDepth() => this.GetDepth(this._root);
 
-        /// <summary>
-        /// Finds the <see cref="BinaryNode{T}"/> for the specified value <typeparamref name="T"/> in the <see cref="BinaryTree{T}"/>. Returns <see langword="null"/> if the <see cref="BinaryTree{T}"/> does not contain the value.
-        /// </summary>
-        /// <param name="value">The value to find in the <see cref="BinaryTree{T}"/>.</param>
-        [Pure]
-        public BinaryNode<T>? Find([DisallowNull] in T value) => this._root.Find(value);
-
-        /// <summary>
-        /// Removes the <see cref="BinaryNode{T}"/> from the <see cref="BinaryTree{T}"/>, which represents the specified value <typeparamref name="T"/>.
-        /// </summary>
-        /// <param name="value">The value to remove from the <see cref="BinaryTree{T}"/>.</param>
-        /// <exception cref="ArgumentException"></exception>
-        public void Remove([DisallowNull] in T value)
-        {
-            if (value.CompareTo(this._root) == 0)
-            {
-                throw new ArgumentException("Cannot remove the root of the BinaryTree.");
-            }
-            else
-            {
-                this._root.Remove(value);
-            }
-        }
+#pragma warning disable
+        private UInt32 GetDepth(BinaryNode<TValue> node) => 
+            node.LeftChild is null &&
+            node.RightChild is null
+                ? node.Depth
+                : node.RightChild is null &&
+                  node.LeftChild is not null
+                    ? this.GetDepth(node.LeftChild)
+                    : node.LeftChild is null &&
+                      node.RightChild is not null
+                        ? this.GetDepth(node.RightChild)
+                        : Math.Max(this.GetDepth(node.LeftChild), this.GetDepth(node.RightChild));
+#pragma warning restore
 
         /// <summary>
         /// Determines the lowest value in the <see cref="BinaryTree{T}"/>.
         /// </summary>
         [Pure]
-        public T LowBound()
+        public TValue LowBound()
         {
-            BinaryNode<T> node = this._root;
+            BinaryNode<TValue> node = this._root;
             while (node.LeftChild is not null)
             {
                 node = node.LeftChild;
@@ -96,9 +91,9 @@ namespace Narumikazuchi.Collections
         /// Determines the highest value in the <see cref="BinaryTree{T}"/>.
         /// </summary>
         [Pure]
-        public T HighBound()
+        public TValue HighBound()
         {
-            BinaryNode<T> node = this._root;
+            BinaryNode<TValue> node = this._root;
             while (node.RightChild is not null)
             {
                 node = node.RightChild;
@@ -111,85 +106,245 @@ namespace Narumikazuchi.Collections
         /// </summary>
         /// <param name="method">The method to use when traversing.</param>
         [Pure]
-        public IEnumerable<BinaryNode<T>> Traverse(BinaryTraversalMethod method) => method == BinaryTraversalMethod.PreOrder ?
+        public IEnumerable<BinaryNode<TValue>> Traverse(BinaryTraversalMethod method) => method == BinaryTraversalMethod.PreOrder ?
                                                                                         this.TraversePreOrder() :
                                                                                         method == BinaryTraversalMethod.InOrder ?
                                                                                             this.TraverseInOrder() :
                                                                                             this.TraversePostOrder();
 
         [Pure]
-        private IEnumerable<BinaryNode<T>> TraversePreOrder()
+        private IEnumerable<BinaryNode<TValue>> TraversePreOrder()
         {
-            List<BinaryNode<T>> nodes = new()
-            {
-                this._root
-            };
-            if (this._root.LeftChild is not null)
-            {
-                this.TraversePreOrderSingle(nodes, this._root.LeftChild);
-            }
-            if (this._root.RightChild is not null)
-            {
-                this.TraversePreOrderSingle(nodes, this._root.RightChild);
-            }
-            return nodes.ToArray();
+            List<BinaryNode<TValue>> nodes = new();
+            this.TraversePreOrder(nodes, this._root);
+            return nodes;
         }
 
         [Pure]
-        private void TraversePreOrderSingle(List<BinaryNode<T>> nodes, BinaryNode<T>? current)
+        private void TraversePreOrder(List<BinaryNode<TValue>> nodes, BinaryNode<TValue> current)
         {
-            if (current is null)
+            nodes.Add(current);
+            if (current.LeftChild is not null)
             {
-                return;
+                this.TraversePreOrder(nodes, current.LeftChild);
+            }
+            if (current.RightChild is not null)
+            {
+                this.TraversePreOrder(nodes, current.RightChild);
+            }
+        }
+
+        [Pure]
+        private IEnumerable<BinaryNode<TValue>> TraverseInOrder()
+        {
+            List<BinaryNode<TValue>> nodes = new();
+            this.TraverseInOrder(nodes, this._root);
+            return nodes;
+        }
+
+        [Pure]
+        private void TraverseInOrder(List<BinaryNode<TValue>> nodes, BinaryNode<TValue> current)
+        {
+            if (current.LeftChild is not null)
+            {
+                this.TraverseInOrder(nodes, current.LeftChild);
             }
             nodes.Add(current);
-            this.TraversePreOrderSingle(nodes, current.LeftChild);
-            this.TraversePreOrderSingle(nodes, current.RightChild);
+            if (current.RightChild is not null)
+            {
+                this.TraverseInOrder(nodes, current.RightChild);
+            }
         }
 
         [Pure]
-        private IEnumerable<BinaryNode<T>> TraverseInOrder()
+        private IEnumerable<BinaryNode<TValue>> TraversePostOrder()
         {
-            List<BinaryNode<T>> nodes = new();
-            this.TraverseInOrderSingle(nodes, this._root);
+            List<BinaryNode<TValue>> nodes = new();
+            this.TraversePostOrder(nodes, this._root);
             return nodes.ToArray();
         }
 
         [Pure]
-        private void TraverseInOrderSingle(List<BinaryNode<T>> nodes, BinaryNode<T>? current)
+        private void TraversePostOrder(List<BinaryNode<TValue>> nodes, BinaryNode<TValue> current)
         {
-            if (current is null)
+            if (current.LeftChild is not null)
             {
-                return;
+                this.TraverseInOrder(nodes, current.LeftChild);
             }
-            this.TraverseInOrderSingle(nodes, current.LeftChild);
-            nodes.Add(current);
-            this.TraverseInOrderSingle(nodes, current.RightChild);
-        }
-
-        [Pure]
-        private IEnumerable<BinaryNode<T>> TraversePostOrder()
-        {
-            List<BinaryNode<T>> nodes = new();
-            this.TraversePostOrderSingle(nodes, this._root);
-            return nodes.ToArray();
-        }
-
-        [Pure]
-        private void TraversePostOrderSingle(List<BinaryNode<T>> nodes, BinaryNode<T>? current)
-        {
-            if (current is null)
+            if (current.RightChild is not null)
             {
-                return;
+                this.TraverseInOrder(nodes, current.RightChild);
             }
-            this.TraversePostOrderSingle(nodes, current.LeftChild);
-            this.TraversePostOrderSingle(nodes, current.RightChild);
             nodes.Add(current);
         }
 
         #endregion
 
+        #region IEnumerable
+
+        /// <inheritdoc/>
+        public IEnumerator<TValue> GetEnumerator()
+        {
+            foreach (BinaryNode<TValue> node in this.TraverseInOrder())
+            {
+                yield return node.Value;
+            }
+            yield break;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        #endregion
+
         #region ITree
+
+        /// <inheritdoc/>
+        public Boolean Insert([DisallowNull] in TValue value)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            BinaryNode<TValue>? node = this._root;
+            Int32 compare = value.CompareTo(node.Value);
+            while (node is not null)
+            {
+                if (compare == 0)
+                {
+                    return this.ThrowExceptionOnDuplicate 
+                        ? throw new ArgumentException("A node with the specified value already exists.") 
+                        : false;
+                }
+                else if (compare < 0)
+                {
+                    if (node.LeftChild is null)
+                    {
+                        node.Left = new(value, node);
+                        return true;
+                    }
+                    node = node.LeftChild;
+                }
+                else if (compare > 0)
+                {
+                    if (node.RightChild is null)
+                    {
+                        node.Right = new(value, node);
+                        return true;
+                    }
+                    node = node.RightChild;
+                }
+                if (node is not null)
+                {
+                    compare = value.CompareTo(node.Value);
+                }
+            }
+            return false;
+        }
+
+        /// <inheritdoc/>
+        [Pure]
+        public Boolean Exists([DisallowNull] in TValue value) => this.Find(value) is not null;
+
+        /// <inheritdoc/>
+        [Pure]
+        public BinaryNode<TValue>? Find([DisallowNull] in TValue value)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            BinaryNode<TValue>? node = this._root;
+            Int32 compare = value.CompareTo(node.Value);
+            while (node is not null &&
+                   compare != 0)
+            {
+                if (compare < 0)
+                {
+                    node = node.LeftChild;
+                }
+                else if (compare > 0)
+                {
+                    node = node.RightChild;
+                }
+                if (node is not null)
+                {
+                    compare = value.CompareTo(node.Value);
+                }
+            }
+            return node;
+        }
+
+        /// <inheritdoc/>
+        public Boolean Remove([DisallowNull] in TValue value)
+        {
+            if (value is null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            if (value.CompareTo(this._root.Value) == 0)
+            {
+                throw new ArgumentException("Cannot remove the root of the BinaryTree.");
+            }
+
+            BinaryNode<TValue>? node = this.Find(value);
+            if (node is null)
+            {
+                return false;
+            }
+
+            if (node.LeftChild is null)
+            {
+                if (node.Parent is null)
+                {
+                    throw new InvalidOperationException("Only roots are supposed to have no parent.");
+                }
+                if (node.Parent.LeftChild == node)
+                {
+                    node.Parent.Left = node.RightChild;
+                }
+                else if (node.Parent.RightChild == node)
+                {
+                    node.Parent.Right = node.RightChild;
+                }
+            }
+            else if (node.RightChild is null)
+            {
+                if (node.Parent is null)
+                {
+                    throw new InvalidOperationException("Only roots are supposed to have no parent.");
+                }
+                if (node.Parent.LeftChild == node)
+                {
+                    node.Parent.Left = node.LeftChild;
+                }
+                else if (node.Parent.RightChild == node)
+                {
+                    node.Parent.Right = node.LeftChild;
+                }
+            }
+            else
+            {
+                BinaryNode<TValue> min = node.SetToMinBranchValue();
+                if (min.Parent is null)
+                {
+                    throw new InvalidOperationException("Only roots are supposed to have no parent.");
+                }
+                min.Parent.Left = null;
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public void Clear()
+        {
+            this._root.Left = null;
+            this._root.Right = null;
+        }
+
+        #region Properties
 
         /// <summary>
         /// Gets the root for the <see cref="BinaryTree{T}"/>.
@@ -197,7 +352,9 @@ namespace Narumikazuchi.Collections
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
         [DisallowNull]
         [Pure]
-        public BinaryNode<T> RootNode => this._root;
+        public BinaryNode<TValue> RootNode => this._root;
+
+        #endregion
 
         #endregion
 
@@ -208,19 +365,13 @@ namespace Narumikazuchi.Collections
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
         public Boolean ThrowExceptionOnDuplicate { get; set; } = true;
-        /// <summary>
-        /// Gets the depth of the <see cref="BinaryTree{T}"/>.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Pure]
-        public Int32 Depth => this._root.GetDepth();
 
         #endregion
 
         #region Fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private BinaryNode<T> _root;
+        private BinaryNode<TValue> _root;
 
         #endregion
     }

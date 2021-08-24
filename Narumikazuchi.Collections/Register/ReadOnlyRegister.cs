@@ -1,9 +1,11 @@
 ﻿using Narumikazuchi.Collections.Abstract;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Narumikazuchi.Collections
 {
@@ -11,7 +13,7 @@ namespace Narumikazuchi.Collections
     /// Represents a collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="ReadOnlyRegister{T}"/> can be specified
     /// with a corresponding <see cref="EqualityComparer{T}"/> or <see cref="EqualityComparison{T}"/> delegate.
     /// </summary>
-    public class ReadOnlyRegister<T> : SearchableReadOnlyListBase<T>, IRegister<T>, IAutoSortable<T>
+    public class ReadOnlyRegister<T> : SearchableReadOnlyListBase<T>, IReadOnlyRegister<T>, IAutoSortable<T>
     {
         #region Constructor
 
@@ -29,7 +31,56 @@ namespace Narumikazuchi.Collections
 
             this._size = 0;
             this._items = _emptyArray;
+            this.Fill(collection);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified capacity using the specified function to check items for equality.
+        /// </summary>
+        public ReadOnlyRegister(EqualityComparison<T> comparison)
+        {
+            if (comparison is null)
+            {
+                this.Comparer = null;
+                return;
+            }
+#pragma warning disable
+            this.Comparer = new __FuncEqualityComparer<T>(comparison);
+#pragma warning restore
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified function to check items for equality.
+        /// </summary>
+        public ReadOnlyRegister(EqualityComparison<T> comparison, [DisallowNull] IEnumerable<T> collection)
+        {
+            if (comparison is null)
+            {
+                this.Comparer = null;
+                return;
+            }
+#pragma warning disable
+            this.Comparer = new __FuncEqualityComparer<T>(comparison);
+#pragma warning restore
+            this.Fill(collection);
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// </summary>
+        public ReadOnlyRegister(IEqualityComparer<T>? comparer) => this.Comparer = comparer;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// </summary>
+        public ReadOnlyRegister(IEqualityComparer<T>? comparer, [DisallowNull] IEnumerable<T> collection)
+        {
+            this.Comparer = comparer;
+            this.Fill(collection);
+        }
 
+        #endregion
+
+        #region Collection Management
+
+        private void Fill(IEnumerable<T> collection)
+        {
             using IEnumerator<T> enumerator = collection.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -51,46 +102,6 @@ namespace Narumikazuchi.Collections
                 }
             }
         }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified capacity using the specified function to check items for equality.
-        /// </summary>
-        public ReadOnlyRegister(EqualityComparison<T> comparison)
-        {
-            if (comparison is null)
-            {
-                this.Comparer = null;
-                return;
-            }
-#pragma warning disable
-            this.Comparer = new __FuncEqualityComparer<T>(comparison);
-#pragma warning restore
-        }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified function to check items for equality.
-        /// </summary>
-        public ReadOnlyRegister(EqualityComparison<T> comparison, [DisallowNull] IEnumerable<T> collection) : this(collection)
-        {
-            if (comparison is null)
-            {
-                this.Comparer = null;
-                return;
-            }
-#pragma warning disable
-            this.Comparer = new __FuncEqualityComparer<T>(comparison);
-#pragma warning restore
-        }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
-        /// </summary>
-        public ReadOnlyRegister(IEqualityComparer<T>? comparer) => this.Comparer = comparer;
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
-        /// </summary>
-        public ReadOnlyRegister(IEqualityComparer<T>? comparer, [DisallowNull] IEnumerable<T> collection) : this(collection) => this.Comparer = comparer;
-
-        #endregion
-
-        #region Collection Management
 
         /// <summary>
         /// Adds the specified item to the <see cref="ReadOnlyRegister{T}"/>.
@@ -211,7 +222,7 @@ namespace Narumikazuchi.Collections
                 };
                 return;
             }
-            this._hashTree.Add(hashcode);
+            this._hashTree.Insert(hashcode);
         }
 
         /// <summary>
@@ -235,60 +246,6 @@ namespace Narumikazuchi.Collections
             this._hashTree.Remove(hashcode);
 #pragma warning restore
         }
-
-        #endregion
-
-        #region IReadOnlyCollection
-
-        /// <inheritdoc/>
-#pragma warning disable
-        public override Boolean Contains([DisallowNull] T item) => item is null
-                                                                    ? throw new ArgumentNullException(nameof(item))
-                                                                    : this._hashTree is not null &&
-                                                                      this._hashTree.Find(item.GetHashCode()) is not null &&
-                                                                      this.IndexOf(item) > -1;
-#pragma warning restore
-
-        #endregion
-
-        #region IReadOnlyList
-
-        /// <inheritdoc/>
-#pragma warning disable
-        [Pure]
-        public override Int32 IndexOf([DisallowNull] T item)
-        {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
-
-            lock (this._syncRoot)
-            {
-                if (this.Comparer is null)
-                {
-                    for (Int32 i = 0; i < this.Count; i++)
-                    {
-                        if ((this._items[i] as IEquatable<T>).Equals(item))
-                        {
-                            return i;
-                        }
-                    }
-                }
-                else
-                {
-                    for (Int32 i = 0; i < this.Count; i++)
-                    {
-                        if (this.Comparer.Equals(this._items[i], item))
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-            return -1;
-        }
-#pragma warning restore
 
         #endregion
 
@@ -395,6 +352,386 @@ namespace Narumikazuchi.Collections
 
         #endregion
 
+        #region IReadOnlyCollection
+
+        /// <inheritdoc/>
+#pragma warning disable
+        public override Boolean Contains([DisallowNull] T item) => item is null
+                                                                    ? throw new ArgumentNullException(nameof(item))
+                                                                    : this._hashTree is not null &&
+                                                                      this._hashTree.Find(item.GetHashCode()) is not null &&
+                                                                      this.IndexOf(item) > -1;
+#pragma warning restore
+
+        #endregion
+
+        #region IReadOnlyList
+
+        /// <inheritdoc/>
+#pragma warning disable
+        [Pure]
+        public override Int32 IndexOf([DisallowNull] T item)
+        {
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+
+            lock (this._syncRoot)
+            {
+                if (this.Comparer is null)
+                {
+                    for (Int32 i = 0; i < this.Count; i++)
+                    {
+                        if ((this._items[i] as IEquatable<T>).Equals(item))
+                        {
+                            return i;
+                        }
+                    }
+                }
+                else
+                {
+                    for (Int32 i = 0; i < this.Count; i++)
+                    {
+                        if (this.Comparer.Equals(this._items[i], item))
+                        {
+                            return i;
+                        }
+                    }
+                }
+            }
+            return -1;
+        }
+#pragma warning restore
+
+        #endregion
+
+        #region IReadOnlySet
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean IsProperSubsetOf(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (other == this)
+            {
+                return false;
+            }
+
+            if (other is ICollection<T> collection)
+            {
+                if (this._size == 0)
+                {
+                    return collection.Count > 0;
+                }
+
+                if (this._size >= collection.Count)
+                {
+                    return false;
+                }
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    for (Int32 i = 0; i < this._size; i++)
+                    {
+                        if (!(register as IReadOnlyCollection2<T>).Contains(this._items[i]) &&
+                            !(register as IReadOnlySet<T>).Contains(this._items[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            return this.FindInOther(other);
+#pragma warning restore
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean IsProperSupersetOf(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (other == this ||
+                this._size == 0)
+            {
+                return false;
+            }
+
+            if (other is ICollection<T> collection &&
+                collection.Count == 0)
+            {
+                return true;
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if (register.Count >= this._size)
+                {
+                    return false;
+                }
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    for (Int32 i = 0; i < register.Count; i++)
+                    {
+                        if (!this.Contains(register[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            if (!other.Any())
+            {
+                return true;
+            }
+
+            foreach (T item in other)
+            {
+                if (!this.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
+#pragma warning restore
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean IsSubsetOf(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (this._size == 0 ||
+                other == this)
+            {
+                return true;
+            }
+
+            if (other is ICollection<T> collection &&
+                this._size > collection.Count)
+            {
+                return false;
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    for (Int32 i = 0; i < this._size; i++)
+                    {
+                        if (!(register as IReadOnlyCollection2<T>).Contains(this._items[i]) &&
+                            !(register as IReadOnlySet<T>).Contains(this._items[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            return this.FindInOther(other);
+#pragma warning restore
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean IsSupersetOf(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if ((other is ICollection<T> collection &&
+                collection.Count == 0) ||
+                other == this)
+            {
+                return true;
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if (register.Count > this._size)
+                {
+                    return false;
+                }
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    for (Int32 i = 0; i < register.Count; i++)
+                    {
+                        if (!this.Contains(register[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            if (!other.Any())
+            {
+                return true;
+            }
+
+            foreach (T item in other)
+            {
+                if (!this.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
+#pragma warning restore
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean Overlaps(IEnumerable<T> other)
+        {
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (this._size == 0)
+            {
+                return false;
+            }
+
+            foreach (T item in other)
+            {
+#pragma warning disable
+                if (this.Contains(item))
+#pragma warning restore
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"/>
+        public virtual Boolean SetEquals(IEnumerable<T> other)
+        {
+#pragma warning disable
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            if (other == this)
+            {
+                return true;
+            }
+
+            if (other is ICollection<T> collection)
+            {
+                if (collection.Count != this._size)
+                {
+                    return false;
+                }
+            }
+
+            if (other is IReadOnlyRegister<T> register)
+            {
+                if ((this.Comparer is null &&
+                    register.Comparer is null) ||
+                    (this.Comparer is not null &&
+                    this.Comparer.Equals(register.Comparer)))
+                {
+                    for (Int32 i = 0; i < register.Count; i++)
+                    {
+                        if (!this.Contains(register[i]))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
+            foreach (T item in other)
+            {
+                if (!this.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
+#pragma warning restore
+        }
+
+        /// <summary>
+        /// Attempts to find all of the items in this collection in the specified other enumerable.
+        /// </summary>
+        /// <param name="other">The enumerable to search through.</param>
+        /// <returns><see langword="true"/> if all of the items of this collection are also present in the enumerable; otherwise, <see langword="false"/></returns>
+        protected Boolean FindInOther(IEnumerable<T> other)
+        {
+            BitArray arr = new(this._size);
+
+            foreach (T item in other)
+            {
+#pragma warning disable
+                Int32 index = this.IndexOf(item);
+#pragma warning restore
+                if (index >= 0)
+                {
+                    if (!arr.Get(index))
+                    {
+                        arr.Set(index, true);
+                    }
+                }
+            }
+
+            for (Int32 i = 0; i < arr.Count; i++)
+            {
+                if (!arr.Get(i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        #endregion
+
         #region Properties
 
         /// <inheritdoc/>
@@ -430,6 +767,7 @@ namespace Narumikazuchi.Collections
         /// <summary>
         /// Internally contains the automatic sort comparer for the <see cref="AutoSort"/> feature.
         /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
         protected IComparer<T>? _autoSortComparer = null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
