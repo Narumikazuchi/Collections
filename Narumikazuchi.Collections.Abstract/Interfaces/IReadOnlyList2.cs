@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a read-only collection of elements that can be accessed by index.
     /// </summary>
-    public partial interface IReadOnlyList2<T> : IReadOnlyCollection2<T>, System.Collections.Generic.IReadOnlyList<T>
+    public partial interface IReadOnlyList2<T> : IIndexGetter<System.Int32, T>, IReadOnlyCollection2<T>, System.Collections.Generic.IReadOnlyList<T>
     {
         #region Management Methods
 

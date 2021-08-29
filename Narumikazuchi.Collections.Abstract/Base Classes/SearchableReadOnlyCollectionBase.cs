@@ -8,7 +8,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed collection of objects, which can be searched. 
     /// </summary>
-    public abstract class SearchableReadOnlyCollectionBase<T> : ReadOnlyCollectionBase<T>, ISearchableCollection<T>
+    public abstract class SearchableReadOnlyCollectionBase<TElement> : ReadOnlyCollectionBase<TElement>, ISearchableCollection<TElement>
     {
         #region Constructor
 
@@ -23,7 +23,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        protected SearchableReadOnlyCollectionBase([DisallowNull] IEnumerable<T> collection) : base(collection) { }
+        protected SearchableReadOnlyCollectionBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
 
         #endregion
 
@@ -33,7 +33,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual Boolean Exists([DisallowNull] Func<T, Boolean> predicate)
+        public virtual Boolean Exists([DisallowNull] Func<TElement, Boolean> predicate)
         {
             lock (this._syncRoot)
             {
@@ -58,7 +58,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException" />
         [Pure]
-        public virtual T? Find([DisallowNull] Func<T, Boolean> predicate)
+        public virtual TElement? Find([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
@@ -88,14 +88,14 @@ namespace Narumikazuchi.Collections.Abstract
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException" />
         [Pure]
-        public virtual IReadOnlyList2<T> FindAll([DisallowNull] Func<T, Boolean> predicate)
+        public virtual IReadOnlyList2<TElement> FindAll([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            List<T> result = new();
+            List<TElement> result = new();
             lock (this._syncRoot)
             {
                 Int32 v = this._version;
@@ -119,14 +119,14 @@ namespace Narumikazuchi.Collections.Abstract
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException" />
         [Pure]
-        public virtual IReadOnlyList2<T> FindExcept([DisallowNull] Func<T, Boolean> predicate)
+        public virtual IReadOnlyList2<TElement> FindExcept([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
                 throw new ArgumentNullException(nameof(predicate));
             }
 
-            List<T> result = new();
+            List<TElement> result = new();
             lock (this._syncRoot)
             {
                 Int32 v = this._version;
@@ -150,7 +150,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException" />
         [Pure]
-        public virtual T? FindLast([DisallowNull] Func<T, Boolean> predicate)
+        public virtual TElement? FindLast([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {

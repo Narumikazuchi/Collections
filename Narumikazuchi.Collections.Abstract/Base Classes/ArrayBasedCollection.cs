@@ -11,7 +11,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// Represents a collection whose underlying item storage is an array.
     /// </summary>
     [DebuggerDisplay("Count = {_size}")]
-    public abstract class ArrayBasedCollection<T> : IEnumerable<T>
+    public abstract class ArrayBasedCollection<TElement> : IEnumerable<TElement>
     {
         #region Constructor
 
@@ -43,7 +43,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     bigger = capacity;
                 }
-                T[] array = new T[bigger];
+                TElement[] array = new TElement[bigger];
                 lock (this._syncRoot)
                 {
                     if (this._size > 0)
@@ -66,18 +66,18 @@ namespace Narumikazuchi.Collections.Abstract
         /// <returns><see langword="true"/> if the object can be added to the list; else <see langword="false"/></returns>
         [Pure]
         protected static Boolean IsCompatibleObject(Object? value) =>
-            value is T || (value is null && default(T) is null);
+            value is TElement || (value is null && default(TElement) is null);
 
         /// <summary>
         /// Copies the entire <see cref="ArrayBasedCollection{T}"/> into a new array.
         /// </summary>
         /// <returns>A new array containing all items from this collection</returns>
         [Pure]
-        public virtual T[] ToArray()
+        public virtual TElement[] ToArray()
         {
             lock (this._syncRoot)
             {
-                T[] array = new T[this._size];
+                TElement[] array = new TElement[this._size];
                 Array.Copy(this._items, 0, array, 0, this._size);
                 return array;
             }
@@ -89,7 +89,7 @@ namespace Narumikazuchi.Collections.Abstract
 
         /// <inheritdoc />
         [Pure]
-        public IEnumerator<T> GetEnumerator()
+        public IEnumerator<TElement> GetEnumerator()
         {
             lock (this._syncRoot)
             {
@@ -145,10 +145,10 @@ namespace Narumikazuchi.Collections.Abstract
         #region Fields
 
         /// <summary>
-        /// Statically allocates an empty array to use for every <see cref="ArrayBasedCollection{T}"/> using the type <typeparamref name="T"/>.
+        /// Statically allocates an empty array to use for every <see cref="ArrayBasedCollection{T}"/> using the type <typeparamref name="TElement"/>.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        protected static readonly T?[] _emptyArray = Array.Empty<T>();
+        protected static readonly TElement?[] _emptyArray = Array.Empty<TElement>();
 
         /// <summary>
         /// The internal mutex for synchronizing multi-threaded access.
@@ -159,7 +159,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// Internally manages and contains the items for the <see cref="ArrayBasedCollection{T}"/>.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        protected T?[] _items = new T[1];
+        protected TElement?[] _items = new TElement[1];
         /// <summary>
         /// Internally manages and contains the actual amount of items in the <see cref="ArrayBasedCollection{T}"/>.
         /// </summary>

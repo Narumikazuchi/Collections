@@ -8,7 +8,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed list of objects, which can be accessed by index. 
     /// </summary>
-    public abstract class ReadOnlyListBase<T> : ReadOnlyCollectionBase<T>, IReadOnlyList2<T>
+    public abstract class ReadOnlyListBase<TElement> : ReadOnlyCollectionBase<TElement>, IReadOnlyList2<TElement>
     {
         #region Constructor
 
@@ -23,7 +23,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        protected ReadOnlyListBase([DisallowNull] IEnumerable<T> collection) : base(collection) { }
+        protected ReadOnlyListBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo([DisallowNull] T[] array) => this.CopyTo(array, 0);
+        public virtual void CopyTo([DisallowNull] TElement[] array) => this.CopyTo(array, 0);
         /// <summary>
         /// Copies a section of the <see cref="ReadOnlyListBase{T}"/> to the specified one-dimensional array.
         /// The section starts at the specified index, entails the specified count of items and begins inserting them
@@ -51,7 +51,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo(in Int32 index, in Int32 count, [DisallowNull] T[] array, in Int32 arrayIndex)
+        public virtual void CopyTo(in Int32 index, in Int32 count, [DisallowNull] TElement[] array, in Int32 arrayIndex)
         {
             if (array is null)
             {
@@ -77,7 +77,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual IList<T> GetRange(in Int32 index, in Int32 count)
+        public virtual IList<TElement> GetRange(in Int32 index, in Int32 count)
         {
             if (index < 0)
             {
@@ -95,7 +95,7 @@ namespace Narumikazuchi.Collections.Abstract
             lock (this._syncRoot)
             {
                 Int32 v = this._version;
-                List<T> result = new();
+                List<TElement> result = new();
                 Int32 end = index + count;
 
                 for (Int32 i = index; i < end; i++)
@@ -120,7 +120,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual Int32 IndexOf([DisallowNull] T item)
+        public virtual Int32 IndexOf([DisallowNull] TElement item)
         {
             if (item is null)
             {
@@ -133,10 +133,12 @@ namespace Narumikazuchi.Collections.Abstract
             }
         }
 
+        #region Indexer
+
         /// <inheritdoc />
         /// <exception cref="IndexOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual T this[Int32 index]
+        public virtual TElement this[Int32 index]
         {
             get
             {
@@ -149,6 +151,8 @@ namespace Narumikazuchi.Collections.Abstract
             }
             set => throw new NotSupportedException("The list is read-only.");
         }
+
+        #endregion
 
         #endregion
     }

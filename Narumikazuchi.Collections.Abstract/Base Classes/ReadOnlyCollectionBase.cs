@@ -9,7 +9,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed collection of objects. 
     /// </summary>
-    public abstract class ReadOnlyCollectionBase<T> : ArrayBasedCollection<T>, IReadOnlyCollection2<T>
+    public abstract class ReadOnlyCollectionBase<TElement> : ArrayBasedCollection<TElement>, IReadOnlyCollection2<TElement>
     {
         #region Constructor
 
@@ -24,14 +24,14 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<T> collection)
+        protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
                 throw new ArgumentNullException(nameof(collection));
             }
 
-            if (collection is ICollection<T> c)
+            if (collection is ICollection<TElement> c)
             {
                 if (c.Count == 0)
                 {
@@ -39,7 +39,7 @@ namespace Narumikazuchi.Collections.Abstract
                 }
                 else
                 {
-                    this._items = new T[c.Count];
+                    this._items = new TElement[c.Count];
 #pragma warning disable 
                     c.CopyTo(this._items, 0);
 #pragma warning restore
@@ -51,24 +51,21 @@ namespace Narumikazuchi.Collections.Abstract
                 this._size = 0;
                 this._items = _emptyArray;
 
-                using IEnumerator<T> enumerator = collection.GetEnumerator();
+                using IEnumerator<TElement> enumerator = collection.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
-                    lock (this._syncRoot)
+                    if (this._items.Length == this._size)
                     {
-                        if (this._items.Length == this._size)
-                        {
-                            Int32 capacity = this._items.Length == 0 ? DEFAULTCAPACITY : this._items.Length * 2;
-                            T[] array = new T[capacity];
-                            Array.Copy(this._items, 0, array, 0, this._size);
-                            this._items = array;
-                        }
-                        this._items[this._size++] = enumerator.Current;
+                        Int32 capacity = this._items.Length == 0 ? DEFAULTCAPACITY : this._items.Length * 2;
+                        TElement[] array = new TElement[capacity];
+                        Array.Copy(this._items, 0, array, 0, this._size);
+                        this._items = array;
                     }
+                    this._items[this._size++] = enumerator.Current;
                 }
                 if (this._items.Length != this._size)
                 {
-                    T[] array = new T[this._size];
+                    TElement[] array = new TElement[this._size];
                     Array.Copy(this._items, 0, array, 0, this._size);
                     this._items = array;
                 }
@@ -87,7 +84,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <returns>An <see cref="IList{T}"/> which contains the converted objects</returns>
         /// <exception cref="ArgumentNullException" />
         [Pure]
-        public virtual IList<TOutput> ConvertAll<TOutput>([DisallowNull] Converter<T, TOutput> converter)
+        public virtual IList<TOutput> ConvertAll<TOutput>([DisallowNull] Converter<TElement, TOutput> converter)
         {
             if (converter is null)
             {
@@ -124,7 +121,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
         [Pure]
-        public virtual void ForEach([DisallowNull] Action<T> action)
+        public virtual void ForEach([DisallowNull] Action<TElement> action)
         {
             if (action is null)
             {
@@ -155,7 +152,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual Boolean Contains([DisallowNull] T item)
+        public virtual Boolean Contains([DisallowNull] TElement item)
         {
             lock (this._syncRoot)
             {
@@ -182,7 +179,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo([DisallowNull] T?[] array, Int32 index)
+        public virtual void CopyTo([DisallowNull] TElement?[] array, Int32 index)
         {
             if (array is null)
             {

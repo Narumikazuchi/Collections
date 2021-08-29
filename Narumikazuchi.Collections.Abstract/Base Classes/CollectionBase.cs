@@ -9,7 +9,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed collection of objects. 
     /// </summary>
-    public abstract class CollectionBase<T> : ReadOnlyCollectionBase<T>, ICollection<T>
+    public abstract class CollectionBase<TElement> : ReadOnlyCollectionBase<TElement>, ICollection<TElement>
     {
         #region Constructor
 
@@ -24,7 +24,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        protected CollectionBase([DisallowNull] IEnumerable<T> collection) : base(collection) { }
+        protected CollectionBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void AddRange([DisallowNull] IEnumerable<T> collection)
+        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -48,7 +48,7 @@ namespace Narumikazuchi.Collections.Abstract
                 throw new InvalidOperationException("The list is read-only.");
             }
 
-            if (collection is ICollection<T> c)
+            if (collection is ICollection<TElement> c)
             {
                 Int32 count = c.Count;
                 if (count > 0)
@@ -64,7 +64,7 @@ namespace Narumikazuchi.Collections.Abstract
                     }
                     else
                     {
-                        T[] insert = new T[count];
+                        TElement[] insert = new TElement[count];
                         c.CopyTo(insert, 0);
                         lock (this._syncRoot)
                         {
@@ -80,7 +80,7 @@ namespace Narumikazuchi.Collections.Abstract
             }
             else
             {
-                using IEnumerator<T> enumerator = collection.GetEnumerator();
+                using IEnumerator<TElement> enumerator = collection.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     if (enumerator.Current is null)
@@ -104,7 +104,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="IndexOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual Int32 RemoveAll([DisallowNull] Func<T, Boolean> predicate)
+        public virtual Int32 RemoveAll([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
@@ -188,7 +188,7 @@ namespace Narumikazuchi.Collections.Abstract
 
 #pragma warning disable
         /// <inheritdoc/>
-        Boolean ICollection<T>.Contains(T item) => this.Contains(item);
+        Boolean ICollection<TElement>.Contains(TElement item) => this.Contains(item);
 #pragma warning restore
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Narumikazuchi.Collections.Abstract
                 throw new ArgumentNullException(nameof(array));
             }
 
-            if (array is T[] arr)
+            if (array is TElement[] arr)
             {
                 this.CopyTo(arr, index);
             }
@@ -223,7 +223,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual void Add([DisallowNull] T item)
+        public virtual void Add([DisallowNull] TElement item)
 #pragma warning restore
         {
             if (item is null)
@@ -276,7 +276,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual Boolean Remove([DisallowNull] T item)
+        public virtual Boolean Remove([DisallowNull] TElement item)
 #pragma warning restore
         {
             if (item is null)

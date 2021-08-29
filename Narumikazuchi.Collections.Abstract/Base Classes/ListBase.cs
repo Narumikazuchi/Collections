@@ -10,7 +10,7 @@ namespace Narumikazuchi.Collections.Abstract
     /// Represents a strongly typed list of objects, which can be accessed by index. 
     /// </summary>
 #pragma warning disable
-    public abstract class ListBase<T> : ReadOnlyListBase<T>, ICollection<T>, IList<T>
+    public abstract class ListBase<TElement> : ReadOnlyListBase<TElement>, ICollection<TElement>, IIndexSetter<Int32, TElement>, IList<TElement>
 #pragma warning restore
     {
         #region Constructor
@@ -31,7 +31,7 @@ namespace Narumikazuchi.Collections.Abstract
                 throw new ArgumentOutOfRangeException(nameof(capacity), "The capacity of the list cannot be negative.");
             }
 
-            this._items = capacity == 0 ? _emptyArray : (new T[capacity]);
+            this._items = capacity == 0 ? _emptyArray : (new TElement[capacity]);
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="ListBase{T}"/> class having the specified collection of items.
@@ -40,7 +40,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        protected ListBase([DisallowNull] IEnumerable<T> collection) : base(collection) { }
+        protected ListBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
 
         #endregion
 
@@ -53,7 +53,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void AddRange([DisallowNull] IEnumerable<T> collection) => this.InsertRange(this._size, collection);
+        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) => this.InsertRange(this._size, collection);
 
         /// <summary>
         /// Inserts the items from the specified collection into this <see cref="ListBase{T}"/> starting at the specified index.
@@ -63,7 +63,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void InsertRange(Int32 index, [DisallowNull] IEnumerable<T> collection)
+        public virtual void InsertRange(Int32 index, [DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -78,7 +78,7 @@ namespace Narumikazuchi.Collections.Abstract
                 throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
             }
 
-            if (collection is ICollection<T> c)
+            if (collection is ICollection<TElement> c)
             {
                 Int32 count = c.Count;
                 if (count > 0)
@@ -105,7 +105,7 @@ namespace Narumikazuchi.Collections.Abstract
                     }
                     else
                     {
-                        T[] insert = new T[count];
+                        TElement[] insert = new TElement[count];
                         c.CopyTo(insert, 0);
                         lock (this._syncRoot)
                         {
@@ -121,7 +121,7 @@ namespace Narumikazuchi.Collections.Abstract
             }
             else
             {
-                using IEnumerator<T> enumerator = collection.GetEnumerator();
+                using IEnumerator<TElement> enumerator = collection.GetEnumerator();
                 while (enumerator.MoveNext())
                 {
                     if (enumerator.Current is null)
@@ -147,7 +147,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// </summary>
         public virtual Boolean MoveItem(Int32 index, ItemMoveDirection direction, Int32 positions)
         {
-            T tmp;
+            TElement tmp;
             if (direction == ItemMoveDirection.ToLowerIndex)
             {
                 while (positions-- > 0)
@@ -193,12 +193,12 @@ namespace Narumikazuchi.Collections.Abstract
         /// <summary>
         /// Moves the item one position in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in T item, ItemMoveDirection direction) => this.MoveItem(item, direction, 1);
+        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction) => this.MoveItem(item, direction, 1);
 
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in T item, ItemMoveDirection direction, Int32 positions)
+        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction, Int32 positions)
         {
             if (item is null)
             {
@@ -260,7 +260,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="IndexOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual Int32 RemoveAll([DisallowNull] Func<T, Boolean> predicate)
+        public virtual Int32 RemoveAll([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
@@ -409,7 +409,7 @@ namespace Narumikazuchi.Collections.Abstract
 
         /// <inheritdoc/>
 #pragma warning disable
-        Boolean ICollection<T>.Contains(T item) => this.Contains(item);
+        Boolean ICollection<TElement>.Contains(TElement item) => this.Contains(item);
 #pragma warning restore
 
         /// <summary>
@@ -431,7 +431,7 @@ namespace Narumikazuchi.Collections.Abstract
                 throw new ArgumentNullException(nameof(array));
             }
 
-            if (array is T[] arr)
+            if (array is TElement[] arr)
             {
                 this.CopyTo(arr, index);
             }
@@ -444,7 +444,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual void Add([DisallowNull] T item)
+        public virtual void Add([DisallowNull] TElement item)
 #pragma warning restore
         {
             if (item is null)
@@ -497,7 +497,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual Boolean Remove([DisallowNull] T item)
+        public virtual Boolean Remove([DisallowNull] TElement item)
 #pragma warning restore
         {
             if (item is null)
@@ -546,7 +546,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="InvalidCastException" />
         /// <exception cref="InvalidOperationException" />
 #pragma warning disable
-        public virtual void Insert(Int32 index, [DisallowNull] T item)
+        public virtual void Insert(Int32 index, [DisallowNull] TElement item)
 #pragma warning restore
         {
             if (item is null)
@@ -606,6 +606,37 @@ namespace Narumikazuchi.Collections.Abstract
             }
         }
 
+        #region Indexer
+
+        /// <inheritdoc />
+        /// <exception cref="IndexOutOfRangeException" />
+        /// <exception cref="InvalidOperationException" />
+        public override TElement this[Int32 index]
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+#pragma warning disable
+                    return (UInt32)index >= (UInt32)this._size ? throw new IndexOutOfRangeException() : this._items[index];
+#pragma warning restore
+                }
+            }
+            set
+            {
+                lock (this._syncRoot)
+                {
+                    if ((UInt32)index >= (UInt32)this._size)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+                    this._items[index] = value;
+                }
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Properties
@@ -639,7 +670,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (value > 0)
                     {
-                        T[] array = new T[value];
+                        TElement[] array = new TElement[value];
                         lock (this._syncRoot)
                         {
                             if (this._size > 0)
