@@ -9,43 +9,8 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed list of objects, which can be accessed by index. 
     /// </summary>
-#pragma warning disable
-    public abstract class ListBase<TElement> : ReadOnlyListBase<TElement>, ICollection<TElement>, IIndexSetter<Int32, TElement>, IList<TElement>
-#pragma warning restore
+    public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
     {
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new empty instance of the <see cref="ListBase{T}"/> class.
-        /// </summary>
-        protected ListBase() : base() { }
-        /// <summary>
-        /// Initializes a new empty instance of the <see cref="ListBase{T}"/> class having the specified capacity.
-        /// </summary>
-        /// <param name="capacity">The capacity of this list.</param>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        protected ListBase(in Int32 capacity)
-        {
-            if (capacity < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(capacity), "The capacity of the list cannot be negative.");
-            }
-
-            this._items = capacity == 0 ? _emptyArray : (new TElement[capacity]);
-        }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ListBase{T}"/> class having the specified collection of items.
-        /// </summary>
-        /// <param name="collection">The initial collection of items in this list.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        protected ListBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
-
-        #endregion
-
-        #region Collection Management
-
         /// <summary>
         /// Adds the elements of the specified collection to the end of the <see cref="ListBase{T}"/>.
         /// </summary>
@@ -53,7 +18,9 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) => this.InsertRange(this._size, collection);
+        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) => 
+            this.InsertRange(this._size, 
+                             collection);
 
         /// <summary>
         /// Inserts the items from the specified collection into this <see cref="ListBase{T}"/> starting at the specified index.
@@ -63,7 +30,8 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void InsertRange(Int32 index, [DisallowNull] IEnumerable<TElement> collection)
+        public virtual void InsertRange(Int32 index, 
+                                        [DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -71,11 +39,12 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this._size)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index), 
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             if (collection is ICollection<TElement> c)
@@ -89,7 +58,11 @@ namespace Narumikazuchi.Collections.Abstract
                     {
                         lock (this._syncRoot)
                         {
-                            Array.Copy(this._items, index, this._items, index + count, this._size - index);
+                            Array.Copy(this._items, 
+                                       index, 
+                                       this._items, 
+                                       index + count, 
+                                       this._size - index);
                         }
                     }
 
@@ -98,9 +71,17 @@ namespace Narumikazuchi.Collections.Abstract
                         lock (this._syncRoot)
                         {
                             // Copy first part of _items to insert location
-                            Array.Copy(this._items, 0, this._items, index, index);
+                            Array.Copy(this._items, 
+                                       0, 
+                                       this._items, 
+                                       index, 
+                                       index);
                             // Copy last part of _items back to inserted location
-                            Array.Copy(this._items, index + count, this._items, index * 2, this._size - index);
+                            Array.Copy(this._items, 
+                                       index + count, 
+                                       this._items, 
+                                       index * 2, 
+                                       this._size - index);
                         }
                     }
                     else
@@ -109,7 +90,8 @@ namespace Narumikazuchi.Collections.Abstract
                         c.CopyTo(insert, 0);
                         lock (this._syncRoot)
                         {
-                            insert.CopyTo(this._items, index);
+                            insert.CopyTo(this._items, 
+                                          index);
                         }
                     }
 
@@ -128,7 +110,8 @@ namespace Narumikazuchi.Collections.Abstract
                     {
                         continue;
                     }
-                    this.Insert(index++, enumerator.Current);
+                    this.Insert(index++, 
+                                enumerator.Current);
                 }
             }
             lock (this._syncRoot)
@@ -140,12 +123,18 @@ namespace Narumikazuchi.Collections.Abstract
         /// <summary>
         /// Moves the item at the given index one position in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem(Int32 index, ItemMoveDirection direction) => this.MoveItem(index, direction, 1);
+        public virtual Boolean MoveItem(in Int32 index, 
+                                        in ItemMoveDirection direction) => 
+            this.MoveItem(index, 
+                          direction, 
+                          1);
 
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem(Int32 index, ItemMoveDirection direction, Int32 positions)
+        public virtual Boolean MoveItem(in Int32 index, 
+                                        in ItemMoveDirection direction, 
+                                        Int32 positions)
         {
             TElement tmp;
             if (direction == ItemMoveDirection.ToLowerIndex)
@@ -193,12 +182,18 @@ namespace Narumikazuchi.Collections.Abstract
         /// <summary>
         /// Moves the item one position in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction) => this.MoveItem(item, direction, 1);
+        public virtual Boolean MoveItem([DisallowNull] in TElement item, 
+                                        in ItemMoveDirection direction) => 
+            this.MoveItem(item, 
+                          direction, 
+                          1);
 
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction, Int32 positions)
+        public virtual Boolean MoveItem([DisallowNull] in TElement item, 
+                                        in ItemMoveDirection direction, 
+                                        Int32 positions)
         {
             if (item is null)
             {
@@ -268,12 +263,11 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
-#pragma warning disable
                 Int32 v = this._version;
                 Int32 free = 0;
                 while (free < this._size &&
@@ -281,7 +275,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     free++;
                 }
@@ -295,7 +289,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     while (current < this._size &&
                            predicate(this._items[current]))
@@ -308,9 +302,10 @@ namespace Narumikazuchi.Collections.Abstract
                         this._items[free++] = this._items[current++];
                     }
                 }
-#pragma warning restore
 
-                Array.Clear(this._items, free, this._size - free);
+                Array.Clear(this._items, 
+                            free, 
+                            this._size - free);
                 Int32 result = this._size - free;
                 this._size = free;
                 this._version++;
@@ -327,23 +322,26 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="IndexOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void RemoveRange(in Int32 index, in Int32 count)
+        public virtual void RemoveRange(in Int32 index, 
+                                        in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index), 
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count), 
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if (this.Count - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
             lock (this._syncRoot)
@@ -354,9 +352,15 @@ namespace Narumikazuchi.Collections.Abstract
                     this._size -= count;
                     if (index < this._size)
                     {
-                        Array.Copy(this._items, index + count, this._items, index, this._size - index);
+                        Array.Copy(this._items, 
+                                   index + count, 
+                                   this._items, 
+                                   index, 
+                                   this._size - index);
                     }
-                    Array.Clear(this._items, this._size, count);
+                    Array.Clear(this._items, 
+                                this._size, 
+                                count);
                 }
                 this._version++;
             }
@@ -368,7 +372,9 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Reverse() => this.Reverse(0, this._size);
+        public virtual void Reverse() => 
+            this.Reverse(0, 
+                         this._size);
         /// <summary>
         /// Reverses the order of items in the specified range in the <see cref="ListBase{T}"/>.
         /// </summary>
@@ -377,41 +383,147 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Reverse(in Int32 index, in Int32 count)
+        public virtual void Reverse(in Int32 index, 
+                                    in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count),
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if (this.Count - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
             lock (this._syncRoot)
             {
-                Array.Reverse(this._items, index, count);
+                Array.Reverse(this._items, 
+                              index, 
+                              count);
                 this._version++;
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Gets or sets the amount of items the <see cref="ListBase{T}"/> can hold without resizing itself.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException" />
+        /// <exception cref="InvalidOperationException" />
+        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+        public virtual Int32 Capacity
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+                    return this._items.Length;
+                }
+            }
+            set
+            {
+                if (this.IsFixedSize)
+                {
+                    throw new InvalidOperationException(SIZE_IS_FIXED);
+                }
+                if (value < this._size)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),
+                                                          CAPACITY_SMALLER_THAN_COUNT);
+                }
+                if (value != this.Capacity)
+                {
+                    if (value > 0)
+                    {
+                        TElement[] array = new TElement[value];
+                        lock (this._syncRoot)
+                        {
+                            if (this._size > 0)
+                            {
+                                Array.Copy(this._items, 
+                                           0, 
+                                           array, 
+                                           0, 
+                                           this._size);
+                            }
+                            this._items = array;
+                        }
+                    }
+                    else
+                    {
+                        lock (this._syncRoot)
+                        {
+                            this._items = _emptyArray;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-        #region ICollection
+    // Non-Public
+    partial class ListBase<TElement>
+    {
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="ListBase{T}"/> class.
+        /// </summary>
+        protected ListBase() : 
+            base() 
+        { }
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="ListBase{T}"/> class having the specified capacity.
+        /// </summary>
+        /// <param name="capacity">The capacity of this list.</param>
+        /// <exception cref="ArgumentOutOfRangeException" />
+        protected ListBase(in Int32 capacity)
+        {
+            if (capacity < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity), 
+                                                      "The capacity of the list cannot be negative.");
+            }
 
-        /// <inheritdoc/>
+            this._items = capacity == 0 
+                                ? _emptyArray 
+                                : new TElement[capacity];
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListBase{T}"/> class having the specified collection of items.
+        /// </summary>
+        /// <param name="collection">The initial collection of items in this list.</param>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        protected ListBase([DisallowNull] IEnumerable<TElement> collection) : 
+            base(collection) 
+        { }
+
 #pragma warning disable
-        Boolean ICollection<TElement>.Contains(TElement item) => this.Contains(item);
+        /// <summary>
+        /// Error message, when the index parameter is greater than the amount of items in the collection.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String INDEX_GREATER_THAN_COUNT = "The specified index is greater than the amount of items in the list.";
+        /// <summary>
+        /// Error message, when the new capacity is smaller than the amount of items in the collection.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String CAPACITY_SMALLER_THAN_COUNT = "The specified capacity is smaller than the amount of items in the list.";
 #pragma warning restore
+    }
 
+    // ICollection
+    partial class ListBase<TElement> : ICollection<TElement>
+    {
         /// <summary>
         /// Copies the entire <see cref="ListBase{T}"/> to a compatible one-dimensional <see cref="Array"/>, 
         /// starting at the specified index of the target array.
@@ -433,7 +545,8 @@ namespace Narumikazuchi.Collections.Abstract
 
             if (array is TElement[] arr)
             {
-                this.CopyTo(arr, index);
+                this.CopyTo(arr, 
+                            index);
             }
         }
 
@@ -443,9 +556,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <param name="item">The object to be added to the end of the <see cref="ListBase{T}"/>. The value can be null for reference types.</param>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-#pragma warning disable
         public virtual void Add([DisallowNull] TElement item)
-#pragma warning restore
         {
             if (item is null)
             {
@@ -453,7 +564,7 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             this.EnsureCapacity(this.Count + 1);
@@ -472,14 +583,16 @@ namespace Narumikazuchi.Collections.Abstract
         {
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
                 if (this._size > 0)
                 {
-                    Array.Clear(this._items, 0, this._size);
+                    Array.Clear(this._items, 
+                                0, 
+                                this._size);
                     this._size = 0;
                 }
                 this._version++;
@@ -496,9 +609,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// </returns>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-#pragma warning disable
         public virtual Boolean Remove([DisallowNull] TElement item)
-#pragma warning restore
         {
             if (item is null)
             {
@@ -506,7 +617,7 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             lock (this._syncRoot)
@@ -521,22 +632,48 @@ namespace Narumikazuchi.Collections.Abstract
             }
         }
 
-        #region Properties
-
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public virtual Boolean IsSynchronized => true;
-
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override Boolean IsReadOnly { get; } = false;
+    }
 
-        #endregion
+    // IIndexSetter
+    partial class ListBase<TElement> : IIndexSetter<Int32, TElement>
+    {
+        /// <inheritdoc />
+        /// <exception cref="IndexOutOfRangeException" />
+        /// <exception cref="InvalidOperationException" />
+        public override TElement this[Int32 index]
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+                    return (UInt32)index >= (UInt32)this._size 
+                                        ? throw new IndexOutOfRangeException() 
+                                        : this._items[index];
+                }
+            }
+            set
+            {
+                lock (this._syncRoot)
+                {
+                    if ((UInt32)index >= (UInt32)this._size)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+                    this._items[index] = value;
+                }
+            }
+        }
+    }
 
-        #endregion
-
-        #region IList
-
+    // IList
+    partial class ListBase<TElement> : IList<TElement>
+    {
         /// <summary>
         /// Inserts an element into the <see cref="ListBase{T}"/> at the specified index.
         /// </summary>
@@ -545,9 +682,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidCastException" />
         /// <exception cref="InvalidOperationException" />
-#pragma warning disable
         public virtual void Insert(Int32 index, [DisallowNull] TElement item)
-#pragma warning restore
         {
             if (item is null)
             {
@@ -555,11 +690,12 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index), 
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             this.EnsureCapacity(this.Count + 1);
@@ -568,7 +704,11 @@ namespace Narumikazuchi.Collections.Abstract
 
                 if (index < this._size)
                 {
-                    Array.Copy(this._items, index, this._items, index + 1, this._size - index);
+                    Array.Copy(this._items, 
+                               index, 
+                               this._items, 
+                               index + 1, 
+                               this._size - index);
                 }
                 this._items[index] = item;
                 this._size++;
@@ -586,11 +726,12 @@ namespace Narumikazuchi.Collections.Abstract
         {
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             lock (this._syncRoot)
@@ -599,98 +740,15 @@ namespace Narumikazuchi.Collections.Abstract
                 this._size--;
                 if (index < this._size)
                 {
-                    Array.Copy(this._items, index + 1, this._items, index, this._size - index);
+                    Array.Copy(this._items, 
+                               index + 1, 
+                               this._items, 
+                               index, 
+                               this._size - index);
                 }
                 this._items[this._size] = default;
                 this._version++;
             }
         }
-
-        #region Indexer
-
-        /// <inheritdoc />
-        /// <exception cref="IndexOutOfRangeException" />
-        /// <exception cref="InvalidOperationException" />
-        public override TElement this[Int32 index]
-        {
-            get
-            {
-                lock (this._syncRoot)
-                {
-#pragma warning disable
-                    return (UInt32)index >= (UInt32)this._size ? throw new IndexOutOfRangeException() : this._items[index];
-#pragma warning restore
-                }
-            }
-            set
-            {
-                lock (this._syncRoot)
-                {
-                    if ((UInt32)index >= (UInt32)this._size)
-                    {
-                        throw new IndexOutOfRangeException();
-                    }
-                    this._items[index] = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets or sets the amount of items the <see cref="ListBase{T}"/> can hold without resizing itself.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        /// <exception cref="InvalidOperationException" />
-        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        public virtual Int32 Capacity
-        {
-            get
-            {
-                lock (this._syncRoot)
-                {
-                    return this._items.Length;
-                }
-            }
-            set
-            {
-                if (this.IsFixedSize)
-                {
-                    throw new InvalidOperationException("The size for the list is fixed.");
-                }
-                if (value < this._size)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value), "The new value was smaller than the count of items in the list.");
-                }
-                if (value != this.Capacity)
-                {
-                    if (value > 0)
-                    {
-                        TElement[] array = new TElement[value];
-                        lock (this._syncRoot)
-                        {
-                            if (this._size > 0)
-                            {
-                                Array.Copy(this._items, 0, array, 0, this._size);
-                            }
-                            this._items = array;
-                        }
-                    }
-                    else
-                    {
-                        lock (this._syncRoot)
-                        {
-                            this._items = _emptyArray;
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
     }
 }

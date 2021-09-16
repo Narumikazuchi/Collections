@@ -5,8 +5,6 @@
     /// </summary>
     public interface IAutoSortable<T> : ISortable<T>
     {
-        #region Sorting Methods
-
         /// <summary>
         /// Enables automatic sorting for this object.
         /// </summary>
@@ -17,27 +15,23 @@
         /// </summary>
         /// <param name="direction">The <see cref="SortDirection"/> in which to apply automatic sorting.</param>
         /// <param name="comparison">The comparision to use for the sorting process.</param>
-        public void EnableAutoSort(SortDirection direction, System.Comparison<T> comparison);
+        public void EnableAutoSort(SortDirection direction, 
+                                   [System.Diagnostics.CodeAnalysis.DisallowNull] System.Comparison<T> comparison);
         /// <summary>
         /// Enables automatic sorting for this object.
         /// </summary>
         /// <param name="direction">The <see cref="SortDirection"/> in which to apply automatic sorting.</param>
         /// <param name="comparer">The <see cref="System.Collections.Generic.IComparer{T}"/> to use for the sorting process.</param>
-        public void EnableAutoSort(SortDirection direction, System.Collections.Generic.IComparer<T>? comparer);
+        public void EnableAutoSort(SortDirection direction,
+                                   [System.Diagnostics.CodeAnalysis.AllowNull] System.Collections.Generic.IComparer<T>? comparer);
         /// <summary>
         /// Disables automatic sorting for this object.
         /// </summary>
         public void DisableAutoSort();
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets if the contents of this object should be automatically sorted upon change.
         /// </summary>
         public System.Boolean AutoSort { get; }
-
-        #endregion
     }
 }

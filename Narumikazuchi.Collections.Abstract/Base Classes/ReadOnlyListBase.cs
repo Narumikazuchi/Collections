@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
@@ -8,27 +9,8 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Represents a strongly typed list of objects, which can be accessed by index. 
     /// </summary>
-    public abstract class ReadOnlyListBase<TElement> : ReadOnlyCollectionBase<TElement>, IReadOnlyList2<TElement>
+    public abstract partial class ReadOnlyListBase<TElement> : ReadOnlyCollectionBase<TElement>
     {
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyListBase{T}"/> class.
-        /// </summary>
-        protected ReadOnlyListBase() : base() { }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyListBase{T}"/> class containing the specified collection of items.
-        /// </summary>
-        /// <param name="collection">The collection of items in this list.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        protected ReadOnlyListBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
-
-        #endregion
-
-        #region Collection Management
-
         /// <summary>
         /// Copies the entire <see cref="ReadOnlyListBase{T}"/> to the specified one-dimensional array.
         /// </summary>
@@ -37,7 +19,8 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo([DisallowNull] TElement[] array) => this.CopyTo(array, 0);
+        public virtual void CopyTo([DisallowNull] TElement[] array) => 
+            this.CopyTo(array, 0);
         /// <summary>
         /// Copies a section of the <see cref="ReadOnlyListBase{T}"/> to the specified one-dimensional array.
         /// The section starts at the specified index, entails the specified count of items and begins inserting them
@@ -51,7 +34,10 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo(in Int32 index, in Int32 count, [DisallowNull] TElement[] array, in Int32 arrayIndex)
+        public virtual void CopyTo(in Int32 index, 
+                                   in Int32 count, 
+                                   [DisallowNull] TElement[] array, 
+                                   in Int32 arrayIndex)
         {
             if (array is null)
             {
@@ -59,12 +45,16 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (array.Rank != 1)
             {
-                throw new ArgumentException("Multidimensional array are not supported.");
+                throw new ArgumentException(MULTI_DIMENSIONAL_ARRAYS);
             }
 
             lock (this._syncRoot)
             {
-                Array.Copy(this._items, index, array, arrayIndex, count);
+                Array.Copy(this._items, 
+                           index, 
+                           array, 
+                           arrayIndex, 
+                           count);
             }
         }
 
@@ -77,19 +67,22 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual IList<TElement> GetRange(in Int32 index, in Int32 count)
+        public virtual IList<TElement> GetRange(in Int32 index, 
+                                                in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index), 
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count), 
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this._size - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
             lock (this._syncRoot)
@@ -102,20 +95,63 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
-#pragma warning disable
                     result.Add(this._items[i]);
-#pragma warning restore
                 }
                 return result;
             }
         }
 
-        #endregion
+    }
 
-        #region IReadOnlyList
+    // Non-Public
+    partial class ReadOnlyListBase<TElement>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyListBase{T}"/> class.
+        /// </summary>
+        protected ReadOnlyListBase() : 
+            base() 
+        { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadOnlyListBase{T}"/> class containing the specified collection of items.
+        /// </summary>
+        /// <param name="collection">The collection of items in this list.</param>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        protected ReadOnlyListBase([DisallowNull] IEnumerable<TElement> collection) : 
+            base(collection) 
+        { }
 
+#pragma warning disable
+        /// <summary>
+        /// Error message, when trying to write to a readonly list.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String LIST_IS_READONLY = "This list is readonly and cannot be written to.";
+        /// <summary>
+        /// Error message, when trying to write to a readonly list.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String START_INDEX_IS_NEGATIVE = "The start index cannot be negative.";
+        /// <summary>
+        /// Error message, when trying to write to a readonly list.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String COUNT_IS_NEGATIVE = "The count cannot be negative.";
+        /// <summary>
+        /// Error message, when trying to write to a readonly list.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String COUNT_IS_GREATER_THAN_ITEMS = "The specified count is greater than the available number of items.";
+#pragma warning restore
+    }
+
+    // IReadOnlyList2
+    partial class ReadOnlyListBase<TElement> : IReadOnlyList2<TElement>
+    {
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
@@ -129,11 +165,12 @@ namespace Narumikazuchi.Collections.Abstract
 
             lock (this._syncRoot)
             {
-                return Array.IndexOf(this._items, item, 0, this._size);
+                return Array.IndexOf(this._items, 
+                                     item, 
+                                     0, 
+                                     this._size);
             }
         }
-
-        #region Indexer
 
         /// <inheritdoc />
         /// <exception cref="IndexOutOfRangeException" />
@@ -144,16 +181,12 @@ namespace Narumikazuchi.Collections.Abstract
             {
                 lock (this._syncRoot)
                 {
-#pragma warning disable
-                    return (UInt32)index >= (UInt32)this._size ? throw new IndexOutOfRangeException() : this._items[index];
-#pragma warning restore
+                    return (UInt32)index >= (UInt32)this._size 
+                                ? throw new IndexOutOfRangeException() 
+                                : this._items[index];
                 }
             }
-            set => throw new NotSupportedException("The list is read-only.");
+            set => throw new NotSupportedException(LIST_IS_READONLY);
         }
-
-        #endregion
-
-        #endregion
     }
 }

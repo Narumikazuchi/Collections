@@ -6,10 +6,8 @@ namespace Narumikazuchi.Collections.Abstract
     /// <summary>
     /// Extends the <see cref="IEnumerable{T}"/> interface.
     /// </summary>
-    public static partial class Enumerable
+    public static class Enumerable
     {
-        #region Conversion to introduced Interfaces
-
         /// <summary>
         /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
         /// </summary>
@@ -69,7 +67,5 @@ namespace Narumikazuchi.Collections.Abstract
         /// </summary>
         public static IReadOnlyList2<T> AsIReadOnlyList2<T>(this ReadOnlyCollection<T> source) =>
             new __ReadOnlyCollectionIListWrapper<T>(source);
-
-        #endregion
     }
 }

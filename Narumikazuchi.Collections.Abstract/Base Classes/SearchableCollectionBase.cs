@@ -7,31 +7,10 @@ using System.Diagnostics.Contracts;
 namespace Narumikazuchi.Collections.Abstract
 {
     /// <summary>
-    /// Represents a strongly typed collection of objects, which can be searched. 
+    /// Represents a strongly typed collection of objects. 
     /// </summary>
-#pragma warning disable
-    public abstract class SearchableCollectionBase<TElement> : SearchableReadOnlyCollectionBase<TElement>, ICollection<TElement>
-#pragma warning restore
+    public abstract partial class SearchableCollectionBase<TElement> : SearchableReadOnlyCollectionBase<TElement>
     {
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new empty instance of the <see cref="SearchableCollectionBase{T}"/> class.
-        /// </summary>
-        protected SearchableCollectionBase() : base() { }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SearchableCollectionBase{T}"/> class having the specified collection of items.
-        /// </summary>
-        /// <param name="collection">The initial collection of items in this list.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        protected SearchableCollectionBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
-
-        #endregion
-
-        #region Collection Management
-
         /// <summary>
         /// Adds the elements of the specified collection to the end of the <see cref="SearchableCollectionBase{T}"/>.
         /// </summary>
@@ -47,7 +26,7 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
             if (collection is ICollection<TElement> c)
@@ -57,24 +36,31 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     this.EnsureCapacity(this.Count + count);
 
-                    if (ReferenceEquals(this, c))
+                    if (ReferenceEquals(this,
+                                        c))
                     {
-                        lock (this.SyncRoot)
+                        lock (this._syncRoot)
                         {
-                            Array.Copy(this._items, 0, this._items, this._size, this._size);
+                            Array.Copy(this._items,
+                                       0,
+                                       this._items,
+                                       this._size,
+                                       this._size);
                         }
                     }
                     else
                     {
                         TElement[] insert = new TElement[count];
-                        c.CopyTo(insert, 0);
-                        lock (this.SyncRoot)
+                        c.CopyTo(insert,
+                                 0);
+                        lock (this._syncRoot)
                         {
-                            insert.CopyTo(this._items, this._size);
+                            insert.CopyTo(this._items,
+                                          this._size);
                         }
                     }
 
-                    lock (this.SyncRoot)
+                    lock (this._syncRoot)
                     {
                         this._size += count;
                     }
@@ -92,7 +78,7 @@ namespace Narumikazuchi.Collections.Abstract
                     this.Add(enumerator.Current);
                 }
             }
-            lock (this.SyncRoot)
+            lock (this._syncRoot)
             {
                 this._version++;
             }
@@ -114,12 +100,11 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
-#pragma warning disable
                 Int32 v = this._version;
                 Int32 free = 0;
                 while (free < this._size &&
@@ -127,7 +112,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     free++;
                 }
@@ -141,7 +126,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     while (current < this._size &&
                            predicate(this._items[current]))
@@ -154,9 +139,10 @@ namespace Narumikazuchi.Collections.Abstract
                         this._items[free++] = this._items[current++];
                     }
                 }
-#pragma warning restore
 
-                Array.Clear(this._items, free, this._size - free);
+                Array.Clear(this._items,
+                            free,
+                            this._size - free);
                 Int32 result = this._size - free;
                 this._size = free;
                 this._version++;
@@ -174,37 +160,75 @@ namespace Narumikazuchi.Collections.Abstract
         {
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
-            lock (this.SyncRoot)
+            lock (this._syncRoot)
             {
-                Array.Reverse(this._items, 0, this._size);
+                Array.Reverse(this._items,
+                              0,
+                              this._size);
                 this._version++;
             }
         }
+    }
 
-        #endregion
+    // Non-Public
+    partial class SearchableCollectionBase<TElement>
+    {
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="SearchableCollectionBase{T}"/> class.
+        /// </summary>
+        protected SearchableCollectionBase() :
+            base()
+        { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchableCollectionBase{T}"/> class having the specified collection of items.
+        /// </summary>
+        /// <param name="collection">The initial collection of items in this list.</param>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        protected SearchableCollectionBase([DisallowNull] IEnumerable<TElement> collection) :
+            base(collection)
+        { }
 
-        #region ICollection
+#pragma warning disable
+        /// <summary>
+        /// Error message, when trying to write to a readonly list.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String COLLECTION_IS_READONLY = "This collection is readonly and cannot be written to.";
+#pragma warning restore
+    }
 
+    // ICollection
+    partial class SearchableCollectionBase<TElement> : ICollection<TElement>
+    {
         /// <summary>
         /// Copies the entire <see cref="SearchableCollectionBase{T}"/> to a compatible one-dimensional <see cref="Array"/>, 
         /// starting at the specified index of the target array.
         /// </summary>
         /// <param name="array">
         /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
-        /// from <see cref="SearchableListBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// from <see cref="SearchableCollectionBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
         /// <param name="index">The zero-based index in array at which copying begins.</param>
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         [Pure]
-        public virtual void CopyTo([DisallowNull] Array array, Int32 index)
+        public virtual void CopyTo([DisallowNull] Array array,
+                                   Int32 index)
         {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
             if (array is TElement[] arr)
             {
-                this.CopyTo(arr, index);
+                this.CopyTo(arr,
+                            index);
             }
         }
 
@@ -212,19 +236,17 @@ namespace Narumikazuchi.Collections.Abstract
         /// Adds an object to the end of the <see cref="SearchableCollectionBase{T}"/>.
         /// </summary>
         /// <param name="item">The object to be added to the end of the <see cref="SearchableCollectionBase{T}"/>. The value can be null for reference types.</param>
+        /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-#pragma warning disable
         public virtual void Add([DisallowNull] TElement item)
-#pragma warning restore
         {
             if (item is null)
             {
                 throw new ArgumentNullException(nameof(item));
             }
-
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
             this.EnsureCapacity(this.Count + 1);
@@ -236,21 +258,23 @@ namespace Narumikazuchi.Collections.Abstract
         }
 
         /// <summary>
-        /// Removes all elements from the <see cref="SearchableListBase{T}"/>.
+        /// Removes all elements from the <see cref="CollectionBase{T}"/>.
         /// </summary>
         /// <exception cref="InvalidOperationException" />
         public virtual void Clear()
         {
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The collection is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
                 if (this._size > 0)
                 {
-                    Array.Clear(this._items, 0, this._size);
+                    Array.Clear(this._items,
+                                0,
+                                this._size);
                     this._size = 0;
                 }
                 this._version++;
@@ -265,10 +289,9 @@ namespace Narumikazuchi.Collections.Abstract
         /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
         /// This method also returns <see langword="false"/> if item was not found in the original <see cref="SearchableCollectionBase{T}"/>.
         /// </returns>
+        /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-#pragma warning disable
         public virtual Boolean Remove([DisallowNull] TElement item)
-#pragma warning restore
         {
             if (item is null)
             {
@@ -276,18 +299,23 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The collection is read-only.");
+                throw new InvalidOperationException(COLLECTION_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
-                Int32 index = Array.IndexOf(this._items, item, 0, this._size);
+                Int32 index = Array.IndexOf(this._items,
+                                            item);
                 if (index > -1)
                 {
                     this._size--;
                     if (index < this._size)
                     {
-                        Array.Copy(this._items, index + 1, this._items, index, this._size - index);
+                        Array.Copy(this._items,
+                                   index + 1,
+                                   this._items,
+                                   index,
+                                   this._size - index);
                     }
                     this._items[this._size] = default;
                     this._version++;
@@ -297,8 +325,6 @@ namespace Narumikazuchi.Collections.Abstract
             }
         }
 
-        #region Properties
-
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public virtual Boolean IsSynchronized => true;
@@ -306,9 +332,5 @@ namespace Narumikazuchi.Collections.Abstract
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override Boolean IsReadOnly { get; } = false;
-
-        #endregion
-
-        #endregion
     }
 }

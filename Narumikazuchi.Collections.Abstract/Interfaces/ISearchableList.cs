@@ -5,8 +5,6 @@
     /// </summary>
     public interface ISearchableList<T> : IReadOnlyList2<T>, ISearchableCollection<T>
     {
-        #region Binary Search
-
         /// <summary>
         /// Searches the sorted <see cref="ISearchableList{T}"/> for the specified item in the entire <see cref="ISearchableList{T}"/>.
         /// </summary>
@@ -24,7 +22,8 @@
         /// <param name="comparer">The comparer to determine a match.</param>
         /// <returns>The zero-based index of the item or -1 if the list doesn't contain the item</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] in T item, System.Collections.Generic.IComparer<T>? comparer);
+        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] in T item, 
+                                         [System.Diagnostics.CodeAnalysis.AllowNull] System.Collections.Generic.IComparer<T>? comparer);
         /// <summary>
         /// Searches the sorted <see cref="ISearchableList{T}"/> for the specified item in the specified range using the
         /// specified <see cref="System.Collections.Generic.IComparer{T}"/>.
@@ -38,11 +37,10 @@
         /// <param name="comparer">The comparer to determine a match.</param>
         /// <returns>The zero-based index of the item or -1 if the list doesn't contain the item</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 BinarySearch(in System.Int32 index, in System.Int32 count, [System.Diagnostics.CodeAnalysis.DisallowNull] in T item, System.Collections.Generic.IComparer<T>? comparer);
-
-        #endregion
-
-        #region Find Index
+        public System.Int32 BinarySearch(in System.Int32 index, 
+                                         in System.Int32 count, 
+                                         [System.Diagnostics.CodeAnalysis.DisallowNull] in T item, 
+                                         [System.Diagnostics.CodeAnalysis.AllowNull] System.Collections.Generic.IComparer<T>? comparer);
 
         /// <summary>
         /// Searches the entire <see cref="ISearchableList{T}"/> for an item matching the specified condition and
@@ -61,7 +59,9 @@
         /// <param name="predicate">The condition to check items against.</param>
         /// <returns>The index of the first item matching the condition or -1 if no item in this list matches the condition</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 FindIndex(in System.Int32 startIndex, in System.Int32 count, [System.Diagnostics.CodeAnalysis.DisallowNull] System.Func<T, System.Boolean> predicate);
+        public System.Int32 FindIndex(in System.Int32 startIndex, 
+                                      in System.Int32 count, 
+                                      [System.Diagnostics.CodeAnalysis.DisallowNull] System.Func<T, System.Boolean> predicate);
         /// <summary>
         /// Searches the entire <see cref="ISearchableList{T}"/> for an item matching the specified condition and
         /// returns the index of the last occurence of a matching item.
@@ -79,11 +79,9 @@
         /// <param name="predicate">The condition to check items against.</param>
         /// <returns>The index of the last item matching the condition or -1 if no item in this list matches the condition</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 FindLastIndex(in System.Int32 startIndex, in System.Int32 count, [System.Diagnostics.CodeAnalysis.DisallowNull] System.Func<T, System.Boolean> predicate);
-
-        #endregion
-
-        #region Index Of
+        public System.Int32 FindLastIndex(in System.Int32 startIndex, 
+                                          in System.Int32 count, 
+                                          [System.Diagnostics.CodeAnalysis.DisallowNull] System.Func<T, System.Boolean> predicate);
 
         /// <summary>
         /// Searches for the specified item and returns the index of the last occurence in the <see cref="ISearchableList{T}"/>.
@@ -92,7 +90,5 @@
         /// <returns>The index of the last occurence of the specified item or -1 if the item does not exist in the list</returns>
         [System.Diagnostics.Contracts.Pure]
         public System.Int32 LastIndexOf([System.Diagnostics.CodeAnalysis.DisallowNull] in T item);
-
-        #endregion
     }
 }

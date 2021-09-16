@@ -7,45 +7,10 @@ using System.Diagnostics.Contracts;
 namespace Narumikazuchi.Collections.Abstract
 {
     /// <summary>
-    /// Represents a strongly typed list of objects, which can be accessed by index and searched. 
+    /// Represents a strongly typed list of objects, which can be accessed by index. 
     /// </summary>
-#pragma warning disable
-    public abstract class SearchableListBase<TElement> : SearchableReadOnlyListBase<TElement>, ICollection<TElement>, IIndexSetter<Int32, TElement>, IList<TElement>
-#pragma warning restore
+    public abstract partial class SearchableListBase<TElement> : SearchableReadOnlyListBase<TElement>
     {
-        #region Constructor
-
-        /// <summary>
-        /// Initializes a new empty instance of the <see cref="SearchableListBase{T}"/> class.
-        /// </summary>
-        protected SearchableListBase() : base() { }
-        /// <summary>
-        /// Initializes a new empty instance of the <see cref="SearchableListBase{T}"/> class having the specified capacity.
-        /// </summary>
-        /// <param name="capacity">The capacity of this list.</param>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        protected SearchableListBase(in Int32 capacity)
-        {
-            if (capacity < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(capacity), "The capacity of the list cannot be negative.");
-            }
-
-            this._items = capacity == 0 ? _emptyArray : (new TElement[capacity]);
-        }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SearchableListBase{T}"/> class having the specified collection of items.
-        /// </summary>
-        /// <param name="collection">The initial collection of items in this list.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        protected SearchableListBase([DisallowNull] IEnumerable<TElement> collection) : base(collection) { }
-
-        #endregion
-
-        #region Collection Management
-
         /// <summary>
         /// Adds the elements of the specified collection to the end of the <see cref="SearchableListBase{T}"/>.
         /// </summary>
@@ -53,7 +18,9 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) => this.InsertRange(this._size, collection);
+        public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) =>
+            this.InsertRange(this._size,
+                             collection);
 
         /// <summary>
         /// Inserts the items from the specified collection into this <see cref="SearchableListBase{T}"/> starting at the specified index.
@@ -63,7 +30,8 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void InsertRange(Int32 index, [DisallowNull] IEnumerable<TElement> collection)
+        public virtual void InsertRange(Int32 index,
+                                        [DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -71,11 +39,12 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this._size)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             if (collection is ICollection<TElement> c)
@@ -89,7 +58,11 @@ namespace Narumikazuchi.Collections.Abstract
                     {
                         lock (this._syncRoot)
                         {
-                            Array.Copy(this._items, index, this._items, index + count, this._size - index);
+                            Array.Copy(this._items,
+                                       index,
+                                       this._items,
+                                       index + count,
+                                       this._size - index);
                         }
                     }
 
@@ -98,9 +71,17 @@ namespace Narumikazuchi.Collections.Abstract
                         lock (this._syncRoot)
                         {
                             // Copy first part of _items to insert location
-                            Array.Copy(this._items, 0, this._items, index, index);
+                            Array.Copy(this._items,
+                                       0,
+                                       this._items,
+                                       index,
+                                       index);
                             // Copy last part of _items back to inserted location
-                            Array.Copy(this._items, index + count, this._items, index * 2, this._size - index);
+                            Array.Copy(this._items,
+                                       index + count,
+                                       this._items,
+                                       index * 2,
+                                       this._size - index);
                         }
                     }
                     else
@@ -109,7 +90,8 @@ namespace Narumikazuchi.Collections.Abstract
                         c.CopyTo(insert, 0);
                         lock (this._syncRoot)
                         {
-                            insert.CopyTo(this._items, index);
+                            insert.CopyTo(this._items,
+                                          index);
                         }
                     }
 
@@ -128,7 +110,8 @@ namespace Narumikazuchi.Collections.Abstract
                     {
                         continue;
                     }
-                    this.Insert(index++, enumerator.Current);
+                    this.Insert(index++,
+                                enumerator.Current);
                 }
             }
             lock (this._syncRoot)
@@ -140,12 +123,18 @@ namespace Narumikazuchi.Collections.Abstract
         /// <summary>
         /// Moves the item at the given index one position in the specified direction in the <see cref="SearchableListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem(Int32 index, ItemMoveDirection direction) => this.MoveItem(index, direction, 1);
+        public virtual Boolean MoveItem(in Int32 index,
+                                        in ItemMoveDirection direction) =>
+            this.MoveItem(index,
+                          direction,
+                          1);
 
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="SearchableListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem(Int32 index, ItemMoveDirection direction, Int32 positions)
+        public virtual Boolean MoveItem(in Int32 index,
+                                        in ItemMoveDirection direction,
+                                        Int32 positions)
         {
             TElement tmp;
             if (direction == ItemMoveDirection.ToLowerIndex)
@@ -193,12 +182,18 @@ namespace Narumikazuchi.Collections.Abstract
         /// <summary>
         /// Moves the item one position in the specified direction in the <see cref="SearchableListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction) => this.MoveItem(item, direction, 1);
+        public virtual Boolean MoveItem([DisallowNull] in TElement item,
+                                        in ItemMoveDirection direction) =>
+            this.MoveItem(item,
+                          direction,
+                          1);
 
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="SearchableListBase{T}"/>.
         /// </summary>
-        public virtual Boolean MoveItem([DisallowNull] in TElement item, ItemMoveDirection direction, Int32 positions)
+        public virtual Boolean MoveItem([DisallowNull] in TElement item,
+                                        in ItemMoveDirection direction,
+                                        Int32 positions)
         {
             if (item is null)
             {
@@ -268,12 +263,11 @@ namespace Narumikazuchi.Collections.Abstract
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
-#pragma warning disable
                 Int32 v = this._version;
                 Int32 free = 0;
                 while (free < this._size &&
@@ -281,7 +275,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     free++;
                 }
@@ -295,7 +289,7 @@ namespace Narumikazuchi.Collections.Abstract
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     while (current < this._size &&
                            predicate(this._items[current]))
@@ -308,9 +302,10 @@ namespace Narumikazuchi.Collections.Abstract
                         this._items[free++] = this._items[current++];
                     }
                 }
-#pragma warning restore
 
-                Array.Clear(this._items, free, this._size - free);
+                Array.Clear(this._items,
+                            free,
+                            this._size - free);
                 Int32 result = this._size - free;
                 this._size = free;
                 this._version++;
@@ -327,23 +322,26 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="IndexOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void RemoveRange(in Int32 index, in Int32 count)
+        public virtual void RemoveRange(in Int32 index,
+                                        in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count),
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if (this.Count - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
             lock (this._syncRoot)
@@ -354,9 +352,15 @@ namespace Narumikazuchi.Collections.Abstract
                     this._size -= count;
                     if (index < this._size)
                     {
-                        Array.Copy(this._items, index + count, this._items, index, this._size - index);
+                        Array.Copy(this._items,
+                                   index + count,
+                                   this._items,
+                                   index,
+                                   this._size - index);
                     }
-                    Array.Clear(this._items, this._size, count);
+                    Array.Clear(this._items,
+                                this._size,
+                                count);
                 }
                 this._version++;
             }
@@ -368,7 +372,9 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Reverse() => this.Reverse(0, this._size);
+        public virtual void Reverse() =>
+            this.Reverse(0,
+                         this._size);
         /// <summary>
         /// Reverses the order of items in the specified range in the <see cref="SearchableListBase{T}"/>.
         /// </summary>
@@ -377,256 +383,36 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Reverse(in Int32 index, in Int32 count)
+        public virtual void Reverse(in Int32 index,
+                                    in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count),
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if (this.Count - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
             lock (this._syncRoot)
             {
-                Array.Reverse(this._items, index, count);
+                Array.Reverse(this._items,
+                              index,
+                              count);
                 this._version++;
             }
         }
-
-        #endregion
-
-        #region ICollection
-
-        /// <summary>
-        /// Copies the entire <see cref="SearchableListBase{T}"/> to a compatible one-dimensional <see cref="Array"/>, 
-        /// starting at the specified index of the target array.
-        /// </summary>
-        /// <param name="array">
-        /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
-        /// from <see cref="SearchableListBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
-        /// <param name="index">The zero-based index in array at which copying begins.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="ArgumentOutOfRangeException" />
-        [Pure]
-        public virtual void CopyTo([DisallowNull] Array array, Int32 index)
-        {
-            if (array is TElement[] arr)
-            {
-                this.CopyTo(arr, index);
-            }
-        }
-
-        /// <summary>
-        /// Adds an object to the end of the <see cref="SearchableListBase{T}"/>.
-        /// </summary>
-        /// <param name="item">The object to be added to the end of the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
-        /// <exception cref="InvalidOperationException" />
-#pragma warning disable
-        public virtual void Add([DisallowNull] TElement item)
-#pragma warning restore
-        {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException("The list is read-only.");
-            }
-
-            this.EnsureCapacity(this.Count + 1);
-            lock (this._syncRoot)
-            {
-                this._items[this._size++] = item;
-                this._version++;
-            }
-        }
-
-        /// <summary>
-        /// Removes all elements from the <see cref="SearchableListBase{T}"/>.
-        /// </summary>
-        /// <exception cref="InvalidOperationException" />
-        public virtual void Clear()
-        {
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException("The list is read-only.");
-            }
-
-            lock (this._syncRoot)
-            {
-                if (this._size > 0)
-                {
-                    Array.Clear(this._items, 0, this._size);
-                    this._size = 0;
-                }
-                this._version++;
-            }
-        }
-
-        /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="SearchableListBase{T}"/>.
-        /// </summary>
-        /// <param name="item">The object to remove from the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
-        /// <returns>
-        /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
-        /// This method also returns <see langword="false"/> if item was not found in the original <see cref="SearchableListBase{T}"/>.
-        /// </returns>
-        /// <exception cref="InvalidOperationException" />
-#pragma warning disable
-        public virtual Boolean Remove([DisallowNull] TElement item)
-#pragma warning restore
-        {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException("The list is read-only.");
-            }
-
-            lock (this._syncRoot)
-            {
-                Int32 index = this.IndexOf(item);
-                if (index > -1)
-                {
-                    this.RemoveAt(index);
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        #region Properties
-
-        /// <inheritdoc />
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public virtual Boolean IsSynchronized => true;
-
-        /// <inheritdoc />
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public override Boolean IsReadOnly { get; } = false;
-
-        #endregion
-
-        #endregion
-
-        #region IList
-
-        /// <summary>
-        /// Inserts an element into the <see cref="SearchableListBase{T}"/> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which item should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        /// <exception cref="InvalidCastException" />
-        /// <exception cref="InvalidOperationException" />
-#pragma warning disable
-        public virtual void Insert(Int32 index, [DisallowNull] TElement item)
-#pragma warning restore
-        {
-            if (item is null)
-            {
-                throw new ArgumentNullException(nameof(item));
-            }
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException("The list is read-only.");
-            }
-            if ((UInt32)index > (UInt32)this.Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
-            }
-
-            this.EnsureCapacity(this.Count + 1);
-            lock (this._syncRoot)
-            {
-
-                if (index < this._size)
-                {
-                    Array.Copy(this._items, index, this._items, index + 1, this._size - index);
-                }
-                this._items[index] = item;
-                this._size++;
-                this._version++;
-            }
-        }
-
-        /// <summary>
-        /// Removes the element at the specified index of the <see cref="SearchableListBase{T}"/>.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        /// <exception cref="InvalidOperationException" />
-        public virtual void RemoveAt(Int32 index)
-        {
-            if (this.IsReadOnly)
-            {
-                throw new InvalidOperationException("The list is read-only.");
-            }
-            if ((UInt32)index > (UInt32)this.Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
-            }
-
-            lock (this._syncRoot)
-            {
-                this._size--;
-                if (index < this._size)
-                {
-                    Array.Copy(this._items, index + 1, this._items, index, this._size - index);
-                }
-                this._items[this._size] = default;
-                this._version++;
-            }
-        }
-
-        #region Indexer
-
-        /// <inheritdoc />
-        /// <exception cref="IndexOutOfRangeException" />
-        /// <exception cref="InvalidOperationException" />
-        public override TElement this[Int32 index]
-        {
-            get
-            {
-                lock (this._syncRoot)
-                {
-#pragma warning disable
-                    return (UInt32)index >= (UInt32)this._size ? throw new IndexOutOfRangeException() : this._items[index];
-#pragma warning restore
-                }
-            }
-            set
-            {
-                lock (this._syncRoot)
-                {
-                    if ((UInt32)index >= (UInt32)this._size)
-                    {
-                        throw new IndexOutOfRangeException();
-                    }
-                    this._items[index] = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets the amount of items the <see cref="SearchableListBase{T}"/> can hold without resizing itself.
@@ -647,11 +433,12 @@ namespace Narumikazuchi.Collections.Abstract
             {
                 if (this.IsFixedSize)
                 {
-                    throw new InvalidOperationException("The size for the list is fixed.");
+                    throw new InvalidOperationException(SIZE_IS_FIXED);
                 }
                 if (value < this._size)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value), "The new value was smaller than the count of items in the list.");
+                    throw new ArgumentOutOfRangeException(nameof(value),
+                                                          CAPACITY_SMALLER_THAN_COUNT);
                 }
                 if (value != this.Capacity)
                 {
@@ -662,7 +449,11 @@ namespace Narumikazuchi.Collections.Abstract
                         {
                             if (this._size > 0)
                             {
-                                Array.Copy(this._items, 0, array, 0, this._size);
+                                Array.Copy(this._items,
+                                           0,
+                                           array,
+                                           0,
+                                           this._size);
                             }
                             this._items = array;
                         }
@@ -677,7 +468,287 @@ namespace Narumikazuchi.Collections.Abstract
                 }
             }
         }
+    }
 
-        #endregion
+    // Non-Public
+    partial class SearchableListBase<TElement>
+    {
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="SearchableListBase{T}"/> class.
+        /// </summary>
+        protected SearchableListBase() :
+            base()
+        { }
+        /// <summary>
+        /// Initializes a new empty instance of the <see cref="SearchableListBase{T}"/> class having the specified capacity.
+        /// </summary>
+        /// <param name="capacity">The capacity of this list.</param>
+        /// <exception cref="ArgumentOutOfRangeException" />
+        protected SearchableListBase(in Int32 capacity)
+        {
+            if (capacity < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity),
+                                                      "The capacity of the list cannot be negative.");
+            }
+
+            this._items = capacity == 0
+                                ? _emptyArray
+                                : new TElement[capacity];
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchableListBase{T}"/> class having the specified collection of items.
+        /// </summary>
+        /// <param name="collection">The initial collection of items in this list.</param>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        protected SearchableListBase([DisallowNull] IEnumerable<TElement> collection) :
+            base(collection)
+        { }
+
+#pragma warning disable
+        /// <summary>
+        /// Error message, when the index parameter is greater than the amount of items in the collection.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String INDEX_GREATER_THAN_COUNT = "The specified index is greater than the amount of items in the list.";
+        /// <summary>
+        /// Error message, when the new capacity is smaller than the amount of items in the collection.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String CAPACITY_SMALLER_THAN_COUNT = "The specified capacity is smaller than the amount of items in the list.";
+#pragma warning restore
+    }
+
+    // ICollection
+    partial class SearchableListBase<TElement> : ICollection<TElement>
+    {
+        /// <summary>
+        /// Copies the entire <see cref="SearchableListBase{T}"/> to a compatible one-dimensional <see cref="Array"/>, 
+        /// starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="array">
+        /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
+        /// from <see cref="SearchableListBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// <param name="index">The zero-based index in array at which copying begins.</param>
+        /// <exception cref="ArgumentException" />
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="ArgumentOutOfRangeException" />
+        [Pure]
+        public virtual void CopyTo([DisallowNull] Array array, Int32 index)
+        {
+            if (array is null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (array is TElement[] arr)
+            {
+                this.CopyTo(arr,
+                            index);
+            }
+        }
+
+        /// <summary>
+        /// Adds an object to the end of the <see cref="SearchableListBase{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to be added to the end of the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        public virtual void Add([DisallowNull] TElement item)
+        {
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            if (this.IsReadOnly)
+            {
+                throw new InvalidOperationException(LIST_IS_READONLY);
+            }
+
+            this.EnsureCapacity(this.Count + 1);
+            lock (this._syncRoot)
+            {
+                this._items[this._size++] = item;
+                this._version++;
+            }
+        }
+
+        /// <summary>
+        /// Removes all elements from the <see cref="SearchableListBase{T}"/>.
+        /// </summary>
+        /// <exception cref="InvalidOperationException" />
+        public virtual void Clear()
+        {
+            if (this.IsReadOnly)
+            {
+                throw new InvalidOperationException(LIST_IS_READONLY);
+            }
+
+            lock (this._syncRoot)
+            {
+                if (this._size > 0)
+                {
+                    Array.Clear(this._items,
+                                0,
+                                this._size);
+                    this._size = 0;
+                }
+                this._version++;
+            }
+        }
+
+        /// <summary>
+        /// Removes the first occurrence of a specific object from the <see cref="SearchableListBase{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to remove from the <see cref="SearchableListBase{T}"/>. The value can be null for reference types.</param>
+        /// <returns>
+        /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
+        /// This method also returns <see langword="false"/> if item was not found in the original <see cref="SearchableListBase{T}"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException" />
+        /// <exception cref="InvalidOperationException" />
+        public virtual Boolean Remove([DisallowNull] TElement item)
+        {
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            if (this.IsReadOnly)
+            {
+                throw new InvalidOperationException(LIST_IS_READONLY);
+            }
+
+            lock (this._syncRoot)
+            {
+                Int32 index = this.IndexOf(item);
+                if (index > -1)
+                {
+                    this.RemoveAt(index);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public virtual Boolean IsSynchronized => true;
+        /// <inheritdoc />
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public override Boolean IsReadOnly { get; } = false;
+    }
+
+    // IIndexSetter
+    partial class SearchableListBase<TElement> : IIndexSetter<Int32, TElement>
+    {
+        /// <inheritdoc />
+        /// <exception cref="IndexOutOfRangeException" />
+        /// <exception cref="InvalidOperationException" />
+        public override TElement this[Int32 index]
+        {
+            get
+            {
+                lock (this._syncRoot)
+                {
+                    return (UInt32)index >= (UInt32)this._size
+                                        ? throw new IndexOutOfRangeException()
+                                        : this._items[index];
+                }
+            }
+            set
+            {
+                lock (this._syncRoot)
+                {
+                    if ((UInt32)index >= (UInt32)this._size)
+                    {
+                        throw new IndexOutOfRangeException();
+                    }
+                    this._items[index] = value;
+                }
+            }
+        }
+    }
+
+    // IList
+    partial class SearchableListBase<TElement> : IList<TElement>
+    {
+        /// <summary>
+        /// Inserts an element into the <see cref="SearchableListBase{T}"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which item should be inserted.</param>
+        /// <param name="item">The object to insert. The value can be null for reference types.</param>
+        /// <exception cref="ArgumentOutOfRangeException" />
+        /// <exception cref="InvalidCastException" />
+        /// <exception cref="InvalidOperationException" />
+        public virtual void Insert(Int32 index, [DisallowNull] TElement item)
+        {
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            if (this.IsReadOnly)
+            {
+                throw new InvalidOperationException(LIST_IS_READONLY);
+            }
+            if ((UInt32)index > (UInt32)this.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
+            }
+
+            this.EnsureCapacity(this.Count + 1);
+            lock (this._syncRoot)
+            {
+
+                if (index < this._size)
+                {
+                    Array.Copy(this._items,
+                               index,
+                               this._items,
+                               index + 1,
+                               this._size - index);
+                }
+                this._items[index] = item;
+                this._size++;
+                this._version++;
+            }
+        }
+
+        /// <summary>
+        /// Removes the element at the specified index of the <see cref="SearchableListBase{T}"/>.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to remove.</param>
+        /// <exception cref="ArgumentOutOfRangeException" />
+        /// <exception cref="InvalidOperationException" />
+        public virtual void RemoveAt(Int32 index)
+        {
+            if (this.IsReadOnly)
+            {
+                throw new InvalidOperationException(LIST_IS_READONLY);
+            }
+            if ((UInt32)index > (UInt32)this.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
+            }
+
+            lock (this._syncRoot)
+            {
+
+                this._size--;
+                if (index < this._size)
+                {
+                    Array.Copy(this._items,
+                               index + 1,
+                               this._items,
+                               index,
+                               this._size - index);
+                }
+                this._items[this._size] = default;
+                this._version++;
+            }
+        }
     }
 }
