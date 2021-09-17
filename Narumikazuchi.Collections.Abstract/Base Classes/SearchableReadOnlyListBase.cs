@@ -193,7 +193,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
         [Pure]
-        public virtual Int32 BinarySearch([DisallowNull] in TElement item) => 
+        public virtual Int32 BinarySearch([DisallowNull] TElement item) => 
             this.BinarySearch(0, 
                               this._size, 
                               item, 
@@ -204,7 +204,7 @@ namespace Narumikazuchi.Collections.Abstract
         /// <exception cref="ArgumentOutOfRangeException" />
         /// <exception cref="InvalidOperationException" />
         [Pure]
-        public virtual Int32 BinarySearch([DisallowNull] in TElement item, 
+        public virtual Int32 BinarySearch([DisallowNull] TElement item, 
                                           [AllowNull] IComparer<TElement>? comparer) => 
             this.BinarySearch(0, 
                               this._size, 
@@ -218,7 +218,7 @@ namespace Narumikazuchi.Collections.Abstract
         [Pure]
         public virtual Int32 BinarySearch(in Int32 index, 
                                           in Int32 count, 
-                                          [DisallowNull] in TElement item, 
+                                          [DisallowNull] TElement item, 
                                           [AllowNull] IComparer<TElement>? comparer)
         {
             if (index < 0)

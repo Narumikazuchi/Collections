@@ -14,7 +14,7 @@
         /// <param name="item">The item to search.</param>
         /// <returns>The zero-based index of the item or -1 if the list doesn't contain the item</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] in TElement item);
+        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] TElement item);
         /// <summary>
         /// Searches the sorted <see cref="ISearchableList{TElement}"/> for the specified item using the specified <see cref="System.Collections.Generic.IComparer{T}"/>.
         /// </summary>
@@ -22,7 +22,7 @@
         /// <param name="comparer">The comparer to determine a match.</param>
         /// <returns>The zero-based index of the item or -1 if the list doesn't contain the item</returns>
         [System.Diagnostics.Contracts.Pure]
-        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] in TElement item, 
+        public System.Int32 BinarySearch([System.Diagnostics.CodeAnalysis.DisallowNull] TElement item, 
                                          [System.Diagnostics.CodeAnalysis.AllowNull] System.Collections.Generic.IComparer<TElement>? comparer);
         /// <summary>
         /// Searches the sorted <see cref="ISearchableList{TElement}"/> for the specified item in the specified range using the
@@ -39,7 +39,7 @@
         [System.Diagnostics.Contracts.Pure]
         public System.Int32 BinarySearch(in System.Int32 index, 
                                          in System.Int32 count, 
-                                         [System.Diagnostics.CodeAnalysis.DisallowNull] in TElement item, 
+                                         [System.Diagnostics.CodeAnalysis.DisallowNull] TElement item, 
                                          [System.Diagnostics.CodeAnalysis.AllowNull] System.Collections.Generic.IComparer<TElement>? comparer);
 
         /// <summary>
