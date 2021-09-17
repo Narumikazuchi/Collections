@@ -1,45 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Narumikazuchi.Collections
 {
-    internal readonly struct __FuncEqualityComparer<T> : IEqualityComparer<T>
+    internal readonly struct __FuncEqualityComparer<TElement> : IEqualityComparer<TElement>
     {
-        #region Constructor
+        public __FuncEqualityComparer(EqualityComparison<TElement> c) => 
+            this.Comparison = c;
 
-        public __FuncEqualityComparer(EqualityComparison<T> c) => this.Comparison = c;
+        public Boolean Equals(TElement? left, 
+                              TElement? right) => 
+            this.Comparison.Invoke(left, 
+                                   right);
 
-        #endregion
+        public Int32 GetHashCode(TElement obj) => 
+            obj.GetHashCode();
 
-        #region Compare
+        public static ref readonly __FuncEqualityComparer<TElement> Default => ref _default;
 
-#pragma warning disable
-        [Pure]
-        public Boolean Equals(T? left, T? right) => this.Comparison.Invoke(left, right);
-#pragma warning restore
+        public EqualityComparison<TElement> Comparison { get; }
 
-        [Pure]
-        public Int32 GetHashCode([DisallowNull] T obj) => obj.GetHashCode();
-
-        #endregion
-
-        #region Properties
-
-        public static ref readonly __FuncEqualityComparer<T> Default => ref _default;
-
-        public EqualityComparison<T> Comparison { get; }
-
-        #endregion
-
-        #region Fields
-
-#pragma warning disable
-        private static readonly __FuncEqualityComparer<T> _default = new((a, b) => typeof(T).IsValueType || typeof(T).GetInterfaces().Contains(typeof(IEquatable<T>)) ? a.Equals(b) : ReferenceEquals(a, b));
-#pragma warning restore
-
-        #endregion
+        private static readonly __FuncEqualityComparer<TElement> _default = new((a, b) => typeof(TElement).IsValueType || 
+                                                                                          typeof(TElement).GetInterfaces()
+                                                                                                          .Contains(typeof(IEquatable<TElement>)) 
+                                                                                                ? a.Equals(b) 
+                                                                                                : ReferenceEquals(a, b));
     }
 }

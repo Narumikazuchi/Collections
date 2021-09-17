@@ -10,17 +10,15 @@ using System.Linq;
 namespace Narumikazuchi.Collections
 {
     /// <summary>
-    /// Represents a collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="ReadOnlyRegister{T}"/> can be specified
+    /// Represents a collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="ReadOnlyRegister{TElement}"/> can be specified
     /// with a corresponding <see cref="EqualityComparer{T}"/> or <see cref="EqualityComparison{T}"/> delegate.
     /// </summary>
-    public class ReadOnlyRegister<T> : SearchableReadOnlyListBase<T>, IReadOnlyRegister<T>, IAutoSortable<T>
+    public partial class ReadOnlyRegister<TElement> : SearchableReadOnlyListBase<TElement>
     {
-        #region Constructor
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items.
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{TElement}"/> class with the specified collection as items.
         /// </summary>
-        public ReadOnlyRegister([DisallowNull] IEnumerable<T> collection)
+        public ReadOnlyRegister([DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -34,79 +32,54 @@ namespace Narumikazuchi.Collections
             this.Fill(collection);
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified capacity using the specified function to check items for equality.
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{TElement}"/> class with the specified capacity using the specified function to check items for equality.
         /// </summary>
-        public ReadOnlyRegister(EqualityComparison<T> comparison)
+        public ReadOnlyRegister([AllowNull] EqualityComparison<TElement> comparison)
         {
             if (comparison is null)
             {
                 this.Comparer = null;
                 return;
             }
-#pragma warning disable
-            this.Comparer = new __FuncEqualityComparer<T>(comparison);
-#pragma warning restore
+            this.Comparer = new __FuncEqualityComparer<TElement>(comparison);
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified function to check items for equality.
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{TElement}"/> class with the specified collection as items using the specified function to check items for equality.
         /// </summary>
-        public ReadOnlyRegister(EqualityComparison<T> comparison, [DisallowNull] IEnumerable<T> collection)
+        public ReadOnlyRegister([AllowNull] EqualityComparison<TElement> comparison, 
+                                [DisallowNull] IEnumerable<TElement> collection)
         {
             if (comparison is null)
             {
                 this.Comparer = null;
                 return;
             }
-#pragma warning disable
-            this.Comparer = new __FuncEqualityComparer<T>(comparison);
-#pragma warning restore
+            this.Comparer = new __FuncEqualityComparer<TElement>(comparison);
             this.Fill(collection);
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{TElement}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
         /// </summary>
-        public ReadOnlyRegister(IEqualityComparer<T>? comparer) => this.Comparer = comparer;
+        public ReadOnlyRegister([AllowNull] IEqualityComparer<TElement>? comparer) => 
+            this.Comparer = comparer;
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyRegister{T}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// Initializes a new instance of the <see cref="ReadOnlyRegister{TElement}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
         /// </summary>
-        public ReadOnlyRegister(IEqualityComparer<T>? comparer, [DisallowNull] IEnumerable<T> collection)
+        public ReadOnlyRegister([AllowNull] IEqualityComparer<TElement>? comparer, 
+                                [DisallowNull] IEnumerable<TElement> collection)
         {
             this.Comparer = comparer;
             this.Fill(collection);
         }
+    }
 
-        #endregion
-
-        #region Collection Management
-
-        private void Fill(IEnumerable<T> collection)
-        {
-            using IEnumerator<T> enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                this.EnsureCapacity(this.Count + 1);
-                lock (this._syncRoot)
-                {
-#pragma warning disable 
-                    this.AddInternal(enumerator.Current);
-#pragma warning restore
-                }
-            }
-            lock (this._syncRoot)
-            {
-                if (this._items.Length != this._size)
-                {
-                    T[] array = new T[this._size];
-                    Array.Copy(this._items, 0, array, 0, this._size);
-                    this._items = array;
-                }
-            }
-        }
-
+    // Non-Public
+    partial class ReadOnlyRegister<TElement>
+    {
         /// <summary>
-        /// Adds the specified item to the <see cref="ReadOnlyRegister{T}"/>.
+        /// Adds the specified item to the <see cref="ReadOnlyRegister{TElement}"/>.
         /// </summary>
-        protected Boolean AddInternal([DisallowNull] T item)
+        protected Boolean AddInternal([DisallowNull] TElement item)
         {
             if (item is null)
             {
@@ -119,15 +92,16 @@ namespace Narumikazuchi.Collections
             }
 
             this.EnsureCapacity(this.Count + 1);
+            this.AppendToInternalRegister(item.GetHashCode());
             lock (this._syncRoot)
             {
-                this.AppendToInternalRegister(item.GetHashCode());
                 this._items[this._size++] = item;
                 this._version++;
             }
             if (this.AutoSort)
             {
-                this.Sort(this._autoSortDirection, this._autoSortComparer);
+                this.Sort(this._autoSortDirection, 
+                          this._autoSortComparer);
             }
             else
             {
@@ -137,9 +111,9 @@ namespace Narumikazuchi.Collections
         }
 
         /// <summary>
-        /// Inserts the specified item at the specified index into the <see cref="ReadOnlyRegister{T}"/>.
+        /// Inserts the specified item at the specified index into the <see cref="ReadOnlyRegister{TElement}"/>.
         /// </summary>
-        protected Boolean InsertInternal(Int32 index, [DisallowNull] T item)
+        protected Boolean InsertInternal(Int32 index, [DisallowNull] TElement item)
         {
             if (item is null)
             {
@@ -147,7 +121,8 @@ namespace Narumikazuchi.Collections
             }
             if ((UInt32)index > (UInt32)this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             if (this.Contains(item))
@@ -158,18 +133,26 @@ namespace Narumikazuchi.Collections
             this.EnsureCapacity(this.Count + 1);
             lock (this._syncRoot)
             {
-                if (index < this.Count)
+                if (index < this._size)
                 {
-                    Array.Copy(this._items, index, this._items, index + 1, this.Count - index);
+                    Array.Copy(this._items,
+                               index,
+                               this._items,
+                               index + 1,
+                               this._size - index);
                 }
-                this.AppendToInternalRegister(item.GetHashCode());
+            }
+            this.AppendToInternalRegister(item.GetHashCode());
+            lock (this._syncRoot)
+            {
                 this._items[index] = item;
                 this._size++;
                 this._version++;
             }
             if (this.AutoSort)
             {
-                this.Sort(this._autoSortDirection, this._autoSortComparer);
+                this.Sort(this._autoSortDirection, 
+                          this._autoSortComparer);
             }
             else
             {
@@ -179,38 +162,43 @@ namespace Narumikazuchi.Collections
         }
 
         /// <summary>
-        /// Removes the specified item from the <see cref="ReadOnlyRegister{T}"/>.
+        /// Removes the specified item from the <see cref="ReadOnlyRegister{TElement}"/>.
         /// </summary>
-        protected Boolean RemoveInternal([DisallowNull] T item)
+        protected Boolean RemoveInternal([DisallowNull] TElement item)
         {
-#pragma warning disable
             if (item is null)
             {
                 throw new ArgumentNullException(nameof(item));
             }
 
-            lock (this._syncRoot)
+            Int32 index = this.IndexOf(item);
+            if (index > -1)
             {
-                Int32 index = this.IndexOf(item);
-                if (index > -1)
+                lock (this._syncRoot)
                 {
                     this._size--;
-                    if (index < this.Count)
+                    if (index < this._size)
                     {
-                        Array.Copy(this._items, index + 1, this._items, index, this.Count - index);
+                        Array.Copy(this._items,
+                                    index + 1,
+                                    this._items,
+                                    index,
+                                    this._size - index);
                     }
-                    this._items[this.Count] = default;
-                    this.RemoveFromInternalRegister(item.GetHashCode());
-                    this._version++;
-                    return true;
+                    this._items[this._size] = default;
                 }
-                return false;
+                this.RemoveFromInternalRegister(item.GetHashCode());
+                lock (this._syncRoot)
+                {
+                    this._version++;
+                }
+                return true;
             }
-#pragma warning restore
+            return false;
         }
 
         /// <summary>
-        /// Appends the hashcode to the internal register for quick <see cref="Contains(T)"/> calls.
+        /// Appends the hashcode to the internal register for quick <see cref="Contains(TElement)"/> calls.
         /// </summary>
         protected void AppendToInternalRegister(in Int32 hashcode)
         {
@@ -222,7 +210,10 @@ namespace Narumikazuchi.Collections
                 };
                 return;
             }
-            this._hashTree.Insert(hashcode);
+            lock (this._syncRoot)
+            {
+                this._hashTree.Insert(hashcode);
+            }
         }
 
         /// <summary>
@@ -230,12 +221,14 @@ namespace Narumikazuchi.Collections
         /// </summary>
         protected void RemoveFromInternalRegister(in Int32 hashcode)
         {
-#pragma warning disable
-            for (Int32 i = 0; i < this.Count; i++)
+            lock (this._syncRoot)
             {
-                if (this._items[i].GetHashCode() == hashcode)
+                for (Int32 i = 0; i < this._size; i++)
                 {
-                    return;
+                    if (this._items[i].GetHashCode() == hashcode)
+                    {
+                        return;
+                    }
                 }
             }
             if (_hashTree.RootNode.Value == hashcode)
@@ -243,38 +236,97 @@ namespace Narumikazuchi.Collections
                 this._hashTree = null;
                 return;
             }
-            this._hashTree.Remove(hashcode);
-#pragma warning restore
+            lock (this._syncRoot)
+            {
+                this._hashTree.Remove(hashcode);
+            }
         }
 
-        #endregion
+        private void Fill(IEnumerable<TElement> collection)
+        {
+            if (collection is null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
 
-        #region IAutoSortable
+            using IEnumerator<TElement> enumerator = collection.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                this.EnsureCapacity(this.Count + 1);
+                this.AddInternal(enumerator.Current);
+            }
+            lock (this._syncRoot)
+            {
+                if (this._items.Length != this._size)
+                {
+                    TElement[] array = new TElement[this._size];
+                    Array.Copy(this._items, 
+                               0, 
+                               array, 
+                               0, 
+                               this._size);
+                    this._items = array;
+                }
+            }
+        }
 
+        /// <summary>
+        /// Internally contains the current sort direction, if the <see cref="ReadOnlyRegister{TElement}"/> is sorted.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected SortDirection _sortDirection = SortDirection.NotSorted;
+        /// <summary>
+        /// Internally contains the automatic sort direction for the <see cref="AutoSort"/> feature.
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected SortDirection _autoSortDirection = SortDirection.NotSorted;
+        /// <summary>
+        /// Internally contains the automatic sort comparer for the <see cref="AutoSort"/> feature.
+        /// </summary>
+        protected IComparer<TElement>? _autoSortComparer = null;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IEqualityComparer<TElement>? _comparer = null;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private BinaryTree<Int32>? _hashTree = null;
+
+#pragma warning disable
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected const String COMPARER_IS_NULL_WITHOUT_IEQUATABLE = "The Comparer property cannot be null if the type parameter '{0}' does not inherit from the IEquatable<T> interface.";
+#pragma warning restore
+    }
+
+    // IAutoSortable
+    partial class ReadOnlyRegister<TElement> : IAutoSortable<TElement>
+    {
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Sort(SortDirection direction) => this.Sort(direction, (IComparer<T>?)null);
+        public virtual void Sort(in SortDirection direction) => 
+            this.Sort(direction, 
+                      (IComparer<TElement>?)null);
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Sort(SortDirection direction, [DisallowNull] Comparison<T> comparison)
+        public virtual void Sort(in SortDirection direction, 
+                                [DisallowNull] Comparison<TElement> comparison)
         {
             if (comparison is null)
             {
                 throw new ArgumentNullException(nameof(comparison));
             }
-#pragma warning disable
-            this.Sort(direction, new __FuncComparer<T>(comparison));
-#pragma warning restore
+
+            this.Sort(direction, 
+                      new __FuncComparer<TElement>(comparison));
         }
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        public virtual void Sort(SortDirection direction, IComparer<T>? comparer)
+        public virtual void Sort(in SortDirection direction, 
+                                 [AllowNull] IComparer<TElement>? comparer)
         {
             if (this.Count < 2 ||
                 direction == SortDirection.NotSorted)
@@ -284,12 +336,15 @@ namespace Narumikazuchi.Collections
 
             lock (this._syncRoot)
             {
-#pragma warning disable
-                Array.Sort(this._items, 0, this.Count, comparer);
-#pragma warning restore
+                Array.Sort(this._items, 
+                           0, 
+                           this._size, 
+                           comparer);
                 if (direction == SortDirection.Descending)
                 {
-                    Array.Reverse(this._items, 0, this.Count);
+                    Array.Reverse(this._items, 
+                                  0, 
+                                  this._size);
                 }
                 this._sortDirection = direction;
             }
@@ -297,45 +352,50 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
-        public virtual void EnableAutoSort(SortDirection direction) => this.EnableAutoSort(direction, (IComparer<T>?)null);
+        public virtual void EnableAutoSort(in SortDirection direction) => 
+            this.EnableAutoSort(direction, 
+                                (IComparer<TElement>?)null);
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
-        public virtual void EnableAutoSort(SortDirection direction, [DisallowNull] Comparison<T> comparison)
+        public virtual void EnableAutoSort(in SortDirection direction, 
+                                           [DisallowNull] Comparison<TElement> comparison)
         {
-            if (direction is SortDirection.NotSorted)
-            {
-                throw new ArgumentException("Can't enable auto sort with no sort direction.", nameof(direction));
-            }
             if (comparison is null)
             {
                 throw new ArgumentNullException(nameof(comparison));
             }
+            if (direction is SortDirection.NotSorted)
+            {
+                this._autoSortDirection = SortDirection.NotSorted;
+                return;
+            }
 
             this._autoSortDirection = direction;
-#pragma warning disable
-            this._autoSortComparer = new __FuncComparer<T>(comparison);
-#pragma warning restore
-            this.Sort(this._autoSortDirection, this._autoSortComparer);
+            this._autoSortComparer = new __FuncComparer<TElement>(comparison);
+            this.Sort(this._autoSortDirection, 
+                      this._autoSortComparer);
         }
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
-        public virtual void EnableAutoSort(SortDirection direction, IComparer<T>? comparer)
+        public virtual void EnableAutoSort(in SortDirection direction, 
+                                           [AllowNull] IComparer<TElement>? comparer)
         {
             if (direction is SortDirection.NotSorted)
             {
-                throw new ArgumentException("Can't enable auto sort with no sort direction.", nameof(direction));
+                this._autoSortDirection = SortDirection.NotSorted;
+                return;
             }
 
             this._autoSortDirection = direction;
             this._autoSortComparer = comparer;
-            this.Sort(this._autoSortDirection, this._autoSortComparer);
+            this.Sort(this._autoSortDirection, 
+                      this._autoSortComparer);
         }
 
         /// <inheritdoc />
-        public virtual void DisableAutoSort() => this._autoSortDirection = SortDirection.NotSorted;
-
-        #region Properties
+        public virtual void DisableAutoSort() => 
+            this._autoSortDirection = SortDirection.NotSorted;
 
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
@@ -347,30 +407,25 @@ namespace Narumikazuchi.Collections
         /// <inheritdoc />
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
         public Boolean AutoSort => this._autoSortDirection is not SortDirection.NotSorted;
+    }
 
-        #endregion
-
-        #endregion
-
-        #region IReadOnlyCollection
-
+    // IReadOnlyCollection
+    partial class ReadOnlyRegister<TElement> : IReadOnlyCollection<TElement>
+    {
         /// <inheritdoc/>
-#pragma warning disable
-        public override Boolean Contains([DisallowNull] T item) => item is null
-                                                                    ? throw new ArgumentNullException(nameof(item))
-                                                                    : this._hashTree is not null &&
-                                                                      this._hashTree.Find(item.GetHashCode()) is not null &&
-                                                                      this.IndexOf(item) > -1;
-#pragma warning restore
+        public override Boolean Contains([DisallowNull] TElement item) => item is null
+                                                                            ? throw new ArgumentNullException(nameof(item))
+                                                                            : this._hashTree is not null &&
+                                                                              this._hashTree.Find(item.GetHashCode()) is not null &&
+                                                                              this.IndexOf(item) > -1;
+    }
 
-        #endregion
-
-        #region IReadOnlyList
-
+    // IReadOnlyList2
+    partial class ReadOnlyRegister<TElement> : IReadOnlyList2<TElement>
+    {
         /// <inheritdoc/>
-#pragma warning disable
         [Pure]
-        public override Int32 IndexOf([DisallowNull] T item)
+        public override Int32 IndexOf([DisallowNull] TElement item)
         {
             if (item is null)
             {
@@ -379,21 +434,23 @@ namespace Narumikazuchi.Collections
 
             lock (this._syncRoot)
             {
-                if (this.Comparer is null)
+                if (this.Comparer is null &&
+                    item is IEquatable<TElement> eq)
                 {
-                    for (Int32 i = 0; i < this.Count; i++)
+                    for (Int32 i = 0; i < this._size; i++)
                     {
-                        if ((this._items[i] as IEquatable<T>).Equals(item))
+                        if (eq.Equals(this._items[i]))
                         {
                             return i;
                         }
                     }
                 }
-                else
+                else if (this.Comparer is not null)
                 {
-                    for (Int32 i = 0; i < this.Count; i++)
+                    for (Int32 i = 0; i < this._size; i++)
                     {
-                        if (this.Comparer.Equals(this._items[i], item))
+                        if (this.Comparer.Equals(this._items[i], 
+                                                 item))
                         {
                             return i;
                         }
@@ -402,15 +459,35 @@ namespace Narumikazuchi.Collections
             }
             return -1;
         }
-#pragma warning restore
+    }
 
-        #endregion
+    // IReadOnlyRegister
+    partial class ReadOnlyRegister<TElement> : IReadOnlyRegister<TElement>
+    {
+        /// <inheritdoc/>
+        [MaybeNull]
+        public IEqualityComparer<TElement>? Comparer
+        {
+            get => this._comparer;
+            set
+            {
+                if (value is null &&
+                    !typeof(IEquatable<TElement>).IsAssignableFrom(typeof(TElement)))
+                {
+                    throw new ArgumentException(String.Format(COMPARER_IS_NULL_WITHOUT_IEQUATABLE,
+                                                              typeof(TElement).FullName));
+                }
+                this._comparer = value;
+            }
+        }
+    }
 
-        #region IReadOnlySet
-
+    // IReadOnlySet
+    partial class ReadOnlyRegister<TElement> : IReadOnlySet<TElement>
+    {
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean IsProperSubsetOf(IEnumerable<T> other)
+        public virtual Boolean IsProperSubsetOf(IEnumerable<TElement> other)
         {
 #pragma warning disable
             if (other is null)
@@ -423,7 +500,7 @@ namespace Narumikazuchi.Collections
                 return false;
             }
 
-            if (other is ICollection<T> collection)
+            if (other is ICollection<TElement> collection)
             {
                 if (this._size == 0)
                 {
@@ -436,7 +513,7 @@ namespace Narumikazuchi.Collections
                 }
             }
 
-            if (other is IReadOnlyRegister<T> register)
+            if (other is IReadOnlyRegister<TElement> register)
             {
                 if ((this.Comparer is null &&
                     register.Comparer is null) ||
@@ -445,8 +522,8 @@ namespace Narumikazuchi.Collections
                 {
                     for (Int32 i = 0; i < this._size; i++)
                     {
-                        if (!(register as IReadOnlyCollection2<T>).Contains(this._items[i]) &&
-                            !(register as IReadOnlySet<T>).Contains(this._items[i]))
+                        if (!(register as IReadOnlyCollection2<TElement>).Contains(this._items[i]) &&
+                            !(register as IReadOnlySet<TElement>).Contains(this._items[i]))
                         {
                             return false;
                         }
@@ -461,7 +538,7 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean IsProperSupersetOf(IEnumerable<T> other)
+        public virtual Boolean IsProperSupersetOf(IEnumerable<TElement> other)
         {
 #pragma warning disable
             if (other is null)
@@ -475,13 +552,13 @@ namespace Narumikazuchi.Collections
                 return false;
             }
 
-            if (other is ICollection<T> collection &&
+            if (other is ICollection<TElement> collection &&
                 collection.Count == 0)
             {
                 return true;
             }
 
-            if (other is IReadOnlyRegister<T> register)
+            if (other is IReadOnlyRegister<TElement> register)
             {
                 if (register.Count >= this._size)
                 {
@@ -508,7 +585,7 @@ namespace Narumikazuchi.Collections
                 return true;
             }
 
-            foreach (T item in other)
+            foreach (TElement item in other)
             {
                 if (!this.Contains(item))
                 {
@@ -521,7 +598,7 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean IsSubsetOf(IEnumerable<T> other)
+        public virtual Boolean IsSubsetOf(IEnumerable<TElement> other)
         {
 #pragma warning disable
             if (other is null)
@@ -535,13 +612,13 @@ namespace Narumikazuchi.Collections
                 return true;
             }
 
-            if (other is ICollection<T> collection &&
+            if (other is ICollection<TElement> collection &&
                 this._size > collection.Count)
             {
                 return false;
             }
 
-            if (other is IReadOnlyRegister<T> register)
+            if (other is IReadOnlyRegister<TElement> register)
             {
                 if ((this.Comparer is null &&
                     register.Comparer is null) ||
@@ -550,8 +627,8 @@ namespace Narumikazuchi.Collections
                 {
                     for (Int32 i = 0; i < this._size; i++)
                     {
-                        if (!(register as IReadOnlyCollection2<T>).Contains(this._items[i]) &&
-                            !(register as IReadOnlySet<T>).Contains(this._items[i]))
+                        if (!(register as IReadOnlyCollection2<TElement>).Contains(this._items[i]) &&
+                            !(register as IReadOnlySet<TElement>).Contains(this._items[i]))
                         {
                             return false;
                         }
@@ -566,7 +643,7 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean IsSupersetOf(IEnumerable<T> other)
+        public virtual Boolean IsSupersetOf(IEnumerable<TElement> other)
         {
 #pragma warning disable
             if (other is null)
@@ -574,14 +651,14 @@ namespace Narumikazuchi.Collections
                 throw new ArgumentNullException(nameof(other));
             }
 
-            if ((other is ICollection<T> collection &&
+            if ((other is ICollection<TElement> collection &&
                 collection.Count == 0) ||
                 other == this)
             {
                 return true;
             }
 
-            if (other is IReadOnlyRegister<T> register)
+            if (other is IReadOnlyRegister<TElement> register)
             {
                 if (register.Count > this._size)
                 {
@@ -608,7 +685,7 @@ namespace Narumikazuchi.Collections
                 return true;
             }
 
-            foreach (T item in other)
+            foreach (TElement item in other)
             {
                 if (!this.Contains(item))
                 {
@@ -621,7 +698,7 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean Overlaps(IEnumerable<T> other)
+        public virtual Boolean Overlaps(IEnumerable<TElement> other)
         {
             if (other is null)
             {
@@ -633,7 +710,7 @@ namespace Narumikazuchi.Collections
                 return false;
             }
 
-            foreach (T item in other)
+            foreach (TElement item in other)
             {
 #pragma warning disable
                 if (this.Contains(item))
@@ -647,7 +724,7 @@ namespace Narumikazuchi.Collections
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"/>
-        public virtual Boolean SetEquals(IEnumerable<T> other)
+        public virtual Boolean SetEquals(IEnumerable<TElement> other)
         {
 #pragma warning disable
             if (other is null)
@@ -660,7 +737,7 @@ namespace Narumikazuchi.Collections
                 return true;
             }
 
-            if (other is ICollection<T> collection)
+            if (other is ICollection<TElement> collection)
             {
                 if (collection.Count != this._size)
                 {
@@ -668,7 +745,7 @@ namespace Narumikazuchi.Collections
                 }
             }
 
-            if (other is IReadOnlyRegister<T> register)
+            if (other is IReadOnlyRegister<TElement> register)
             {
                 if ((this.Comparer is null &&
                     register.Comparer is null) ||
@@ -686,7 +763,7 @@ namespace Narumikazuchi.Collections
                 }
             }
 
-            foreach (T item in other)
+            foreach (TElement item in other)
             {
                 if (!this.Contains(item))
                 {
@@ -702,11 +779,11 @@ namespace Narumikazuchi.Collections
         /// </summary>
         /// <param name="other">The enumerable to search through.</param>
         /// <returns><see langword="true"/> if all of the items of this collection are also present in the enumerable; otherwise, <see langword="false"/></returns>
-        protected Boolean FindInOther(IEnumerable<T> other)
+        protected Boolean FindInOther(IEnumerable<TElement> other)
         {
             BitArray arr = new(this._size);
 
-            foreach (T item in other)
+            foreach (TElement item in other)
             {
 #pragma warning disable
                 Int32 index = this.IndexOf(item);
@@ -729,52 +806,5 @@ namespace Narumikazuchi.Collections
             }
             return true;
         }
-
-        #endregion
-
-        #region Properties
-
-        /// <inheritdoc/>
-        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        public IEqualityComparer<T>? Comparer
-        {
-            get => this._comparer;
-            set
-            {
-                if (value is null &&
-                    !typeof(IEquatable<T>).IsAssignableFrom(typeof(T)))
-                {
-                    throw new ArgumentException($"Comparer can not be null if the generic type T ({typeof(T).Name}) does not inherit from the IEquatable<T> interface.");
-                }
-                this._comparer = value;
-            }
-        }
-
-        #endregion
-
-        #region Fields
-
-        /// <summary>
-        /// Internally contains the current sort direction, if the <see cref="ReadOnlyRegister{T}"/> is sorted.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        protected SortDirection _sortDirection = SortDirection.NotSorted;
-        /// <summary>
-        /// Internally contains the automatic sort direction for the <see cref="AutoSort"/> feature.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        protected SortDirection _autoSortDirection = SortDirection.NotSorted;
-        /// <summary>
-        /// Internally contains the automatic sort comparer for the <see cref="AutoSort"/> feature.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        protected IComparer<T>? _autoSortComparer = null;
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IEqualityComparer<T>? _comparer = null;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private BinaryTree<Int32>? _hashTree = null;
-
-        #endregion
     }
 }

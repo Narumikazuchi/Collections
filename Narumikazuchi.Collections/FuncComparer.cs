@@ -1,28 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace Narumikazuchi.Collections
 {
-    internal readonly struct __FuncComparer<T> : IComparer<T>
+    internal readonly struct __FuncComparer<TElement> : IComparer<TElement>
     {
-        #region Constructor
+        public __FuncComparer(Comparison<TElement?> c) => 
+            this.Comparison = c;
 
-        public __FuncComparer(Comparison<T?> c) => this.Comparison = c;
+        public Int32 Compare(TElement? left, 
+                             TElement? right) => 
+            this.Comparison.Invoke(left, 
+                                   right);
 
-        #endregion
-
-        #region Compare
-
-        [Pure]
-        public Int32 Compare(T? left, T? right) => this.Comparison.Invoke(left, right);
-
-        #endregion
-
-        #region Properties
-
-        public Comparison<T?> Comparison { get; }
-
-        #endregion
+        public Comparison<TElement?> Comparison { get; }
     }
 }

@@ -3,10 +3,10 @@
     /// <summary>
     /// Represents a node inside a tree structure where nodes can hold contents.
     /// </summary>
-    public interface IContentTreeNode<TNode, TValue, TContent> : ITreeNode<TNode, TValue> where TNode : ITreeNode<TNode, TValue> where TContent : class
+    public interface IContentTreeNode<TNode, TValue, TContent> : ITreeNode<TNode, TValue> 
+        where TNode : ITreeNode<TNode, TValue> 
+        where TContent : class
     {
-        #region Content Management
-
         /// <summary>
         /// Attaches an item of type <typeparamref name="TContent"/> to the <typeparamref name="TNode"/>.
         /// </summary>
@@ -17,7 +17,8 @@
         /// </summary>
         /// <param name="index">The index at which the item will be inserted into the <see cref="IContentTreeNode{TNode, TValue, TContent}.Items"/>.</param>
         /// <param name="item">The item to add to the <typeparamref name="TNode"/>.</param>
-        public void InsertItem(in System.Int32 index, [System.Diagnostics.CodeAnalysis.DisallowNull] TContent item);
+        public void InsertItem(in System.Int32 index, 
+                               [System.Diagnostics.CodeAnalysis.DisallowNull] TContent item);
         /// <summary>
         /// Determines whether the specified item is attached to the <typeparamref name="TNode"/>. 
         /// </summary>
@@ -35,17 +36,11 @@
         /// </summary>
         public void ClearItems();
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Gets a collection of items which are either attached to this <typeparamref name="TNode"/> or 
         /// are attached to any of its child-nodes (only when <see cref="IContentTree{TNode, TValue, TContent}.ParentsKnowChildItems"/> for the parent is set to <see langword="true"/>).
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.DisallowNull]
+        [System.Diagnostics.CodeAnalysis.NotNull]
         public Abstract.IReadOnlyList2<TContent> Items { get; }
-
-        #endregion
     }
 }

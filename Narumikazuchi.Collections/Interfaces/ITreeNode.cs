@@ -3,10 +3,9 @@
     /// <summary>
     /// Represents a node inside any tree structure.
     /// </summary>
-    public interface ITreeNode<TNode, TValue> where TNode : ITreeNode<TNode, TValue>
+    public interface ITreeNode<TNode, TValue> 
+        where TNode : ITreeNode<TNode, TValue>
     {
-        #region Properties
-
         /// <summary>
         /// Gets the <typeparamref name="TValue"/> value of this <typeparamref name="TNode"/>.
         /// </summary>
@@ -16,7 +15,8 @@
         /// Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
         /// </summary>
         [System.Diagnostics.Contracts.Pure]
-        public TNode? Parent { get; }
+        [System.Diagnostics.CodeAnalysis.MaybeNull]
+        public TNode Parent { get; }
         /// <summary>
         /// Gets the depth of this node in it's corresponding tree. Should be 0 for root nodes.
         /// </summary>
@@ -30,9 +30,7 @@
         /// <summary>
         /// A collection child-nodes attached to this node.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.DisallowNull]
+        [System.Diagnostics.CodeAnalysis.NotNull]
         public NodeCollection<TNode, TValue> Children { get; }
-
-        #endregion
     }
 }

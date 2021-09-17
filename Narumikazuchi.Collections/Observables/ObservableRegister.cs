@@ -1,65 +1,90 @@
-﻿using System;
+﻿using Narumikazuchi.Collections.Abstract;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+using System.Linq;
 
 namespace Narumikazuchi.Collections
 {
     /// <summary>
-    /// Represents a collection which reports changes and contains every object is only once. The procedure to check whether the object is already in the <see cref="ObservableRegister{T}"/> can be specified
+    /// Represents a collection which reports changes and contains every object is only once. The procedure to check whether the object is already in the <see cref="ObservableRegister{TElement}"/> can be specified
     /// with a corresponding <see cref="EqualityComparer{T}"/> or <see cref="EqualityComparison{T}"/> delegate.
     /// </summary>
     /// <remarks>
     /// If neither <see cref="EqualityComparer{T}"/> nor <see cref="EqualityComparison{T}"/> are specified, the register will compare the references for classes or check each field/property for values types.
     /// </remarks>
-    public class ObservableRegister<T> : Register<T>, INotifyCollectionChanged, INotifyPropertyChanging, INotifyPropertyChanged
+    public partial class ObservableRegister<TElement> : Register<TElement>
     {
-        #region Constructor
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class.
         /// </summary>
-        public ObservableRegister() : base(4, __FuncEqualityComparer<T>.Default) { }
+        public ObservableRegister() : 
+            base(4, 
+                 __FuncEqualityComparer<TElement>.Default) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified capacity.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified capacity.
         /// </summary>
-        public ObservableRegister(in Int32 capacity) : base(capacity, __FuncEqualityComparer<T>.Default) { }
+        public ObservableRegister(in Int32 capacity) : 
+            base(capacity, 
+                 __FuncEqualityComparer<TElement>.Default) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class using the specified function to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class using the specified function to check items for equality.
         /// </summary>
-        public ObservableRegister([DisallowNull] EqualityComparison<T> comparison) : base(4, comparison) { }
+        public ObservableRegister([DisallowNull] EqualityComparison<TElement> comparison) : 
+            base(4, 
+                 comparison) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified collection as items.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified collection as items.
         /// </summary>
-        public ObservableRegister([DisallowNull] IEnumerable<T> collection) : base(__FuncEqualityComparer<T>.Default, collection) { }
+        public ObservableRegister([DisallowNull] IEnumerable<TElement> collection) : 
+            base(__FuncEqualityComparer<TElement>.Default, 
+                 collection) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified capacity using the specified function to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified capacity using the specified function to check items for equality.
         /// </summary>
-        public ObservableRegister(in Int32 capacity, [DisallowNull] EqualityComparison<T> comparison) : base(capacity, comparison) { }
+        public ObservableRegister(in Int32 capacity, 
+                                  [DisallowNull] EqualityComparison<TElement> comparison) : 
+            base(capacity, 
+                 comparison) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified collection as items using the specified function to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified collection as items using the specified function to check items for equality.
         /// </summary>
-        public ObservableRegister([DisallowNull] EqualityComparison<T> comparison, [DisallowNull] IEnumerable<T> collection) : base(comparison, collection) { }
+        public ObservableRegister([DisallowNull] EqualityComparison<TElement> comparison, 
+                                  [DisallowNull] IEnumerable<TElement> collection) : 
+            base(comparison, 
+                 collection) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
         /// </summary>
-        public ObservableRegister(IEqualityComparer<T>? comparer) : base(4, comparer) { }
+        public ObservableRegister([AllowNull] IEqualityComparer<TElement>? comparer) : 
+            base(4, 
+                 comparer) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified capacity using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified capacity using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
         /// </summary>
-        public ObservableRegister(in Int32 capacity, IEqualityComparer<T>? comparer) : base(capacity, comparer) { }
+        public ObservableRegister(in Int32 capacity, 
+                                  [AllowNull] IEqualityComparer<TElement>? comparer) : 
+            base(capacity, 
+                 comparer) 
+        { }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ObservableRegister{T}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
+        /// Initializes a new instance of the <see cref="ObservableRegister{TElement}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
         /// </summary>
-        public ObservableRegister(IEqualityComparer<T>? comparer, [DisallowNull] IEnumerable<T> collection) : base(comparer, collection) { }
-
-        #endregion
-
-        #region Collection Management
+        public ObservableRegister([AllowNull] IEqualityComparer<TElement>? comparer, 
+                                  [DisallowNull] IEnumerable<TElement> collection) : 
+            base(comparer, 
+                 collection) 
+        { }
 
         /// <summary>
         /// Inserts the items from the specified collection into this <see cref="ObservableList{T}"/> starting at the specified index.
@@ -68,7 +93,8 @@ namespace Narumikazuchi.Collections
         /// <param name="collection">The collection of items to insert.</param>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentOutOfRangeException" />
-        public override void InsertRange(Int32 index, [DisallowNull] IEnumerable<T> collection)
+        public override void InsertRange(Int32 index, 
+                                         [DisallowNull] IEnumerable<TElement> collection)
         {
             if (collection is null)
             {
@@ -76,16 +102,17 @@ namespace Narumikazuchi.Collections
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             this.OnPropertyChanging(nameof(this.Count));
-            IList? list = new List<T>();
-            using IEnumerator<T> enumerator = collection.GetEnumerator();
+            IList? list = new List<TElement>();
+            using IEnumerator<TElement> enumerator = collection.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 if (enumerator.Current is null)
@@ -97,136 +124,20 @@ namespace Narumikazuchi.Collections
                     continue;
                 }
                 list.Add(enumerator.Current);
-                this.Insert(index++, enumerator.Current);
+                this.Insert(index++, 
+                            enumerator.Current);
             }
             lock (this._syncRoot)
             {
                 this._version++;
             }
             this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list));
-        }
-
-        /// <summary>
-        /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ObservableList{T}"/>.
-        /// </summary>
-        public override Boolean MoveItem(Int32 index, ItemMoveDirection direction, Int32 positions)
-        {
-#pragma warning disable
-            T tmp;
-            Register<T> list = new((a, b) => ReferenceEquals(a, b));
-            if (direction == ItemMoveDirection.ToLowerIndex)
-            {
-                while (positions-- > 0)
-                {
-                    if (index > 0)
-                    {
-                        lock (this._syncRoot)
-                        {
-                            tmp = this[index];
-                            this[index] = this[index - 1];
-                            this[index - 1] = tmp;
-                            list.Add(this[index]);
-                            list.Add(this[index - 1]);
-                        }
-                    }
-                    else
-                    {
-                        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index - 1, index - 1 + positions));
-                        return false;
-                    }
-                }
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index - 1, index - 1 + positions));
-            }
-            else
-            {
-                while (positions-- > 0)
-                {
-                    if (index > -1 &&
-                        index < this._size - 1)
-                    {
-                        lock (this._syncRoot)
-                        {
-                            tmp = this[index];
-                            this[index] = this[index + 1];
-                            this[index + 1] = tmp;
-                            list.Add(this[index]);
-                            list.Add(this[index + 1]);
-                        }
-                    }
-                    else
-                    {
-                        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index + 1, index + 1 + positions));
-                        return false;
-                    }
-                }
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index + 1, index + 1 + positions));
-            }
-            return true;
-#pragma warning restore
-        }
-
-        /// <summary>
-        /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ObservableList{T}"/>.
-        /// </summary>
-        public override Boolean MoveItem([DisallowNull] in T item, ItemMoveDirection direction, Int32 positions)
-        {
-#pragma warning disable
-            Int32 index = this.IndexOf(item);
-            Register<T> list = new((a, b) => ReferenceEquals(a, b));
-            if (direction == ItemMoveDirection.ToLowerIndex)
-            {
-                while (positions-- > 0)
-                {
-                    if (index > 0)
-                    {
-                        lock (this._syncRoot)
-                        {
-                            this[index] = this[index - 1];
-                            this[index - 1] = item;
-                            index--;
-                            list.Add(this[index]);
-                            list.Add(this[index - 1]);
-                        }
-                    }
-                    else
-                    {
-                        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index - 1, index - 1 + positions));
-                        return false;
-                    }
-                }
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index - 1, index - 1 + positions));
-            }
-            else
-            {
-                while (positions-- > 0)
-                {
-                    if (index > -1 &&
-                        index < this._size - 1)
-                    {
-                        lock (this._syncRoot)
-                        {
-                            this[index] = this[index + 1];
-                            this[index + 1] = item;
-                            index++;
-                            list.Add(this[index]);
-                            list.Add(this[index + 1]);
-                        }
-                    }
-                    else
-                    {
-                        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index + 1, index + 1 + positions));
-                        return false;
-                    }
-                }
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, index + 1, index + 1 + positions));
-            }
-            return true;
-#pragma warning restore
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, 
+                                                                          list));
         }
 
         /// <inheritdoc/>
-        public override Int32 RemoveAll([DisallowNull] Func<T, Boolean> predicate)
+        public override Int32 RemoveAll([DisallowNull] Func<TElement, Boolean> predicate)
         {
             if (predicate is null)
             {
@@ -234,13 +145,12 @@ namespace Narumikazuchi.Collections
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
 
             lock (this._syncRoot)
             {
                 this.OnPropertyChanging(nameof(this.Count));
-#pragma warning disable
                 Int32 v = this._version;
                 Int32 free = 0;
                 while (free < this._size &&
@@ -248,7 +158,7 @@ namespace Narumikazuchi.Collections
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     free++;
                 }
@@ -258,24 +168,17 @@ namespace Narumikazuchi.Collections
                 }
 
                 Int32 current = free + 1;
-                List<T> list = new();
+                List<TElement> list = new();
                 while (current < this._size)
                 {
                     if (this._version != v)
                     {
-                        throw new InvalidOperationException("The collection changed during enumeration.");
+                        throw new InvalidOperationException(COLLECTION_CHANGED);
                     }
                     while (current < this._size &&
-                           predicate(this._items[current]))
+                           predicate.Invoke(this._items[current]))
                     {
-                        list.Add(this._items[current]);
-                        if (this._items[current] is INotifyPropertyChanging changing
-                                                 and INotifyPropertyChanged changed)
-                        {
-                            changing.PropertyChanging -= this.CacheItemChangingState;
-                            changed.PropertyChanged -= this.RaiseItemChangedEvent;
-                        }
-                        current++;
+                        list.Add(this._items[current++]);
                     }
 
                     if (current < this._size)
@@ -283,39 +186,45 @@ namespace Narumikazuchi.Collections
                         this._items[free++] = this._items[current++];
                     }
                 }
-#pragma warning restore
 
-                Array.Clear(this._items, free, this._size - free);
+                Array.Clear(this._items, 
+                            free, 
+                            this._size - free);
                 Int32 result = this._size - free;
                 this._size = free;
                 this._version++;
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, list));
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 
+                                                                              list));
                 return result;
             }
         }
 
         /// <inheritdoc/>
-        public override void RemoveRange(in Int32 index, in Int32 count)
+        public override void RemoveRange(in Int32 index, 
+                                         in Int32 count)
         {
             if (index < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "Start index cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      START_INDEX_IS_NEGATIVE);
             }
             if (count < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(count),
+                                                      COUNT_IS_NEGATIVE);
             }
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if (this.Count - index < count)
             {
-                throw new ArgumentException("The specified count is greater than the available number of items.");
+                throw new ArgumentException(COUNT_IS_GREATER_THAN_ITEMS);
             }
 
-            IList<T> list = this.GetRange(index, count);
+            IList<TElement> list = this.GetRange(index, 
+                                                 count);
             lock (this._syncRoot)
             {
                 this.OnPropertyChanging(nameof(this.Count));
@@ -325,31 +234,29 @@ namespace Narumikazuchi.Collections
                     this._size -= count;
                     if (index < this._size)
                     {
-                        Array.Copy(this._items, index + count, this._items, index, this._size - index);
+                        Array.Copy(this._items, 
+                                   index + count, 
+                                   this._items, 
+                                   index, 
+                                   this._size - index);
                     }
-                    Array.Clear(this._items, this._size, count);
+                    Array.Clear(this._items, 
+                                this._size, 
+                                count);
                 }
                 this._version++;
             }
-            for (Int32 i = 0; i < list.Count; i++)
-            {
-                if (list[i] is INotifyPropertyChanging changing
-                            and INotifyPropertyChanged changed)
-                {
-                    changing.PropertyChanging += this.CacheItemChangingState;
-                    changed.PropertyChanged += this.RaiseItemChangedEvent;
-                }
-            }
             this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, (IList)list));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 
+                                                                          (IList)list));
         }
+    }
 
-        #endregion
-
-        #region ICollection
-
+    // ICollection
+    partial class ObservableRegister<TElement> : ICollection<TElement>
+    {
         /// <inheritdoc/>
-        public override Boolean Add([DisallowNull] T item)
+        public override Boolean Add([DisallowNull] TElement item)
         {
             this.OnPropertyChanging(nameof(this.Count));
             if (!base.Add(item))
@@ -358,20 +265,17 @@ namespace Narumikazuchi.Collections
             }
             if (this.AutoSort)
             {
-                this.Sort(this._autoSortDirection, this._autoSortComparer);
+                this.Sort(this._autoSortDirection, 
+                          this._autoSortComparer);
             }
             else
             {
                 this._sortDirection = SortDirection.NotSorted;
             }
-            if (item is INotifyPropertyChanging changing
-                     and INotifyPropertyChanged changed)
-            {
-                changing.PropertyChanging += this.CacheItemChangingState;
-                changed.PropertyChanged += this.RaiseItemChangedEvent;
-            }
+
             this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, 
+                                                                          item));
             return true;
         }
 
@@ -379,45 +283,34 @@ namespace Narumikazuchi.Collections
         public override void Clear()
         {
             this.OnPropertyChanging(nameof(this.Count));
-            for (Int32 i = 0; i < this.Count; i++)
-            {
-                if (this._items[i] is INotifyPropertyChanging changing
-                                   and INotifyPropertyChanged changed)
-                {
-                    changing.PropertyChanging -= this.CacheItemChangingState;
-                    changed.PropertyChanged -= this.RaiseItemChangedEvent;
-                }
-            }
             base.Clear();
             this.OnPropertyChanged(nameof(this.Count));
             this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
+    }
 
-        #endregion
-
-        #region IList
-
+    // IList
+    partial class ObservableRegister<TElement> : IList<TElement>
+    {
         /// <inheritdoc/>
-        public override void Insert(Int32 index, [DisallowNull] T item)
+        public override void Insert(Int32 index, 
+                                    [DisallowNull] TElement item)
         {
             this.OnPropertyChanging(nameof(this.Count));
-            base.Insert(index, item);
+            base.Insert(index, 
+                        item);
             if (this.AutoSort)
             {
-                this.Sort(this._autoSortDirection, this._autoSortComparer);
+                this.Sort(this._autoSortDirection, 
+                          this._autoSortComparer);
             }
             else
             {
                 this._sortDirection = SortDirection.NotSorted;
             }
-            if (item is INotifyPropertyChanging changing
-                     and INotifyPropertyChanged changed)
-            {
-                changing.PropertyChanging += this.CacheItemChangingState;
-                changed.PropertyChanged += this.RaiseItemChangedEvent;
-            }
             this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, 
+                                                                          item));
         }
 
         /// <inheritdoc/>
@@ -425,41 +318,39 @@ namespace Narumikazuchi.Collections
         {
             if (this.IsReadOnly)
             {
-                throw new InvalidOperationException("The list is read-only.");
+                throw new InvalidOperationException(LIST_IS_READONLY);
             }
             if ((UInt32)index > (UInt32)this.Count)
             {
-                throw new ArgumentOutOfRangeException(nameof(index), "The specified index exceeds the item count.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                                                      INDEX_GREATER_THAN_COUNT);
             }
 
             lock (this._syncRoot)
             {
-#pragma warning disable
                 this.OnPropertyChanging(nameof(this.Count));
                 this._size--;
-                T item = this._items[index];
+                TElement item = this._items[index];
                 if (index < this._size)
                 {
-                    Array.Copy(this._items, index + 1, this._items, index, this._size - index);
+                    Array.Copy(this._items, 
+                               index + 1, 
+                               this._items, 
+                               index, 
+                               this._size - index);
                 }
                 this._items[this._size] = default;
                 this._version++;
-                if (item is INotifyPropertyChanging changing
-                         and INotifyPropertyChanged changed)
-                {
-                    changing.PropertyChanging -= this.CacheItemChangingState;
-                    changed.PropertyChanged -= this.RaiseItemChangedEvent;
-                }
                 this.OnPropertyChanged(nameof(this.Count));
-                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-#pragma warning restore
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, 
+                                                                              item));
             }
         }
+    }
 
-        #endregion
-
-        #region INotifyCollectionChanged
-
+    // INotifyCollectionChanged
+    partial class ObservableRegister<TElement> : INotifyCollectionChanged
+    {
         /// <inheritdoc />
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
@@ -467,12 +358,13 @@ namespace Narumikazuchi.Collections
         /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
         /// </summary>
         protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e) =>
-            this.CollectionChanged?.Invoke(this, e);
+            this.CollectionChanged?.Invoke(this, 
+                                           e);
+    }
 
-        #endregion
-
-        #region INotifyPropertyChanging
-
+    // INotifyPropertyChanging
+    partial class ObservableRegister<TElement> : INotifyPropertyChanging
+    {
         /// <inheritdoc />
         public event PropertyChangingEventHandler? PropertyChanging;
 
@@ -480,12 +372,13 @@ namespace Narumikazuchi.Collections
         /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
         /// </summary>
         protected void OnPropertyChanging(String propertyName) =>
-            this.PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+            this.PropertyChanging?.Invoke(this, 
+                                          new PropertyChangingEventArgs(propertyName));
+    }
 
-        #endregion
-
-        #region INotifyPropertyChanged
-
+    // INotifyPropertyChanged
+    partial class ObservableRegister<TElement> : INotifyPropertyChanged
+    {
         /// <inheritdoc />
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -493,78 +386,27 @@ namespace Narumikazuchi.Collections
         /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
         /// </summary>
         protected void OnPropertyChanged(String propertyName) =>
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.PropertyChanged?.Invoke(this, 
+                                         new PropertyChangedEventArgs(propertyName));
+    }
 
-        #endregion
-
-        #region ISortable
-
+    // ISortable
+    partial class ObservableRegister<TElement> : ISortable<TElement>
+    {
         /// <inheritdoc />
         /// <exception cref="ArgumentException" />
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="InvalidOperationException" />
-        public override void Sort(SortDirection direction, IComparer<T>? comparer)
+        public override void Sort(in SortDirection direction, 
+                                  [AllowNull] IComparer<TElement>? comparer)
         {
-            base.Sort(direction, comparer);
-#pragma warning disable
-            IList list = new List<T>(this._items);
-#pragma warning restore
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, list, 0, 0));
+            base.Sort(direction, 
+                      comparer);
+            IList list = new List<TElement>(this._items.Take(this._size));
+            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, 
+                                                                          list, 
+                                                                          0, 
+                                                                          0));
         }
-
-        #endregion
-
-        #region Events
-
-        /// <summary>
-        /// Occurs when an item in the list changed.
-        /// </summary>
-        public event EventHandler<ObservableRegister<T>, ItemChangedEventArgs<T>>? ItemChanged;
-
-        /// <summary>
-        /// Caches the "previous" value of the changing property of the sender.
-        /// </summary>
-        protected void CacheItemChangingState(Object? sender, PropertyChangingEventArgs e)
-        {
-            this._cache = null;
-            if (sender is null ||
-                sender is not T obj ||
-                String.IsNullOrWhiteSpace(e.PropertyName))
-            {
-                return;
-            }
-
-            PropertyInfo? property = typeof(T).GetProperty(e.PropertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (property is null)
-            {
-                return;
-            }
-            this._cache = property.GetValue(obj)?.DeepCopy();
-        }
-
-        /// <summary>
-        /// Raises the <see cref="ItemChanged"/> event after an item in the list changed.
-        /// </summary>
-        protected void RaiseItemChangedEvent(Object? sender, PropertyChangedEventArgs e)
-        {
-            if (sender is null ||
-                sender is not T obj ||
-                String.IsNullOrWhiteSpace(e.PropertyName))
-            {
-                return;
-            }
-
-            this.ItemChanged?.Invoke(this, new ItemChangedEventArgs<T>(obj, this._cache, e.PropertyName));
-            this._cache = null;
-        }
-
-        #endregion
-
-        #region Fields
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        private Object? _cache = null;
-
-        #endregion
     }
 }

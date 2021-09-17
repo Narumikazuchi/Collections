@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Narumikazuchi.Collections
@@ -10,81 +11,141 @@ namespace Narumikazuchi.Collections
     /// </summary>
     public static class Enumerable
     {
-        #region Conversion to introduced Collections
+        /// <summary>
+        /// Creates a <see cref="ObservableList{TElement}"/> from an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        [return: NotNull]
+        public static ObservableList<TElement> ToObservableList<TElement>(this IEnumerable<TElement> source)
+            where TElement : INotifyPropertyChanged =>
+                source is ObservableList<TElement> list
+                    ? list
+                    : new(source);
 
         /// <summary>
-        /// Creates a <see cref="ObservableList{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="Register{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static ObservableList<T> ToObservableList<T>(this IEnumerable<T> source) where T : INotifyPropertyChanged => 
-            source is ObservableList<T> list ? list : new ObservableList<T>(source);
+        [return: NotNull]
+        public static Register<TElement> ToRegister<TElement>(this IEnumerable<TElement> source) =>
+            source is Register<TElement> register
+                ? register
+                : new(source);
+        /// <summary>
+        /// Creates a <see cref="Register{TElement}"/> from an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        [return: NotNull]
+        public static Register<TElement> ToRegister<TElement>(this IEnumerable<TElement> source,
+                                                              [AllowNull] IEqualityComparer<TElement>? comparer) =>
+            source is Register<TElement> register &&
+            ReferenceEquals(register.Comparer,
+                            comparer)
+                ? register
+                : new(comparer,
+                      source);
+        /// <summary>
+        /// Creates a <see cref="Register{TElement}"/> from an <see cref="IEnumerable{T}"/>.
+        /// </summary>
+        [return: NotNull]
+        public static Register<TElement> ToRegister<TElement>(this IEnumerable<TElement> source,
+                                                              [DisallowNull] EqualityComparison<TElement> comparison)
+        {
+            if (comparison is null)
+            {
+                throw new ArgumentNullException(nameof(comparison));
+            }
+            if (source is Register<TElement> register &&
+                register.Comparer is __FuncEqualityComparer<TElement> func &&
+                func.Comparison == comparison)
+            {
+                return register;
+            }
+            return new(comparison,
+                       source);
+        }
 
         /// <summary>
-        /// Creates a <see cref="Register{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="ObservableRegister{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static Register<T> ToRegister<T>(this IEnumerable<T> source) =>
-            source is Register<T> register ? register : new Register<T>(source);
+        [return: NotNull]
+        public static ObservableRegister<TElement> ToObservableRegister<TElement>(this IEnumerable<TElement> source) 
+            where TElement : INotifyPropertyChanged =>
+                source is ObservableRegister<TElement> register 
+                    ? register 
+                    : new(source);
         /// <summary>
-        /// Creates a <see cref="Register{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="ObservableRegister{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static Register<T> ToRegister<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer) =>
-            source is Register<T> register && ReferenceEquals(register.Comparer, comparer) ? register : new Register<T>(comparer, source);
+        [return: NotNull]
+        public static ObservableRegister<TElement> ToObservableRegister<TElement>(this IEnumerable<TElement> source, 
+                                                                                  [AllowNull] IEqualityComparer<TElement>? comparer) 
+            where TElement : INotifyPropertyChanged =>
+                source is ObservableRegister<TElement> register && 
+                ReferenceEquals(register.Comparer, 
+                                comparer) 
+                    ? register 
+                    : new(comparer, 
+                          source);
         /// <summary>
-        /// Creates a <see cref="Register{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="ObservableRegister{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static Register<T> ToRegister<T>(this IEnumerable<T> source, EqualityComparison<T> comparison) =>
-            source is Register<T> register && register.Comparer is __FuncEqualityComparer<T> func && func.Comparison == comparison ? register : new Register<T>(comparison, source);
+        [return: NotNull]
+        public static ObservableRegister<TElement> ToObservableRegister<TElement>(this IEnumerable<TElement> source, 
+                                                                                  [DisallowNull] EqualityComparison<TElement> comparison) 
+            where TElement : INotifyPropertyChanged
+        {
+            if (comparison is null)
+            {
+                throw new ArgumentNullException(nameof(comparison));
+            }
+            if (source is ObservableRegister<TElement> register &&
+                register.Comparer is __FuncEqualityComparer<TElement> func &&
+                func.Comparison == comparison)
+            {
+                return register;
+            }
+            return new(comparison,
+                       source);
+        }
 
         /// <summary>
-        /// Creates a <see cref="ObservableRegister{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="BinaryTree{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static ObservableRegister<T> ToObservableRegister<T>(this IEnumerable<T> source) where T : INotifyPropertyChanged =>
-            source is ObservableRegister<T> register ? register : new ObservableRegister<T>(source);
-        /// <summary>
-        /// Creates a <see cref="ObservableRegister{T}"/> from an <see cref="IEnumerable{T}"/>.
-        /// </summary>
-        public static ObservableRegister<T> ToObservableRegister<T>(this IEnumerable<T> source, IEqualityComparer<T>? comparer) where T : INotifyPropertyChanged =>
-            source is ObservableRegister<T> register && ReferenceEquals(register.Comparer, comparer) ? register : new ObservableRegister<T>(comparer, source);
-        /// <summary>
-        /// Creates a <see cref="ObservableRegister{T}"/> from an <see cref="IEnumerable{T}"/>.
-        /// </summary>
-        public static ObservableRegister<T> ToObservableRegister<T>(this IEnumerable<T> source, EqualityComparison<T> comparison) where T : INotifyPropertyChanged =>
-            source is ObservableRegister<T> register && register.Comparer is __FuncEqualityComparer<T> func && func.Comparison == comparison ? register : new ObservableRegister<T>(comparison, source);
+        [return: NotNull]
+        public static BinaryTree<TElement> ToBinaryTree<TElement>(this IEnumerable<TElement> source) 
+            where TElement : IComparable<TElement> =>
+                source is BinaryTree<TElement> tree 
+                    ? tree 
+                    : new(source);
 
         /// <summary>
-        /// Creates a <see cref="BinaryTree{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Creates a <see cref="BinaryTree{TElement}"/> from an <see cref="IEnumerable{T}"/>.
         /// </summary>
-        public static BinaryTree<T> ToBinaryTree<T>(this IEnumerable<T> source) where T : IComparable<T> =>
-            source is BinaryTree<T> tree ? tree : new BinaryTree<T>(source);
+        [return: NotNull]
+        public static Trie<TElement> ToTrie<TElement>(this IEnumerable<String> source) 
+            where TElement : class =>
+                source is Trie<TElement> trie 
+                    ? trie 
+                    : new(source);
 
         /// <summary>
-        /// Creates a <see cref="BinaryTree{T}"/> from an <see cref="IEnumerable{T}"/>.
+        /// Returns the item <typeparamref name="TElement"/> at the center of the collection.
         /// </summary>
-        public static Trie<T> ToTrie<T>(this IEnumerable<String> source) where T : class =>
-            source is Trie<T> trie ? trie : new Trie<T>(source);
-
-        #endregion
-
-        #region Enumerables
-
-        /// <summary>
-        /// Returns the item <typeparamref name="T"/> at the center of the collection.
-        /// </summary>
-        /// <returns>The item <typeparamref name="T"/> at the center of the collection</returns>
-        public static T? Median<T>(this IEnumerable<T> source)
+        /// <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
+        [return: MaybeNull]
+        public static TElement Median<TElement>(this IEnumerable<TElement> source)
         {
             if (!source.Any())
             {
                 return default;
             }
 
-            if (source is IReadOnlyList<T> list)
+            if (source is IReadOnlyList<TElement> list)
             {
                 return list[list.Count / 2];
             }
 
-            IEnumerator<T> enumerator;
+            IEnumerator<TElement> enumerator;
             Int32 index = 0;
-            if (source is IReadOnlyCollection<T> collection)
+            if (source is IReadOnlyCollection<TElement> collection)
             {
                 enumerator = collection.GetEnumerator();
                 while (index < collection.Count / 2)
@@ -95,7 +156,7 @@ namespace Narumikazuchi.Collections
                 return enumerator.Current;
             }
 
-            IEnumerator<T> counter = source.GetEnumerator();
+            IEnumerator<TElement> counter = source.GetEnumerator();
             enumerator = source.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -113,9 +174,15 @@ namespace Narumikazuchi.Collections
         /// </summary>
         /// <param name="source"></param>
         /// <param name="other">The collection to add.</param>
-        public static void AddRange<T>(this ICollection<T> source, IEnumerable<T> other)
+        public static void AddRange<TElement>(this ICollection<TElement> source, 
+                                              [DisallowNull] IEnumerable<TElement> other)
         {
-            foreach (T item in other)
+            if (other is null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            foreach (TElement item in other)
             {
                 source.Add(item);
             }
@@ -124,9 +191,11 @@ namespace Narumikazuchi.Collections
         /// <summary>
         /// Moves the item at the given index one position in the specified direction in the <see cref="IList{T}"/>.
         /// </summary>
-        public static void MoveItem<T>(this IList<T> list, Int32 index, ItemMoveDirection direction)
+        public static void MoveItem<TElement>(this IList<TElement> list, 
+                                              in Int32 index, 
+                                              in ItemMoveDirection direction)
         {
-            T tmp;
+            TElement tmp;
             if (direction == ItemMoveDirection.ToLowerIndex)
             {
                 if (index > 0)
@@ -150,19 +219,34 @@ namespace Narumikazuchi.Collections
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="IList{T}"/>.
         /// </summary>
-        public static void MoveItem<T>(this IList<T> list, Int32 index, ItemMoveDirection direction, Int32 positions)
+        public static void MoveItem<TElement>(this IList<TElement> list, 
+                                              in Int32 index, 
+                                              in ItemMoveDirection direction, 
+                                              Int32 positions)
         {
-            T item = list[index];
-            while (positions-- > 0)
+            if (positions == 0)
             {
-                list.MoveItem(item, direction);
+                return;
             }
+
+            TElement item = list[index];
+            list.RemoveAt(index);
+            if (positions > 0)
+            {
+                list.Insert(index + positions,
+                            item);
+                return;
+            }
+            list.Insert(index - positions,
+                        item);
         }
 
         /// <summary>
         /// Moves the item one position in the specified direction in the <see cref="IList{T}"/>.
         /// </summary>
-        public static void MoveItem<T>(this IList<T> list, T item, ItemMoveDirection direction)
+        public static void MoveItem<TElement>(this IList<TElement> list, 
+                                              [MaybeNull] TElement item, 
+                                              in ItemMoveDirection direction)
         {
             Int32 index = list.IndexOf(item);
             if (index == -1)
@@ -190,14 +274,31 @@ namespace Narumikazuchi.Collections
         /// <summary>
         /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="IList{T}"/>.
         /// </summary>
-        public static void MoveItem<T>(this IList<T> list, T item, ItemMoveDirection direction, Int32 positions)
+        public static void MoveItem<TElement>(this IList<TElement> list, 
+                                              [MaybeNull] TElement item, 
+                                              in ItemMoveDirection direction, 
+                                              Int32 positions)
         {
-            while (positions-- > 0)
+            if (positions == 0)
             {
-                list.MoveItem(item, direction);
+                return;
             }
-        }
 
-        #endregion
+            Int32 index = list.IndexOf(item);
+            if (index == -1)
+            {
+                return;
+            }
+
+            list.RemoveAt(index);
+            if (positions > 0)
+            {
+                list.Insert(index + positions,
+                            item);
+                return;
+            }
+            list.Insert(index - positions,
+                        item);
+        }
     }
 }
