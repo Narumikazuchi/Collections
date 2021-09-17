@@ -12,7 +12,7 @@ For more information visit https://github.com/Narumikazuchi/Collections/wiki.</D
     <PackageReleaseNotes></PackageReleaseNotes>
     <Version>1.0.0</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/Narumikazuchi/Collections</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Narumikazuchi/Collections/wiki</PackageProjectUrl>
     <PackageIcon>Narumikazuchi nuget.png</PackageIcon>
     <PackageTags>Collections; Base Classes; Interfaces</PackageTags>
   </PropertyGroup>
