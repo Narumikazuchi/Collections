@@ -4,26 +4,26 @@ using System.Collections.Generic;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    internal readonly partial struct __SortedSetICollectionWrapper<Type>
+    internal readonly partial struct __SortedSetICollectionWrapper<TElement>
     {
-        public __SortedSetICollectionWrapper(SortedSet<Type> source) =>
+        public __SortedSetICollectionWrapper(SortedSet<TElement> source) =>
             this._source = source;
 
-        public static explicit operator SortedSet<Type>(__SortedSetICollectionWrapper<Type> source) =>
+        public static explicit operator SortedSet<TElement>(__SortedSetICollectionWrapper<TElement> source) =>
             source._source;
 
     }
 
     // Non-Public
-    partial struct __SortedSetICollectionWrapper<Type>
+    partial struct __SortedSetICollectionWrapper<TElement>
     {
-        private readonly SortedSet<Type> _source;
+        private readonly SortedSet<TElement> _source;
     }
 
     // IEnumerable
-    partial struct __SortedSetICollectionWrapper<Type> : IEnumerable<Type>
+    partial struct __SortedSetICollectionWrapper<TElement> : IEnumerable<TElement>
     {
-        public IEnumerator<Type> GetEnumerator() =>
+        public IEnumerator<TElement> GetEnumerator() =>
             this._source.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() =>
@@ -31,19 +31,19 @@ namespace Narumikazuchi.Collections.Abstract
     }
 
     // IReadOnlyCollection
-    partial struct __SortedSetICollectionWrapper<Type> : IReadOnlyCollection<Type>
+    partial struct __SortedSetICollectionWrapper<TElement> : IReadOnlyCollection<TElement>
     {
         public Int32 Count =>
             this._source.Count;
     }
 
     // IReadOnlyCollection2
-    partial struct __SortedSetICollectionWrapper<Type> : IReadOnlyCollection2<Type>
+    partial struct __SortedSetICollectionWrapper<TElement> : IReadOnlyCollection2<TElement>
     {
-        public Boolean Contains(Type item) =>
+        public Boolean Contains(TElement item) =>
             this._source.Contains(item);
 
-        public void CopyTo(Type[] array, Int32 index) =>
+        public void CopyTo(TElement[] array, Int32 index) =>
             this._source.CopyTo(array, index);
     }
 }

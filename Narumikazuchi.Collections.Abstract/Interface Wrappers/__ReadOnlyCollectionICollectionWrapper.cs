@@ -5,26 +5,26 @@ using System.Collections.ObjectModel;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    internal readonly partial struct __ReadOnlyCollectionICollectionWrapper<Type>
+    internal readonly partial struct __ReadOnlyCollectionICollectionWrapper<TElement>
     {
-        public __ReadOnlyCollectionICollectionWrapper(ReadOnlyCollection<Type> source) =>
+        public __ReadOnlyCollectionICollectionWrapper(ReadOnlyCollection<TElement> source) =>
             this._source = source;
 
-        public static explicit operator ReadOnlyCollection<Type>(__ReadOnlyCollectionICollectionWrapper<Type> source) =>
+        public static explicit operator ReadOnlyCollection<TElement>(__ReadOnlyCollectionICollectionWrapper<TElement> source) =>
             source._source;
 
     }
 
     // Non-Public
-    partial struct __ReadOnlyCollectionICollectionWrapper<Type>
+    partial struct __ReadOnlyCollectionICollectionWrapper<TElement>
     {
-        private readonly ReadOnlyCollection<Type> _source;
+        private readonly ReadOnlyCollection<TElement> _source;
     }
 
     // IEnumerable
-    partial struct __ReadOnlyCollectionICollectionWrapper<Type> : IEnumerable<Type>
+    partial struct __ReadOnlyCollectionICollectionWrapper<TElement> : IEnumerable<TElement>
     {
-        public IEnumerator<Type> GetEnumerator() =>
+        public IEnumerator<TElement> GetEnumerator() =>
             this._source.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() =>
@@ -32,19 +32,19 @@ namespace Narumikazuchi.Collections.Abstract
     }
 
     // IReadOnlyCollection
-    partial struct __ReadOnlyCollectionICollectionWrapper<Type> : IReadOnlyCollection<Type>
+    partial struct __ReadOnlyCollectionICollectionWrapper<TElement> : IReadOnlyCollection<TElement>
     {
         public Int32 Count =>
             this._source.Count;
     }
 
     // IReadOnlyCollection2
-    partial struct __ReadOnlyCollectionICollectionWrapper<Type> : IReadOnlyCollection2<Type>
+    partial struct __ReadOnlyCollectionICollectionWrapper<TElement> : IReadOnlyCollection2<TElement>
     {
-        public Boolean Contains(Type item) =>
+        public Boolean Contains(TElement item) =>
             this._source.Contains(item);
 
-        public void CopyTo(Type[] array, Int32 index) =>
+        public void CopyTo(TElement[] array, Int32 index) =>
             this._source.CopyTo(array, index);
     }
 }

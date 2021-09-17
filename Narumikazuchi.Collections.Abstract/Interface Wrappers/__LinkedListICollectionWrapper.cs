@@ -4,26 +4,26 @@ using System.Collections.Generic;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    internal readonly partial struct __LinkedListICollectionWrapper<Type>
+    internal readonly partial struct __LinkedListICollectionWrapper<TElement>
     {
-        public __LinkedListICollectionWrapper(LinkedList<Type> source) =>
+        public __LinkedListICollectionWrapper(LinkedList<TElement> source) =>
             this._source = source;
 
-        public static explicit operator LinkedList<Type>(__LinkedListICollectionWrapper<Type> source) =>
+        public static explicit operator LinkedList<TElement>(__LinkedListICollectionWrapper<TElement> source) =>
             source._source;
 
     }
 
     // Non-Public
-    partial struct __LinkedListICollectionWrapper<Type>
+    partial struct __LinkedListICollectionWrapper<TElement>
     {
-        private readonly LinkedList<Type> _source;
+        private readonly LinkedList<TElement> _source;
     }
 
     // IEnumerable
-    partial struct __LinkedListICollectionWrapper<Type> : IEnumerable<Type>
+    partial struct __LinkedListICollectionWrapper<TElement> : IEnumerable<TElement>
     {
-        public IEnumerator<Type> GetEnumerator() =>
+        public IEnumerator<TElement> GetEnumerator() =>
             this._source.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() =>
@@ -31,19 +31,19 @@ namespace Narumikazuchi.Collections.Abstract
     }
 
     // IReadOnlyCollection
-    partial struct __LinkedListICollectionWrapper<Type> : IReadOnlyCollection<Type>
+    partial struct __LinkedListICollectionWrapper<TElement> : IReadOnlyCollection<TElement>
     {
         public Int32 Count =>
             this._source.Count;
     }
 
     // IReadOnlyCollection2
-    partial struct __LinkedListICollectionWrapper<Type> : IReadOnlyCollection2<Type>
+    partial struct __LinkedListICollectionWrapper<TElement> : IReadOnlyCollection2<TElement>
     {
-        public Boolean Contains(Type item) =>
+        public Boolean Contains(TElement item) =>
             this._source.Contains(item);
 
-        public void CopyTo(Type[] array, Int32 index) =>
+        public void CopyTo(TElement[] array, Int32 index) =>
             this._source.CopyTo(array, index);
     }
 }

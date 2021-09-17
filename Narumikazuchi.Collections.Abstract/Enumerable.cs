@@ -9,63 +9,63 @@ namespace Narumikazuchi.Collections.Abstract
     public static class Enumerable
     {
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this Collection<T> source) =>
-            new __CollectionICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Collection<TElement> source) =>
+            new __CollectionICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this LinkedList<T> source) =>
-            new __LinkedListICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this LinkedList<TElement> source) =>
+            new __LinkedListICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this List<T> source) =>
-            new __ListICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this List<TElement> source) =>
+            new __ListICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this Queue<T> source) =>
-            new __QueueICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Queue<TElement> source) =>
+            new __QueueICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this ReadOnlyCollection<T> source) =>
-            new __ReadOnlyCollectionICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this ReadOnlyCollection<TElement> source) =>
+            new __ReadOnlyCollectionICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this SortedSet<T> source) =>
-            new __SortedSetICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this SortedSet<TElement> source) =>
+            new __SortedSetICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyCollection2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyCollection2<T> AsIReadOnlyCollection2<T>(this Stack<T> source) =>
-            new __StackICollectionWrapper<T>(source);
+        public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Stack<TElement> source) =>
+            new __StackICollectionWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyList2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyList2<T> AsIReadOnlyList2<T>(this Collection<T> source) =>
-            new __CollectionIListWrapper<T>(source);
+        public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this Collection<TElement> source) =>
+            new __CollectionIListWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyList2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyList2<T> AsIReadOnlyList2<T>(this List<T> source) =>
-            new __ListIListWrapper<T>(source);
+        public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this List<TElement> source) =>
+            new __ListIListWrapper<TElement>(source);
 
         /// <summary>
-        /// Represents this object as the <see cref="IReadOnlyList2{T}"/> interface.
+        /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
         /// </summary>
-        public static IReadOnlyList2<T> AsIReadOnlyList2<T>(this ReadOnlyCollection<T> source) =>
-            new __ReadOnlyCollectionIListWrapper<T>(source);
+        public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this ReadOnlyCollection<TElement> source) =>
+            new __ReadOnlyCollectionIListWrapper<TElement>(source);
     }
 }

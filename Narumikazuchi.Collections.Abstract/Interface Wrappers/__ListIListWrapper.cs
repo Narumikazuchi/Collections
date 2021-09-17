@@ -4,26 +4,26 @@ using System.Collections.Generic;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    internal readonly partial struct __ListIListWrapper<Type>
+    internal readonly partial struct __ListIListWrapper<TElement>
     {
-        public __ListIListWrapper(List<Type> source) =>
+        public __ListIListWrapper(List<TElement> source) =>
             this._source = source;
 
-        public static explicit operator List<Type>(__ListIListWrapper<Type> source) =>
+        public static explicit operator List<TElement>(__ListIListWrapper<TElement> source) =>
             source._source;
 
     }
 
     // Non-Public
-    partial struct __ListIListWrapper<Type>
+    partial struct __ListIListWrapper<TElement>
     {
-        private readonly List<Type> _source;
+        private readonly List<TElement> _source;
     }
 
     // IEnumerable
-    partial struct __ListIListWrapper<Type> : IEnumerable<Type>
+    partial struct __ListIListWrapper<TElement> : IEnumerable<TElement>
     {
-        public IEnumerator<Type> GetEnumerator() =>
+        public IEnumerator<TElement> GetEnumerator() =>
             this._source.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() =>
@@ -31,33 +31,33 @@ namespace Narumikazuchi.Collections.Abstract
     }
 
     // IReadOnlyCollection
-    partial struct __ListIListWrapper<Type> : IReadOnlyCollection<Type>
+    partial struct __ListIListWrapper<TElement> : IReadOnlyCollection<TElement>
     {
         public Int32 Count =>
             this._source.Count;
     }
 
     // IReadOnlyCollection2
-    partial struct __ListIListWrapper<Type> : IReadOnlyCollection2<Type>
+    partial struct __ListIListWrapper<TElement> : IReadOnlyCollection2<TElement>
     {
-        public Boolean Contains(Type item) =>
+        public Boolean Contains(TElement item) =>
             this._source.Contains(item);
 
-        public void CopyTo(Type[] array, Int32 index) =>
+        public void CopyTo(TElement[] array, Int32 index) =>
             this._source.CopyTo(array, index);
     }
 
     // IReadOnlyList
-    partial struct __ListIListWrapper<Type> : IReadOnlyList<Type>
+    partial struct __ListIListWrapper<TElement> : IReadOnlyList<TElement>
     {
-        public Type this[Int32 index] =>
+        public TElement this[Int32 index] =>
             this._source[index];
     }
 
     // IReadOnlyList2
-    partial struct __ListIListWrapper<Type> : IReadOnlyList2<Type>
+    partial struct __ListIListWrapper<TElement> : IReadOnlyList2<TElement>
     {
-        public Int32 IndexOf(Type item) =>
+        public Int32 IndexOf(TElement item) =>
             this._source.IndexOf(item);
     }
 }

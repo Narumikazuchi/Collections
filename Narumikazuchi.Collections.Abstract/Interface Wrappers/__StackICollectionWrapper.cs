@@ -4,26 +4,26 @@ using System.Collections.Generic;
 
 namespace Narumikazuchi.Collections.Abstract
 {
-    internal readonly partial struct __StackICollectionWrapper<Type>
+    internal readonly partial struct __StackICollectionWrapper<TElement>
     {
-        public __StackICollectionWrapper(Stack<Type> source) =>
+        public __StackICollectionWrapper(Stack<TElement> source) =>
             this._source = source;
 
-        public static explicit operator Stack<Type>(__StackICollectionWrapper<Type> source) =>
+        public static explicit operator Stack<TElement>(__StackICollectionWrapper<TElement> source) =>
             source._source;
 
     }
 
     // Non-Public
-    partial struct __StackICollectionWrapper<Type>
+    partial struct __StackICollectionWrapper<TElement>
     {
-        private readonly Stack<Type> _source;
+        private readonly Stack<TElement> _source;
     }
 
     // IEnumerable
-    partial struct __StackICollectionWrapper<Type> : IEnumerable<Type>
+    partial struct __StackICollectionWrapper<TElement> : IEnumerable<TElement>
     {
-        public IEnumerator<Type> GetEnumerator() =>
+        public IEnumerator<TElement> GetEnumerator() =>
             this._source.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() =>
@@ -31,19 +31,19 @@ namespace Narumikazuchi.Collections.Abstract
     }
 
     // IReadOnlyCollection
-    partial struct __StackICollectionWrapper<Type> : IReadOnlyCollection<Type>
+    partial struct __StackICollectionWrapper<TElement> : IReadOnlyCollection<TElement>
     {
         public Int32 Count =>
             this._source.Count;
     }
 
     // IReadOnlyCollection2
-    partial struct __StackICollectionWrapper<Type> : IReadOnlyCollection2<Type>
+    partial struct __StackICollectionWrapper<TElement> : IReadOnlyCollection2<TElement>
     {
-        public Boolean Contains(Type item) =>
+        public Boolean Contains(TElement item) =>
             this._source.Contains(item);
 
-        public void CopyTo(Type[] array, Int32 index) =>
+        public void CopyTo(TElement[] array, Int32 index) =>
             this._source.CopyTo(array, index);
     }
 }
