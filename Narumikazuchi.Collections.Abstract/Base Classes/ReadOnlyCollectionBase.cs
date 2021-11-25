@@ -1,216 +1,214 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
+﻿namespace Narumikazuchi.Collections.Abstract;
 
-namespace Narumikazuchi.Collections.Abstract
+/// <summary>
+/// Represents a strongly typed collection of objects. 
+/// </summary>
+public abstract partial class ReadOnlyCollectionBase<TElement> : ArrayBasedCollection<TElement>
 {
     /// <summary>
-    /// Represents a strongly typed collection of objects. 
+    /// Converts all elements in the <see cref="ReadOnlyCollectionBase{T}"/> into another type and returns an <see cref="IList{T}"/>
+    /// containing the converted objects.
     /// </summary>
-    public abstract partial class ReadOnlyCollectionBase<TElement> : ArrayBasedCollection<TElement>
+    /// <param name="converter">A delegate which converts every item into the new type.</param>
+    /// <returns>An <see cref="IList{T}"/> which contains the converted objects</returns>
+    /// <exception cref="ArgumentNullException" />
+    [Pure]
+    [return: NotNull]
+    public virtual ICollection<TOutput> ConvertAll<TOutput>([DisallowNull] Converter<TElement, TOutput> converter)
     {
-        /// <summary>
-        /// Converts all elements in the <see cref="ReadOnlyCollectionBase{T}"/> into another type and returns an <see cref="IList{T}"/>
-        /// containing the converted objects.
-        /// </summary>
-        /// <param name="converter">A delegate which converts every item into the new type.</param>
-        /// <returns>An <see cref="IList{T}"/> which contains the converted objects</returns>
-        /// <exception cref="ArgumentNullException" />
-        [Pure]
-        [return: NotNull]
-        public virtual ICollection<TOutput> ConvertAll<TOutput>([DisallowNull] Converter<TElement, TOutput> converter)
+        ExceptionHelpers.ThrowIfArgumentNull(converter);
+
+        List<TOutput> result = new();
+        lock (this._syncRoot)
         {
-            if (converter is null)
-            {
-                throw new ArgumentNullException(nameof(converter));
-            }
+            Int32 v = this._version;
 
-            List<TOutput> result = new();
-            lock (this._syncRoot)
+            for (Int32 i = 0; i < this._size; i++)
             {
-                Int32 v = this._version;
-
-                for (Int32 i = 0; i < this._size; i++)
+                if (this._version != v)
                 {
-                    if (this._version != v)
-                    {
-                        throw new InvalidOperationException(COLLECTION_CHANGED);
-                    }
-                    result.Add(converter.Invoke(this._items[i]));
+                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
+                    ex.Data.Add(key: "Index",
+                                value: i);
+                    ex.Data.Add(key: "Fixed Version",
+                                value: v);
+                    ex.Data.Add(key: "Altered Version",
+                                value: this._version);
+                    throw ex;
                 }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Performs the specified action for every element of this <see cref="ReadOnlyCollectionBase{T}"/>.
-        /// </summary>
-        /// <param name="action">The action to perform on each item.</param>
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        [Pure]
-        public virtual void ForEach([DisallowNull] Action<TElement> action)
-        {
-            if (action is null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            lock (this._syncRoot)
-            {
-                Int32 v = this._version;
-                for (Int32 i = 0; i < this._size; i++)
-                {
-                    if (this._version != v)
-                    {
-                        throw new InvalidOperationException(COLLECTION_CHANGED);
-                    }
-                    action.Invoke(this._items[i]);
-                }
+                result.Add(item: converter.Invoke(input: this._items[i]));
             }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the <see cref="ReadOnlyCollectionBase{T}"/> is read-only.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        public virtual Boolean IsReadOnly { get; } = true;
+        return result;
     }
 
-    // Non-Public
-    partial class ReadOnlyCollectionBase<TElement>
+    /// <summary>
+    /// Performs the specified action for every element of this <see cref="ReadOnlyCollectionBase{T}"/>.
+    /// </summary>
+    /// <param name="action">The action to perform on each item.</param>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    [Pure]
+    public virtual void ForEach([DisallowNull] Action<TElement> action)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class.
-        /// </summary>
-        protected ReadOnlyCollectionBase() => 
-            this._items = _emptyArray;
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class containing the specified collection of items.
-        /// </summary>
-        /// <param name="collection">The collection of items in this list.</param>
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="InvalidOperationException" />
-        protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<TElement> collection)
-        {
-            if (collection is null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+        ExceptionHelpers.ThrowIfArgumentNull(action);
 
-            if (collection is ICollection<TElement> c)
+        lock (this._syncRoot)
+        {
+            Int32 v = this._version;
+            for (Int32 i = 0; i < this._size; i++)
             {
-                if (c.Count == 0)
+                if (this._version != v)
                 {
-                    this._items = _emptyArray;
+                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
+                    ex.Data.Add(key: "Index",
+                                value: i);
+                    ex.Data.Add(key: "Fixed Version",
+                                value: v);
+                    ex.Data.Add(key: "Altered Version",
+                                value: this._version);
+                    throw ex;
                 }
-                else
-                {
-                    this._items = new TElement[c.Count];
-                    c.CopyTo(this._items, 
-                             0);
-                    this._size = c.Count;
-                }
+                action.Invoke(obj: this._items[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the <see cref="ReadOnlyCollectionBase{T}"/> is read-only.
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+    public virtual Boolean IsReadOnly { get; } = true;
+}
+
+// Non-Public
+partial class ReadOnlyCollectionBase<TElement>
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class.
+    /// </summary>
+    protected ReadOnlyCollectionBase() => 
+        this._items = _emptyArray;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<TElement> collection,
+                                     Boolean exactCapacity)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
+
+        if (collection is ICollection<TElement> c)
+        {
+            if (c.Count == 0)
+            {
+                this._items = _emptyArray;
             }
             else
             {
-                this._size = 0;
-                this._items = _emptyArray;
-
-                using IEnumerator<TElement> enumerator = collection.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    if (this._items.Length == this._size)
-                    {
-                        Int32 capacity = this._items.Length == 0 
-                                                ? DEFAULTCAPACITY 
-                                                : this._items.Length * 2;
-                        TElement[] array = new TElement[capacity];
-                        Array.Copy(this._items, 
-                                   0, 
-                                   array, 
-                                   0, 
-                                   this._size);
-                        this._items = array;
-                    }
-                    this._items[this._size++] = enumerator.Current;
-                }
-                if (this._items.Length != this._size)
-                {
-                    TElement[] array = new TElement[this._size];
-                    Array.Copy(this._items, 
-                               0, 
-                               array, 
-                               0, 
-                               this._size);
-                    this._items = array;
-                }
+                this._items = new TElement[c.Count];
+                c.CopyTo(array: this._items, 
+                         arrayIndex: 0);
+                this._size = c.Count;
             }
         }
+        else
+        {
+            this._size = 0;
+            this._items = _emptyArray;
 
-#pragma warning disable
-        /// <summary>
-        /// Error message, when trying to copy this collection to a multidimensional array.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        protected const String MULTI_DIMENSIONAL_ARRAYS = "Multidimensional array are not supported.";
-#pragma warning restore
+            using IEnumerator<TElement> enumerator = collection.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                this.EnsureCapacity(capacity: this._size + 1);
+                this._items[this._size++] = enumerator.Current;
+            }
+            // Resize to an exact fit
+            if (exactCapacity &&
+                this._items.Length != this._size)
+            {
+                TElement[] array = new TElement[this._size];
+                Array.Copy(sourceArray: this._items, 
+                           sourceIndex: 0, 
+                           destinationArray: array, 
+                           destinationIndex: 0, 
+                           length: this._size);
+                this._items = array;
+            }
+        }
     }
 
-    // IReadOnlyCollection2
-    partial class ReadOnlyCollectionBase<TElement> : IReadOnlyCollection2<TElement>
+#pragma warning disable
+    /// <summary>
+    /// Error message, when trying to copy this collection to a multidimensional array.
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    protected const String MULTI_DIMENSIONAL_ARRAYS = "Multidimensional array are not supported.";
+#pragma warning restore
+}
+
+// IReadOnlyCollection2
+partial class ReadOnlyCollectionBase<TElement> : IReadOnlyCollection2<TElement>
+{
+    /// <inheritdoc />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual Boolean Contains([AllowNull] TElement item)
     {
-        /// <inheritdoc />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="ArgumentOutOfRangeException" />
-        [Pure]
-        public virtual Boolean Contains([DisallowNull] TElement item)
+        lock (this._syncRoot)
         {
-            lock (this._syncRoot)
+            Int32 v = this._version;
+            for (Int32 i = 0; i < this._size; i++)
             {
-                Int32 v = this._version;
-                for (Int32 i = 0; i < this._size; i++)
+                if (this._version != v)
                 {
-                    if (this._version != v)
-                    {
-                        throw new InvalidOperationException(COLLECTION_CHANGED);
-                    }
-                    if (item.Equals(this._items[i]))
-                    {
-                        return true;
-                    }
+                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
+                    ex.Data.Add(key: "Index",
+                                value: i);
+                    ex.Data.Add(key: "Fixed Version",
+                                value: v);
+                    ex.Data.Add(key: "Altered Version",
+                                value: this._version);
+                    throw ex;
                 }
-                return false;
+                if ((item is null && 
+                    this._items[i] is null) ||
+                    (item is not null &&
+                    item.Equals(this._items[i])))
+                {
+                    return true;
+                }
             }
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual void CopyTo([DisallowNull] TElement[] array, 
+                               Int32 index)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(array);
+        if (array.Rank != 1)
+        {
+            throw new ArgumentException(message: MULTI_DIMENSIONAL_ARRAYS);
         }
 
-        /// <inheritdoc />
-        /// <exception cref="ArgumentException" />
-        /// <exception cref="ArgumentNullException" />
-        /// <exception cref="ArgumentOutOfRangeException" />
-        [Pure]
-        public virtual void CopyTo([DisallowNull] TElement[] array, Int32 index)
+        lock (this._syncRoot)
         {
-            if (array is null)
-            {
-                throw new ArgumentNullException(nameof(array));
-            }
-            if (array.Rank != 1)
-            {
-                throw new ArgumentException(MULTI_DIMENSIONAL_ARRAYS);
-            }
-
-            lock (this._syncRoot)
-            {
-                Array.Copy(this._items, 
-                           0, 
-                           array, 
-                           index, 
-                           this._size);
-            }
+            Array.Copy(sourceArray: this._items, 
+                       sourceIndex: 0, 
+                       destinationArray: array, 
+                       destinationIndex: index, 
+                       length: this._size);
         }
     }
 }

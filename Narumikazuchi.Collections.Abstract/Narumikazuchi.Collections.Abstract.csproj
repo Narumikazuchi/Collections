@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <RepositoryUrl>https://github.com/Narumikazuchi/Collections</RepositoryUrl>
     <Authors>Narumikazuchi</Authors>
     <Copyright>©2021 Narumikazuchi</Copyright>
@@ -37,6 +40,10 @@ For more information visit https://github.com/Narumikazuchi/Collections/wiki.</D
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Narumikazuchi" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
