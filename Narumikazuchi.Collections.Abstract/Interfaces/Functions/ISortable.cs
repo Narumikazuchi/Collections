@@ -3,7 +3,8 @@
 /// <summary>
 /// Represents an <see cref="IEnumerable{T}"/> that can be sorted.
 /// </summary>
-public interface ISortable<TElement> : IEnumerable<TElement>
+public interface ISortable<TElement> : 
+    IEnumerable<TElement>
 {
     /// <summary>
     /// Sorts the contents of this object in the specifiedorder.
@@ -15,7 +16,7 @@ public interface ISortable<TElement> : IEnumerable<TElement>
     /// </summary>
     /// <param name="direction">The <see cref="Collections.SortDirection"/> in which to sort the contents of this object.</param>
     /// <param name="comparison">The comparision to use for the sorting process.</param>
-    public void Sort(in SortDirection direction, 
+    public void Sort(in SortDirection direction,
                      [DisallowNull] Comparison<TElement> comparison);
     /// <summary>
     /// Sorts the contents of this object in the specified order using the specified comparer.
@@ -28,9 +29,11 @@ public interface ISortable<TElement> : IEnumerable<TElement>
     /// <summary>
     /// Gets if the object is currently sorted.
     /// </summary>
+    [Pure]
     public Boolean IsSorted { get; }
     /// <summary>
     /// Gets the direction this collection is sorted in.
     /// </summary>
+    [Pure]
     public SortDirection SortDirection { get; }
 }

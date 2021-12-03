@@ -5,57 +5,7 @@
 /// </summary>
 [DebuggerDisplay("Count = {_size}")]
 public abstract partial class ArrayBasedCollection<TElement>
-{
-    /// <summary>
-    /// Copies the entire <see cref="ArrayBasedCollection{T}"/> into a new array.
-    /// </summary>
-    /// <returns>A new array containing all items from this collection</returns>
-    [Pure]
-    [return: NotNull]
-    public virtual TElement[] ToArray()
-    {
-        lock (this._syncRoot)
-        {
-            if (this._size == 0)
-            {
-                return Array.Empty<TElement>();
-            }
-
-            TElement[] array = new TElement[this._size];
-            Array.Copy(sourceArray: this._items, 
-                       sourceIndex: 0, 
-                       destinationArray: array, 
-                       destinationIndex: 0, 
-                       length: this._size);
-            return array;
-        }
-    }
-
-    /// <summary>
-    /// Gets the number of elements contained in the <see cref="ArrayBasedCollection{T}"/>.
-    /// </summary>
-    [Pure]
-    public virtual Int32 Count
-    {
-        get
-        {
-            lock (this._syncRoot)
-            {
-                return this._size;
-            }
-        }
-    }
-    /// <summary>
-    /// Gets a value indicating whether the <see cref="ArrayBasedCollection{T}"/> has a fixed size.
-    /// </summary>
-    public virtual Boolean IsFixedSize => false;
-    /// <summary>
-    /// Gets the object mutex used to synchronize acces to this <see cref="ArrayBasedCollection{T}"/>.
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    [DisallowNull]
-    public virtual Object SyncRoot => this._syncRoot;
-}
+{ }
 
 // Non-Public
 partial class ArrayBasedCollection<TElement>
@@ -78,50 +28,29 @@ partial class ArrayBasedCollection<TElement>
     /// </summary>
     /// <param name="capacity">The number of items to fit into this collection.</param>
     /// <exception cref="NotAllowed" />
-    protected void EnsureCapacity(in Int32 capacity)
-    {
-        if (this._items.Length < capacity)
-        {
-            if (this.IsFixedSize)
-            {
-                throw new NotAllowed(auxMessage: SIZE_IS_FIXED);
-            }
-            Int32 bigger = this._items.Length == 0 
-                                ? DEFAULTCAPACITY 
-                                : this._items.Length * 2;
-            bigger = bigger.Clamp(1, MAXARRAYSIZE);
-            TElement[] array = new TElement[bigger];
-            lock (this._syncRoot)
-            {
-                if (this._size > 0)
-                {
-                    Array.Copy(sourceArray: this._items, 
-                               sourceIndex: 0, 
-                               destinationArray: array, 
-                               destinationIndex: 0, 
-                               length: this._size);
-                }
-                this._items = array;
-            }
-        }
-    }
+    protected void EnsureCapacity(in Int32 capacity) =>
+        ICollectionExpandable<TElement>.EnsureCapacity(this,
+                                                       capacity);
 
     /// <summary>
     /// Statically allocates an empty array to use for every <see cref="ArrayBasedCollection{T}"/> using the type <typeparamref name="TElement"/>.
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    protected static readonly TElement[] _emptyArray = Array.Empty<TElement>();
+    [NotNull]
+    protected static readonly TElement?[] _emptyArray = Array.Empty<TElement?>();
 
     /// <summary>
     /// The internal mutex for synchronizing multi-threaded access.
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [NotNull]
     protected readonly Object _syncRoot = new();
     /// <summary>
     /// Internally manages and contains the items for the <see cref="ArrayBasedCollection{T}"/>.
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-    protected TElement[] _items = new TElement[1];
+    [NotNull]
+    protected TElement?[] _items = new TElement?[1];
     /// <summary>
     /// Internally manages and contains the actual amount of items in the <see cref="ArrayBasedCollection{T}"/>.
     /// </summary>
@@ -157,12 +86,117 @@ partial class ArrayBasedCollection<TElement>
 #pragma warning restore
 }
 
-// IEnumerable
-partial class ArrayBasedCollection<TElement> : IEnumerable<TElement>
+// IBackendContainer<T>
+partial class ArrayBasedCollection<TElement> : IBackingContainer<TElement?[]>
+{
+    [NotNull]
+    TElement?[] IBackingContainer<TElement?[]>.Items
+    {
+        get => this._items;
+        set => this._items = value;
+    }
+
+    Int32 IBackingContainer<TElement?[]>.ItemCount
+    {
+        get => this._size;
+        set => this._size = value;
+    }
+}
+
+// ICollection
+partial class ArrayBasedCollection<TElement> : ICollection
+{
+    /// <inheritdoc/>
+    [Pure]
+    public abstract void CopyTo([DisallowNull] Array array, 
+                                Int32 index);
+
+    /// <inheritdoc/>
+    [Pure]
+    public virtual Int32 Count
+    {
+        get
+        {
+            lock (this._syncRoot)
+            {
+                return this._size;
+            }
+        }
+    }
+}
+
+// ICollectionExpandable<T>
+partial class ArrayBasedCollection<TElement> : ICollectionExpandable<TElement>
+{
+    void ICollectionExpandable<TElement>.EnsureCapacity(in Int32 capacity) =>
+        this.EnsureCapacity(capacity);
+}
+
+// ICollectionImmutability
+partial class ArrayBasedCollection<TElement> : ICollectionImmutability
+{
+    /// <inheritdoc/>
+    [Pure]
+    public virtual Boolean IsFixedSize => false;
+}
+
+// IConvertToArray<T>
+partial class ArrayBasedCollection<TElement> : IConvertToArray<TElement?[]>
+{
+    /// <inheritdoc/>
+    [Pure]
+    [return: NotNull]
+    public virtual TElement?[] ToArray()
+    {
+        lock (this._syncRoot)
+        {
+            if (this._size == 0)
+            {
+                return Array.Empty<TElement?>();
+            }
+
+            TElement?[] array = new TElement?[this._size];
+            Array.Copy(sourceArray: this._items,
+                       sourceIndex: 0,
+                       destinationArray: array,
+                       destinationIndex: 0,
+                       length: this._size);
+            return array;
+        }
+    }
+}
+
+// IElementContainer
+partial class ArrayBasedCollection<TElement> : IElementContainer
+{
+    [Pure]
+    Boolean IElementContainer.Contains(Object? item) =>
+        item is TElement element &&
+        this.Contains(element);
+}
+
+// IElementContainer<T>
+partial class ArrayBasedCollection<TElement> : IElementContainer<TElement?>
+{
+    /// <inheritdoc/>
+    [Pure]
+    public virtual Boolean Contains([AllowNull] TElement? item)
+    {
+        lock (this._syncRoot)
+        {
+            return Array.IndexOf(array: this._items,
+                                 value: item) > -1;
+        }
+    }
+}
+
+// IEnumerable<T>
+partial class ArrayBasedCollection<TElement> : IEnumerable<TElement?>
 {
     /// <inheritdoc />
     [Pure]
-    public IEnumerator<TElement> GetEnumerator()
+    [return: NotNull]
+    public IEnumerator<TElement?> GetEnumerator()
     {
         lock (this._syncRoot)
         {
@@ -187,6 +221,30 @@ partial class ArrayBasedCollection<TElement> : IEnumerable<TElement>
 
     /// <inheritdoc />
     [Pure]
-    IEnumerator IEnumerable.GetEnumerator() => 
+    [return: NotNull]
+    IEnumerator IEnumerable.GetEnumerator() =>
         this.GetEnumerator();
+}
+
+// ISynchronized
+partial class ArrayBasedCollection<TElement> : ISynchronized
+{
+    /// <inheritdoc />
+    [Pure]
+    public virtual Boolean IsSynchronized => true;
+
+    /// <inheritdoc />
+    [Pure]
+    [NotNull]
+    public virtual Object SyncRoot => this._syncRoot;
+}
+
+// IVersioned
+partial class ArrayBasedCollection<TElement> : IVersioned
+{
+    Int32 IVersioned.Version 
+    { 
+        get => this._version;
+        set => this._version = value; 
+    }
 }

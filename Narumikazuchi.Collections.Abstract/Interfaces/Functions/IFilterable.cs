@@ -3,7 +3,8 @@
 /// <summary>
 /// Represents a collection that can be filtered.
 /// </summary>
-public interface IFilterable<TElement> : IEnumerable<TElement>
+public interface IFilterable<TElement> : 
+    IEnumerable<TElement>
 {
     /// <summary>
     /// Filters the <see cref="IFilterable{TElement}"/> through the specified predicate.
@@ -19,5 +20,6 @@ public interface IFilterable<TElement> : IEnumerable<TElement>
     /// <summary>
     /// Gets if the <see cref="IFilterable{TElement}"/> is currently filtered.
     /// </summary>
+    [Pure]
     public Boolean IsFiltered { get; }
 }

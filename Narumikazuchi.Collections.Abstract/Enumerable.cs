@@ -6,62 +6,98 @@
 public static class Enumerable
 {
     /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
+    /// Represents this object as the <see cref="IElementContainer{TElement}"/> interface.
     /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Collection<TElement> source) =>
-        new __CollectionICollectionWrapper<TElement>(source: source);
+    [return: NotNull]
+    public static IElementContainer AsIReadOnlyCollection<TCollection, TElement>(this TCollection source)
+        where TCollection : ICollection, ICollection<TElement?>, IReadOnlyCollection<TElement?> =>
+            new __CollectionWrapper<TCollection, TElement>(source: source);
 
     /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
+    /// Represents this object as the <see cref="IElementContainer{TElement}"/> interface.
     /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this LinkedList<TElement> source) =>
-        new __LinkedListICollectionWrapper<TElement>(source: source);
+    [return: NotNull]
+    public static IElementContainer<TElement> AsIReadOnlyCollection2<TCollection, TElement>(this TCollection source)
+        where TCollection : ICollection, ICollection<TElement?>, IReadOnlyCollection<TElement?> =>
+            new __CollectionWrapper<TCollection, TElement>(source: source);
 
     /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
+    /// Represents this object as the <see cref="IIndexedReadOnlyCollection{TElement}"/> interface.
     /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this List<TElement> source) =>
-        new __ListICollectionWrapper<TElement>(source: source);
+    [return: NotNull]
+    public static IIndexedReadOnlyCollection<Int32, TElement> AsIReadOnlyList2<TList, TElement>(this TList source)
+        where TList : ICollection, ICollection<TElement?>, IList, IList<TElement?>, IReadOnlyCollection<TElement?>, IReadOnlyList<TElement?> =>
+            new __ListWrapper<TList, TElement>(source: source);
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Queue<TElement> source) =>
-        new __QueueICollectionWrapper<TElement>(source: source);
+    //public static IReadOnlyMatrix2D<Int32, TElement> ToReadOnlyMatrix2D<TElement>(this IEnumerable<TElement?> source,
+    //                                                                              [DisallowNull] Mapping2D<Int32, TElement> mapping) =>
+    //    source.ToMatrix2D(mapping);
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this ReadOnlyCollection<TElement> source) =>
-        new __ReadOnlyCollectionICollectionWrapper<TElement>(source: source);
+    //public static IReadOnlyMatrix3D<Int32, TElement> ToReadOnlyMatrix3D<TElement>(this IEnumerable<TElement?> source,
+    //                                                                              [DisallowNull] Mapping3D<Int32, TElement> mapping) =>
+    //    source.ToMatrix3D(mapping);
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this SortedSet<TElement> source) =>
-        new __SortedSetICollectionWrapper<TElement>(source: source);
+    //public static IReadOnlyMatrix4D<Int32, TElement> ToReadOnlyMatrix4D<TElement>(this IEnumerable<TElement?> source,
+    //                                                                              [DisallowNull] Mapping4D<Int32, TElement> mapping) =>
+    //    source.ToMatrix4D(mapping);
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyCollection2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyCollection2<TElement> AsIReadOnlyCollection2<TElement>(this Stack<TElement> source) =>
-        new __StackICollectionWrapper<TElement>(source: source);
+    //public static IMatrix2D<Int32, TElement> ToMatrix2D<TElement>(this IEnumerable<TElement?> source,
+    //                                                              [DisallowNull] Mapping2D<Int32, TElement> mapping)
+    //{
+    //    Matrix2D<Int32, TElement> result = new();
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this Collection<TElement> source) =>
-        new __CollectionIListWrapper<TElement>(source: source);
+    //    Vector2D<Int32> last = new(x: 0,
+    //                               y: 0);
+    //    foreach (TElement? element in source)
+    //    {
+    //        Vector2D<Int32> index = mapping.Invoke(element: element,
+    //                                               lastIndex: last);
+    //        result.Insert(index: index,
+    //                      value: element);
+    //        last = index;
+    //    }
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this List<TElement> source) =>
-        new __ListIListWrapper<TElement>(source: source);
+    //    return result;
+    //}
 
-    /// <summary>
-    /// Represents this object as the <see cref="IReadOnlyList2{TElement}"/> interface.
-    /// </summary>
-    public static IReadOnlyList2<TElement> AsIReadOnlyList2<TElement>(this ReadOnlyCollection<TElement> source) =>
-        new __ReadOnlyCollectionIListWrapper<TElement>(source: source);
+    //public static IMatrix3D<Int32, TElement> ToMatrix3D<TElement>(this IEnumerable<TElement?> source,
+    //                                                              [DisallowNull] Mapping3D<Int32, TElement> mapping)
+    //{
+    //    Matrix3D<Int32, TElement> result = new();
+
+    //    Vector3D<Int32> last = new(x: 0,
+    //                               y: 0,
+    //                               z: 0);
+    //    foreach (TElement? element in source)
+    //    {
+    //        Vector3D<Int32> index = mapping.Invoke(element: element,
+    //                                               lastIndex: last);
+    //        result.Insert(index: index,
+    //                      value: element);
+    //        last = index;
+    //    }
+
+    //    return result;
+    //}
+
+    //public static IMatrix4D<Int32, TElement> ToMatrix4D<TElement>(this IEnumerable<TElement?> source,
+    //                                                              [DisallowNull] Mapping4D<Int32, TElement> mapping)
+    //{
+    //    Matrix4D<Int32, TElement> result = new();
+
+    //    Vector4D<Int32> last = new(x: 0,
+    //                               y: 0,
+    //                               z: 0,
+    //                               w: 0);
+    //    foreach (TElement? element in source)
+    //    {
+    //        Vector4D<Int32> index = mapping.Invoke(element: element,
+    //                                               lastIndex: last);
+    //        result.Insert(index: index,
+    //                      value: element);
+    //        last = index;
+    //    }
+
+    //    return result;
+    //}
 }

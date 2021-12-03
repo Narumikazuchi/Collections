@@ -3,19 +3,8 @@
 /// <summary>
 /// Represents a strongly typed list of objects, which can be accessed by index. 
 /// </summary>
-public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
+public abstract partial class ListBase<TElement>
 {
-    /// <summary>
-    /// Adds the elements of the specified collection to the end of the <see cref="ListBase{T}"/>.
-    /// </summary>
-    /// <param name="collection">The collection of items to add.</param>
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    /// <exception cref="NotAllowed" />
-    public virtual void AddRange([DisallowNull] IEnumerable<TElement> collection) => 
-        this.InsertRange(index: this._size, 
-                         collection: collection);
-
     /// <summary>
     /// Inserts the items from the specified collection into this <see cref="ListBase{T}"/> starting at the specified index.
     /// </summary>
@@ -25,7 +14,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
     /// <exception cref="ArgumentOutOfRangeException" />
     /// <exception cref="NotAllowed" />
     public virtual void InsertRange(Int32 index, 
-                                    [DisallowNull] IEnumerable<TElement> collection)
+                                    [DisallowNull] IEnumerable<TElement?> collection)
     {
         ExceptionHelpers.ThrowIfArgumentNull(collection);
         if (this.IsReadOnly)
@@ -43,7 +32,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
             throw ex;
         }
 
-        if (collection is ICollection<TElement> c)
+        if (collection is ICollection c)
         {
             Int32 count = c.Count;
             if (count > 0)
@@ -85,7 +74,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
                 {
                     TElement[] insert = new TElement[count];
                     c.CopyTo(array: insert, 
-                             arrayIndex: 0);
+                             index: 0);
                     lock (this._syncRoot)
                     {
                         insert.CopyTo(array: this._items, 
@@ -101,7 +90,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
         }
         else
         {
-            using IEnumerator<TElement> enumerator = collection.GetEnumerator();
+            using IEnumerator<TElement?> enumerator = collection.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 if (enumerator.Current is null)
@@ -119,7 +108,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
     }
 
     /// <summary>
-    /// Moves the item at the given index one position in the specified direction in the <see cref="SearchableListBase{T}"/>.
+    /// Moves the item at the given index one position in the specified direction in the <see cref="ListBase{T}"/>.
     /// </summary>
     public virtual Boolean MoveItem(in Int32 index,
                                     in ItemMoveDirection direction) =>
@@ -128,13 +117,13 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
                       positions: 1);
 
     /// <summary>
-    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="SearchableListBase{T}"/>.
+    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ListBase{T}"/>.
     /// </summary>
     public virtual Boolean MoveItem(in Int32 index,
                                     in ItemMoveDirection direction,
                                     Int32 positions)
     {
-        TElement tmp;
+        TElement? tmp;
         if (direction == ItemMoveDirection.ToLowerIndex)
         {
             while (positions-- > 0)
@@ -178,23 +167,21 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
     }
 
     /// <summary>
-    /// Moves the item one position in the specified direction in the <see cref="SearchableListBase{T}"/>.
+    /// Moves the item one position in the specified direction in the <see cref="ListBase{T}"/>.
     /// </summary>
-    public virtual Boolean MoveItem([DisallowNull] in TElement item,
+    public virtual Boolean MoveItem([AllowNull] in TElement? item,
                                     in ItemMoveDirection direction) =>
         this.MoveItem(item: item,
                       direction: direction,
                       positions: 1);
 
     /// <summary>
-    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="SearchableListBase{T}"/>.
+    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="ListBase{T}"/>.
     /// </summary>
-    public virtual Boolean MoveItem([DisallowNull] in TElement item,
+    public virtual Boolean MoveItem([AllowNull] in TElement? item,
                                     in ItemMoveDirection direction,
                                     Int32 positions)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(item);
-
         Int32 index = this.IndexOf(item: item);
         if (index == -1)
         {
@@ -240,79 +227,6 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
             }
         }
         return true;
-    }
-
-    /// <summary>
-    /// Removes all items from the <see cref="ListBase{T}"/> that match the specified condition.
-    /// </summary>
-    /// <param name="predicate">The condition to determine if an item should be removed.</param>
-    /// <returns>The number of items removed from the list</returns>
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="IndexOutOfRangeException" />
-    /// <exception cref="NotAllowed" />
-    public virtual Int32 RemoveAll([DisallowNull] Func<TElement, Boolean> predicate)
-    {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-        if (this.IsReadOnly)
-        {
-            throw new NotAllowed(auxMessage: LIST_IS_READONLY);
-        }
-
-        lock (this._syncRoot)
-        {
-            Int32 v = this._version;
-            Int32 free = 0;
-            while (free < this._size &&
-                   !predicate.Invoke(arg: this._items[free]))
-            {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                free++;
-            }
-            if (free >= this._size)
-            {
-                return 0;
-            }
-
-            Int32 current = free + 1;
-            while (current < this._size)
-            {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                while (current < this._size &&
-                       predicate(arg: this._items[current]))
-                {
-                    current++;
-                }
-
-                if (current < this._size)
-                {
-                    this._items[free++] = this._items[current++];
-                }
-            }
-
-            Array.Clear(array: this._items, 
-                        index: free, 
-                        length: this._size - free);
-            Int32 result = this._size - free;
-            this._size = free;
-            this._version++;
-            return result;
-        }
     }
 
     /// <summary>
@@ -507,7 +421,7 @@ public abstract partial class ListBase<TElement> : ReadOnlyListBase<TElement>
 }
 
 // Non-Public
-partial class ListBase<TElement>
+partial class ListBase<TElement> : ReadOnlyListBase<TElement>
 {
     /// <summary>
     /// Initializes a new empty instance of the <see cref="ListBase{T}"/> class.
@@ -539,7 +453,7 @@ partial class ListBase<TElement>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected ListBase([DisallowNull] IEnumerable<TElement> collection) : 
+    protected ListBase([DisallowNull] IEnumerable<TElement?> collection) : 
         base(collection: collection,
              exactCapacity: false) 
     { }
@@ -551,7 +465,7 @@ partial class ListBase<TElement>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected ListBase([DisallowNull] IEnumerable<TElement> collection,
+    protected ListBase([DisallowNull] IEnumerable<TElement?> collection,
                        Boolean exactCapacity) :
         base(collection: collection,
              exactCapacity: exactCapacity)
@@ -571,119 +485,51 @@ partial class ListBase<TElement>
 #pragma warning restore
 }
 
-// ICollection
-partial class ListBase<TElement> : ICollection<TElement>
+// IContentAddable<T>
+partial class ListBase<TElement> : IContentAddable<TElement?>
 {
-    /// <summary>
-    /// Copies the entire <see cref="ListBase{T}"/> to a compatible one-dimensional <see cref="Array"/>, 
-    /// starting at the specified index of the target array.
-    /// </summary>
-    /// <param name="array">
-    /// The one-dimensional <see cref="Array"/> that is the destination of the elements copied
-    /// from <see cref="ListBase{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
-    /// <param name="index">The zero-based index in array at which copying begins.</param>
-    /// <exception cref="ArgumentException" />
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    [Pure]
-    public virtual void CopyTo([DisallowNull] Array array, 
-                               Int32 index)
-    {
-        ExceptionHelpers.ThrowIfArgumentNull(array);
-
-        if (array is TElement[] arr)
-        {
-            this.CopyTo(array: arr, 
-                        index: index);
-        }
-    }
-
     /// <summary>
     /// Adds an object to the end of the <see cref="ListBase{T}"/>.
     /// </summary>
     /// <param name="item">The object to be added to the end of the <see cref="ListBase{T}"/>. The value can be null for reference types.</param>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    public virtual void Add([DisallowNull] TElement item)
-    {
-        ExceptionHelpers.ThrowIfArgumentNull(item);
-        if (this.IsReadOnly)
-        {
-            throw new NotAllowed(auxMessage: LIST_IS_READONLY);
-        }
-
-        this.EnsureCapacity(capacity: this.Count + 1);
-        lock (this._syncRoot)
-        {
-            this._items[this._size++] = item;
-            this._version++;
-        }
-    }
+    public virtual Boolean Add([AllowNull] TElement? item) =>
+        IContentAddable<TElement?>.Add(this,
+                                       item);
 
     /// <summary>
-    /// Removes all elements from the <see cref="ListBase{T}"/>.
+    /// Adds the elements of the specified collection to the end of the <see cref="ListBase{T}"/>.
     /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public virtual void Clear()
-    {
-        if (this.IsReadOnly)
-        {
-            throw new NotAllowed(auxMessage: LIST_IS_READONLY);
-        }
+    public virtual void AddRange([DisallowNull] IEnumerable<TElement?> collection) =>
+        IContentAddable<TElement?>.AddRange(this,
+                                            collection);
+}
 
-        lock (this._syncRoot)
-        {
-            if (this._size > 0)
-            {
-                Array.Clear(array: this._items, 
-                            index: 0, 
-                            length: this._size);
-                this._size = 0;
-            }
-            this._version++;
-        }
-    }
-
+// ICollection<T>
+partial class ListBase<TElement> : ICollection<TElement?>
+{
     /// <summary>
-    /// Removes the first occurrence of a specific object from the <see cref="ListBase{T}"/>.
+    /// Adds an object to the end of the <see cref="ListBase{T}"/>.
     /// </summary>
-    /// <param name="item">The object to remove from the <see cref="ListBase{T}"/>. The value can be null for reference types.</param>
-    /// <returns>
-    /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
-    /// This method also returns <see langword="false"/> if item was not found in the original <see cref="ListBase{T}"/>.
-    /// </returns>
+    /// <param name="item">The object to be added to the end of the <see cref="ListBase{T}"/>. The value can be null for reference types.</param>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    public virtual Boolean Remove([DisallowNull] TElement item)
-    {
-        ExceptionHelpers.ThrowIfArgumentNull(item);
-        if (this.IsReadOnly)
-        {
-            throw new NotAllowed(auxMessage: LIST_IS_READONLY);
-        }
-
-        lock (this._syncRoot)
-        {
-            Int32 index = this.IndexOf(item: item);
-            if (index > -1)
-            {
-                this.RemoveAt(index: index);
-                return true;
-            }
-            return false;
-        }
-    }
+    void ICollection<TElement?>.Add([AllowNull] TElement? item) =>
+        IContentAddable<TElement?>.Add(this,
+                                       item);
 
     /// <inheritdoc />
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public virtual Boolean IsSynchronized => true;
-    /// <inheritdoc />
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [Pure]
     public override Boolean IsReadOnly { get; } = false;
 }
 
-// IList
-partial class ListBase<TElement> : IList<TElement>
+// IList<T>
+partial class ListBase<TElement> : IList<TElement?>
 {
     /// <summary>
     /// Inserts an element into the <see cref="ListBase{T}"/> at the specified index.
@@ -694,9 +540,8 @@ partial class ListBase<TElement> : IList<TElement>
     /// <exception cref="InvalidCastException" />
     /// <exception cref="NotAllowed" />
     public virtual void Insert(Int32 index, 
-                               [DisallowNull] TElement item)
+                               [AllowNull] TElement? item)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(item);
         if (this.IsReadOnly)
         {
             throw new NotAllowed(auxMessage: LIST_IS_READONLY);
@@ -755,7 +600,6 @@ partial class ListBase<TElement> : IList<TElement>
 
         lock (this._syncRoot)
         {
-
             this._size--;
             if (index < this._size)
             {
@@ -772,17 +616,10 @@ partial class ListBase<TElement> : IList<TElement>
     /// <inheritdoc />
     /// <exception cref="IndexOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public override TElement this[Int32 index]
+    [MaybeNull]
+    public override TElement? this[Int32 index]
     {
-        get
-        {
-            lock (this._syncRoot)
-            {
-                return (UInt32)index >= (UInt32)this._size
-                                    ? throw new IndexOutOfRangeException()
-                                    : this._items[index];
-            }
-        }
+        get => base[index];
         set
         {
             lock (this._syncRoot)
@@ -795,4 +632,41 @@ partial class ListBase<TElement> : IList<TElement>
             }
         }
     }
+}
+
+// IContentRemovable<T>
+partial class ListBase<TElement> : IContentRemovable<TElement?>
+{
+    /// <summary>
+    /// Removes all elements from the <see cref="ListBase{T}"/>.
+    /// </summary>
+    /// <exception cref="NotAllowed" />
+    public virtual void Clear() =>
+        IContentRemovable<TElement?>.Clear(this);
+
+    /// <summary>
+    /// Removes the first occurrence of a specific object from the <see cref="ListBase{T}"/>.
+    /// </summary>
+    /// <param name="item">The object to remove from the <see cref="ListBase{T}"/>. The value can be null for reference types.</param>
+    /// <returns>
+    /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
+    /// This method also returns <see langword="false"/> if item was not found in the original <see cref="ListBase{T}"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    public virtual Boolean Remove([AllowNull] TElement? item) =>
+        IContentRemovable<TElement?>.Remove(this,
+                                            item);
+
+    /// <summary>
+    /// Removes all items from the <see cref="ListBase{T}"/> that match the specified condition.
+    /// </summary>
+    /// <param name="predicate">The condition to determine if an item should be removed.</param>
+    /// <returns>The number of items removed from the list</returns>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="IndexOutOfRangeException" />
+    /// <exception cref="NotAllowed" />
+    public virtual Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate) =>
+        IContentRemovable<TElement?>.RemoveAll(this,
+                                               predicate);
 }
