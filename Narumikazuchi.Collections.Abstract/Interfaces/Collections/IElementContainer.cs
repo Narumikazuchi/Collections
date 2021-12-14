@@ -13,10 +13,4 @@ public interface IElementContainer :
     /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="IElementContainer"/>; otherwise, <see langword="false"/></returns>
     [Pure]
     public Boolean Contains([AllowNull] Object? item);
-
-    /// <summary>
-    /// Gets a value indicating whether the <see cref="IElementContainer"/> has a fixed size.
-    /// </summary>
-    [Pure]
-    public Boolean IsFixedSize { get; }
 }

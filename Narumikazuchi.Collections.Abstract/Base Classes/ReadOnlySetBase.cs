@@ -1,60 +1,14 @@
 ﻿namespace Narumikazuchi.Collections.Abstract;
 
 /// <summary>
-/// Represents a strongly typed immutable collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="ReadOnlySetBase{TElement}"/> can be specified
+/// Represents a strongly typed immutable collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="ReadOnlySetBase{TIndex, TElement}"/> can be specified
 /// with a corresponding <see cref="IEqualityComparer{T}"/> object or a <see cref="EqualityComparison{T}"/> delegate.
 /// </summary>
-public abstract partial class ReadOnlySetBase<TElement>
+public abstract partial class ReadOnlySetBase<TIndex, TElement>
+    where TIndex : ISignedNumber<TIndex>
 {
-    /// <inheritdoc/>
-    [Pure]
-    public override Boolean Contains([AllowNull] TElement? item)
-    {
-        lock (this._syncRoot)
-        {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
-            {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (item is null &&
-                    this._items[i] is null)
-                {
-                    return true;
-                }
-                if (this.Comparer is not null)
-                {
-                    if (this.Comparer.Equals(x: item,
-                                             y: this._items[i]))
-                    {
-                        return true;
-                    }
-                    continue;
-                }
-                if (item is IEquatable<TElement> eq)
-                {
-                    if (eq.Equals(this._items[i]))
-                    {
-                        return true;
-                    }
-                    continue;
-                }
-            }
-            return false;
-        }
-    }
-
     /// <summary>
-    /// Gets or sets the <see cref="IEqualityComparer{T}"/> that the <see cref="ReadOnlySetBase{TElement}"/> uses for duplicate-checks.
+    /// Gets or sets the <see cref="IEqualityComparer{T}"/> that the <see cref="ReadOnlySetBase{TIndex, TElement}"/> uses for duplicate-checks.
     /// </summary>
     /// <exception cref="ArgumentException"/>
     [MaybeNull]
@@ -75,85 +29,162 @@ public abstract partial class ReadOnlySetBase<TElement>
 }
 
 // Non-Public
-partial class ReadOnlySetBase<TElement> : ReadOnlyCollectionBase<TElement>
+partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex, TElement>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TElement}"/> class.
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class.
     /// </summary>
     protected ReadOnlySetBase() : 
         base() =>
             this.Comparer = null;
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected ReadOnlySetBase([DisallowNull] IEnumerable<TElement?> collection,
-                              Boolean exactCapacity) :
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection) :
         this(collection: collection,
-             comparer: null,
-             exactCapacity: exactCapacity)
+             comparer: null)
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
     /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected ReadOnlySetBase([DisallowNull] IEnumerable<TElement?> collection,
-                              [DisallowNull] EqualityComparison<TElement?> comparison,
-                              Boolean exactCapacity) :
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
+                              [DisallowNull] EqualityComparison<TElement?> comparison) :
          this(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison),
-              exactCapacity: exactCapacity)
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
     /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected ReadOnlySetBase([DisallowNull] IEnumerable<TElement?> collection,
-                              [AllowNull] IEqualityComparer<TElement?>? comparer,
-                              Boolean exactCapacity)
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
+                              [AllowNull] IEqualityComparer<TElement?>? comparer)
     {
         ExceptionHelpers.ThrowIfArgumentNull(collection);
 
-        this._size = 0;
-        this._items = _emptyArray;
         this.Comparer = comparer;
 
-        using IEnumerator<TElement?> enumerator = collection.GetEnumerator();
+        using IEnumerator<KeyValuePair<TIndex, TElement?>> enumerator = collection.GetEnumerator();
         while (enumerator.MoveNext())
         {
-            if (enumerator.Current is null ||
-                this.Contains(item: enumerator.Current))
+            if (this.Contains(item: enumerator.Current.Value))
             {
                 continue;
             }
-            this.EnsureCapacity(capacity: this._size + 1);
-            this._items[this._size++] = enumerator.Current;
+            this.InsertInternal(index: enumerator.Current.Key,
+                                item: enumerator.Current.Value);
         }
-        // Resize to an exact fit
-        if (exactCapacity &&
-            this._items.Length != this._size)
+    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection) :
+        this(collection: collection,
+             comparer: null)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
+                              [DisallowNull] EqualityComparison<TElement?> comparison) :
+         this(collection: collection,
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
+                              [AllowNull] IEqualityComparer<TElement?>? comparer)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
+
+        this.Comparer = comparer;
+
+        using IEnumerator<(TIndex, TElement?)> enumerator = collection.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            TElement[] array = new TElement[this._size];
-            Array.Copy(sourceArray: this._items,
-                       sourceIndex: 0,
-                       destinationArray: array,
-                       destinationIndex: 0,
-                       length: this._size);
-            this._items = array;
+            if (this.Contains(item: enumerator.Current.Item2))
+            {
+                continue;
+            }
+            this.InsertInternal(index: enumerator.Current.Item1,
+                                item: enumerator.Current.Item2);
+        }
+    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection) :
+        this(collection: collection,
+             comparer: null)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
+                              [DisallowNull] EqualityComparison<TElement?> comparison) :
+         this(collection: collection,
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected ReadOnlySetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
+                              [AllowNull] IEqualityComparer<TElement?>? comparer)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
+
+        this.Comparer = comparer;
+
+        using IEnumerator<Tuple<TIndex, TElement?>> enumerator = collection.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (this.Contains(item: enumerator.Current.Item2))
+            {
+                continue;
+            }
+            this.InsertInternal(index: enumerator.Current.Item1,
+                                item: enumerator.Current.Item2);
         }
     }
 
@@ -165,12 +196,26 @@ partial class ReadOnlySetBase<TElement> : ReadOnlyCollectionBase<TElement>
     [Pure]
     protected Boolean FindInOther(IEnumerable<TElement?> other)
     {
-        BitArray arr = new(length: this._size);
+        BitArray arr = new(length: this.Count);
 
         foreach (TElement? item in other)
         {
-            Int32 index = Array.IndexOf(array: this._items,
-                                        value: item);
+            Int32 index = -1;
+            for (Int32 i = 0; i < this.Count; i++)
+            {
+                if (item is null &&
+                    this._entries[i].Value is null)
+                {
+                    index = i;
+                    break;
+                }
+                if (item is not null &&
+                    item.Equals(this._entries[i].Value))
+                {
+                    index = i;
+                    break;
+                }
+            }
             if (index >= 0)
             {
                 if (!arr.Get(index: index))
@@ -201,7 +246,7 @@ partial class ReadOnlySetBase<TElement> : ReadOnlyCollectionBase<TElement>
 }
 
 // IReadOnlySet<T>
-partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
+partial class ReadOnlySetBase<TIndex, TElement> : IReadOnlySet<TElement?>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
@@ -217,12 +262,12 @@ partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
 
         if (other is ICollection<TElement?> collection)
         {
-            if (this._size == 0)
+            if (this.Count == 0)
             {
                 return collection.Count > 0;
             }
 
-            if (this._size >= collection.Count)
+            if (this.Count >= collection.Count)
             {
                 return false;
             }
@@ -239,7 +284,7 @@ partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
         ExceptionHelpers.ThrowIfArgumentNull(other);
 
         if (other == this ||
-            this._size == 0)
+            this.Count == 0)
         {
             return false;
         }
@@ -272,14 +317,14 @@ partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(other);
 
-        if (this._size == 0 ||
+        if (this.Count == 0 ||
             other == this)
         {
             return true;
         }
 
         if (other is ICollection<TElement?> collection &&
-            this._size > collection.Count)
+            this.Count > collection.Count)
         {
             return false;
         }
@@ -323,7 +368,7 @@ partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(other);
 
-        if (this._size == 0)
+        if (this.Count == 0)
         {
             return false;
         }
@@ -352,7 +397,7 @@ partial class ReadOnlySetBase<TElement> : IReadOnlySet<TElement?>
 
         if (other is ICollection<TElement?> collection)
         {
-            if (collection.Count != this._size)
+            if (collection.Count != this.Count)
             {
                 return false;
             }

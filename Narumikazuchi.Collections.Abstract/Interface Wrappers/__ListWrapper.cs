@@ -16,6 +16,24 @@ partial struct __ListWrapper<TList, TElement>
     private readonly TList _source;
 }
 
+// ICollection
+partial struct __ListWrapper<TList, TElement> : ICollection
+{
+    void ICollection.CopyTo(Array array,
+                            Int32 index) =>
+        this._source.CopyTo(array: array,
+                            index: index);
+
+    Int32 ICollection.Count =>
+        ((ICollection)this._source).Count;
+
+    Boolean ICollection.IsSynchronized =>
+        this._source.IsSynchronized;
+
+    Object ICollection.SyncRoot =>
+        this._source.SyncRoot;
+}
+
 // IEnumerable<T>
 partial struct __ListWrapper<TList, TElement> : IEnumerable<TElement?>
 {
@@ -31,23 +49,6 @@ partial struct __ListWrapper<TList, TElement> : IElementContainer
 {
     Boolean IElementContainer.Contains(Object? item) => 
         this._source.Contains(item);
-
-    void ICollection.CopyTo(Array array,
-                            Int32 index) =>
-        this._source.CopyTo(array: array,
-                            index: index);
-
-    Int32 ICollection.Count =>
-        ((ICollection)this._source).Count;
-
-    Boolean ICollection.IsSynchronized =>
-        this._source.IsSynchronized;
-
-    Object ICollection.SyncRoot =>
-        this._source.SyncRoot;
-
-    Boolean IElementContainer.IsFixedSize =>
-        this._source.IsFixedSize;
 }
 
 // IReadOnlyCollection<T>

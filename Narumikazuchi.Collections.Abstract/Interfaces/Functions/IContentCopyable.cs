@@ -12,5 +12,5 @@ public interface IContentCopyable<TIndex, TArray>
     /// <param name="index"></param>
     [Pure]
     public void CopyTo([DisallowNull] TArray array,
-                       TIndex index);
+                       [DisallowNull] in TIndex index);
 }

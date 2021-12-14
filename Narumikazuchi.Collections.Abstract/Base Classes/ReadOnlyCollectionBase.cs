@@ -3,7 +3,8 @@
 /// <summary>
 /// Represents a strongly typed collection of objects. 
 /// </summary>
-public abstract partial class ReadOnlyCollectionBase<TElement>
+public abstract partial class ReadOnlyCollectionBase<TIndex, TElement>
+    where TIndex : ISignedNumber<TIndex>
 {
     /// <summary>
     /// Gets whether this collection can be edited.
@@ -13,61 +14,63 @@ public abstract partial class ReadOnlyCollectionBase<TElement>
 }
 
 // Non-Public
-partial class ReadOnlyCollectionBase<TElement> : ArrayBasedCollection<TElement?>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : FastCollectionBase<TIndex, TElement?>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class.
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{TIndex, TElement}"/> class.
     /// </summary>
-    protected ReadOnlyCollectionBase() => 
-        this._items = _emptyArray;
+    protected ReadOnlyCollectionBase() :
+        base()
+    { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{T}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentNullException" />
-    protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<TElement?> collection,
-                                     Boolean exactCapacity)
+    protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection) :
+        base()
     {
         ExceptionHelpers.ThrowIfArgumentNull(collection);
 
-        if (collection is ICollection c)
+        using IEnumerator<KeyValuePair<TIndex, TElement?>> enumerator = collection.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            if (c.Count == 0)
-            {
-                this._items = _emptyArray;
-            }
-            else
-            {
-                this._items = new TElement[c.Count];
-                c.CopyTo(array: this._items, 
-                         index: 0);
-                this._size = c.Count;
-            }
+            this.InsertInternal(index: enumerator.Current.Key,
+                                item: enumerator.Current.Value);
         }
-        else
-        {
-            this._size = 0;
-            this._items = _emptyArray;
+    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentNullException" />
+    protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection) :
+        base()
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
 
-            using IEnumerator<TElement?> enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                this.EnsureCapacity(capacity: this._size + 1);
-                this._items[this._size++] = enumerator.Current;
-            }
-            // Resize to an exact fit
-            if (exactCapacity &&
-                this._items.Length != this._size)
-            {
-                TElement?[] array = new TElement[this._size];
-                Array.Copy(sourceArray: this._items, 
-                           sourceIndex: 0, 
-                           destinationArray: array, 
-                           destinationIndex: 0, 
-                           length: this._size);
-                this._items = array;
-            }
+        using IEnumerator<(TIndex, TElement?)> enumerator = collection.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            this.InsertInternal(index: enumerator.Current.Item1,
+                                item: enumerator.Current.Item2);
+        }
+    }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlyCollectionBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentNullException" />
+    protected ReadOnlyCollectionBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection) :
+        base()
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
+
+        using IEnumerator<Tuple<TIndex, TElement?>> enumerator = collection.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            this.InsertInternal(index: enumerator.Current.Item1,
+                                item: enumerator.Current.Item2);
         }
     }
 
@@ -91,16 +94,12 @@ partial class ReadOnlyCollectionBase<TElement> : ArrayBasedCollection<TElement?>
 }
 
 // ICollection
-partial class ReadOnlyCollectionBase<TElement> : ICollection
+partial class ReadOnlyCollectionBase<TIndex, TElement> : ICollection
 {
-    /// <inheritdoc/>
-    /// <exception cref="ArrayTypeMismatchException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    [Pure]
-    public override void CopyTo([DisallowNull] Array array,
-                                Int32 index)
+    void ICollection.CopyTo([DisallowNull] Array array,
+                            Int32 index)
     {
-        if (array is not TElement[]
+        if (array is not KeyValuePair<TIndex, TElement?>[]
                   and not Object[])
         {
             ArrayTypeMismatchException ex = new(message: ARRAY_TYPE_MISMATCH);
@@ -120,19 +119,17 @@ partial class ReadOnlyCollectionBase<TElement> : ICollection
             throw ex;
         }
 
-        lock (this._syncRoot)
+        Int32 i = 0;
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            Array.Copy(sourceArray: this._items,
-                       sourceIndex: 0,
-                       destinationArray: array,
-                       destinationIndex: index,
-                       length: this._size);
+            array.SetValue(index: index + i++,
+                           value: kv);
         }
     }
 }
 
 // IContentConvertable<T>
-partial class ReadOnlyCollectionBase<TElement> : IContentConvertable<TElement?>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentConvertable<TElement?>
 {
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
@@ -144,39 +141,34 @@ partial class ReadOnlyCollectionBase<TElement> : IContentConvertable<TElement?>
         ExceptionHelpers.ThrowIfArgumentNull(converter);
 
         List<TOutput> result = new();
-        lock (this._syncRoot)
-        {
-            Int32 v = this._version;
+        Int32 v = this.Version;
 
-            for (Int32 i = 0; i < this._size; i++)
+        foreach (TElement? element in this.GetValuesFirstToLast())
+        {
+            if (this.Version != v)
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                result.Add(item: converter.Invoke(input: this._items[i]));
+                NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
+                ex.Data.Add(key: "Fixed Version",
+                            value: v);
+                ex.Data.Add(key: "Altered Version",
+                            value: this.Version);
+                throw ex;
             }
+            result.Add(item: converter.Invoke(input: element));
         }
         return result;
     }
 }
 
 // IContentCopyable<T, U>
-partial class ReadOnlyCollectionBase<TElement> : IContentCopyable<Int32, TElement?[]>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentCopyable<Int32, TElement?[]>
 {
     /// <inheritdoc />
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     [Pure]
     public virtual void CopyTo([DisallowNull] TElement?[] array,
-                               Int32 index)
+                               in Int32 index)
     {
         ExceptionHelpers.ThrowIfArgumentNull(array);
         if (array.Rank != 1)
@@ -184,24 +176,19 @@ partial class ReadOnlyCollectionBase<TElement> : IContentCopyable<Int32, TElemen
             throw new ArgumentException(message: MULTI_DIMENSIONAL_ARRAYS);
         }
 
-        lock (this._syncRoot)
+        Int32 i = 0;
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Array.Copy(sourceArray: this._items,
-                       sourceIndex: 0,
-                       destinationArray: array,
-                       destinationIndex: index,
-                       length: this._size);
+            array.SetValue(index: index + i++,
+                           value: element);
         }
     }
 }
 
 // IContentForEach<T>
-partial class ReadOnlyCollectionBase<TElement> : IContentForEach<TElement?>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentForEach<TElement?>
 {
-    /// <summary>
-    /// Performs the specified action for every element of this <see cref="ICollection{T}"/>.
-    /// </summary>
-    /// <param name="action">The action to perform on each item.</param>
+    /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
     [Pure]
@@ -209,70 +196,45 @@ partial class ReadOnlyCollectionBase<TElement> : IContentForEach<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(action);
 
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
-            {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                action.Invoke(obj: this._items[i]);
-            }
+            action.Invoke(obj: element);
         }
     }
 }
 
-// IElementContainer<T>
-partial class ReadOnlyCollectionBase<TElement> : IElementContainer<TElement?>
+// IContentSegmentable<T, U>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentSegmentable<TIndex, TElement?>
 {
-    /// <inheritdoc />
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="NotAllowed" />
+    /// <inheritdoc/>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
     [Pure]
-    public override Boolean Contains([AllowNull] TElement item)
+    [return: NotNull]
+    public virtual ICollection<TElement?> GetRange([DisallowNull] in TIndex startIndex,
+                                                   [DisallowNull] in TIndex endIndex)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(item);
-
-        lock (this._syncRoot)
+        if (endIndex.CompareTo(startIndex) <= 0)
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
-            {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if ((item is null &&
-                    this._items[i] is null) ||
-                    (item is not null &&
-                    item.Equals(this._items[i])))
-                {
-                    return true;
-                }
-            }
-            return false;
+            // No or negative count
+            throw new ArgumentException(message: "The endIndex parameter needs to be larger than the startIndex parameter.",
+                                        paramName: nameof(endIndex));
         }
+        Collection<TElement?> result = new();
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
+        {
+            if (kv.Key.CompareTo(other: startIndex) >= 0 &&
+                kv.Key.CompareTo(other: endIndex) <= 0)
+            {
+                result.Add(item: kv.Value);
+            }
+        }
+        return result;
     }
 }
 
 // IElementFinder<T>
-partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement?>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
@@ -282,26 +244,11 @@ partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
+            if (predicate.Invoke(arg: element))
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (predicate.Invoke(arg: this._items[i]))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
@@ -316,26 +263,11 @@ partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
+            if (predicate.Invoke(arg: element))
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (predicate.Invoke(arg: this._items[i]))
-                {
-                    return this._items[i];
-                }
+                return element;
             }
         }
         return default;
@@ -351,26 +283,11 @@ partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         Collection<TElement?> result = new();
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
+            if (predicate.Invoke(arg: element))
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (predicate.Invoke(arg: this._items[i]))
-                {
-                    result.Add(item: this._items[i]);
-                }
+                result.Add(item: element);
             }
         }
         return result.AsIReadOnlyCollection2<Collection<TElement?>, TElement?>();
@@ -386,27 +303,13 @@ partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         Collection<TElement?> result = new();
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            Int32 v = this._version;
-            for (Int32 i = 0; i < this._size; i++)
+            if (predicate.Invoke(arg: element))
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (!predicate.Invoke(arg: this._items[i]))
-                {
-                    result.Add(item: this._items[i]);
-                }
+                continue;
             }
+            result.Add(item: element);
         }
         return result.AsIReadOnlyCollection2<Collection<TElement?>, TElement?>();
     }
@@ -420,28 +323,128 @@ partial class ReadOnlyCollectionBase<TElement> : IElementFinder<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        lock (this._syncRoot)
+        foreach (TElement? element in this.GetValuesLastToFirst())
         {
-            Int32 v = this._version;
-            for (Int32 i = this._size - 1; i >= 0; i--)
+            if (predicate.Invoke(arg: element))
             {
-                if (this._version != v)
-                {
-                    NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                    ex.Data.Add(key: "Index",
-                                value: i);
-                    ex.Data.Add(key: "Fixed Version",
-                                value: v);
-                    ex.Data.Add(key: "Altered Version",
-                                value: this._version);
-                    throw ex;
-                }
-                if (predicate.Invoke(arg: this._items[i]))
-                {
-                    return this._items[i];
-                }
+                return element;
             }
         }
         return default;
+    }
+}
+
+// IIndexFinder<T, U>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IIndexFinder<TIndex, TElement?>
+{
+    /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual TIndex FindIndex([DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(predicate);
+
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
+        {
+            if (predicate.Invoke(arg: kv.Value))
+            {
+                return kv.Key;
+            }
+        }
+        return TIndex.NegativeOne;
+    }
+    /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual TIndex FindIndex([DisallowNull] in TIndex startIndex,
+                                    [DisallowNull] in TIndex endIndex,
+                                    [DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(predicate);
+
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
+        {
+            if (kv.Key.CompareTo(other: startIndex) < 0 ||
+                kv.Key.CompareTo(other: endIndex) > 0)
+            {
+                continue;
+            }
+            if (predicate.Invoke(arg: kv.Value))
+            {
+                return kv.Key;
+            }
+        }
+        return TIndex.NegativeOne;
+    }
+
+    /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual TIndex FindLastIndex([DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(predicate);
+
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsLastToFirst())
+        {
+            if (predicate.Invoke(arg: kv.Value))
+            {
+                return kv.Key;
+            }
+        }
+        return TIndex.NegativeOne;
+    }
+    /// <inheritdoc/>
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="ArgumentOutOfRangeException" />
+    [Pure]
+    public virtual TIndex FindLastIndex([DisallowNull] in TIndex startIndex,
+                                        [DisallowNull] in TIndex endIndex,
+                                        [DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(predicate);
+
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsLastToFirst())
+        {
+            if (kv.Key.CompareTo(other: startIndex) < 0 ||
+                kv.Key.CompareTo(other: endIndex) > 0)
+            {
+                continue;
+            }
+            if (predicate.Invoke(arg: kv.Value))
+            {
+                return kv.Key;
+            }
+        }
+        return TIndex.NegativeOne;
+    }
+}
+
+// IReadOnlyList<T>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IReadOnlyList<TElement?>
+{
+    [MaybeNull]
+    TElement? IReadOnlyList<TElement?>.this[Int32 index]
+    {
+        get
+        {
+            Int32 i = 0;
+            IEnumerator<TElement?> enumerator = this.GetValuesFirstToLast()
+                                                    .GetEnumerator();
+            while(enumerator.MoveNext() &&
+                  i < index)
+            {
+                ++i;
+            }
+
+            if (i != index)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            return enumerator.Current;
+        }
     }
 }

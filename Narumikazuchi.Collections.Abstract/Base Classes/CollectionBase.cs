@@ -3,63 +3,52 @@
 /// <summary>
 /// Represents a strongly typed collection of objects. 
 /// </summary>
-public abstract partial class CollectionBase<TElement>
+public abstract partial class CollectionBase<TIndex, TElement>
+    where TIndex : ISignedNumber<TIndex>
 {
-    /// <summary>
-    /// Reverses the order of items in the entire <see cref="CollectionBase{T}"/>.
-    /// </summary>
-    /// <exception cref="ArgumentException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    /// <exception cref="NotAllowed" />
-    public virtual void Reverse()
-    {
-        if (this.IsReadOnly)
-        {
-            throw new NotAllowed(auxMessage: COLLECTION_IS_READONLY);
-        }
-
-        lock (this._syncRoot)
-        {
-            Array.Reverse(array: this._items, 
-                          index: 0, 
-                          length: this._size);
-            this._version++;
-        }
-    }
+    /// <inheritdoc/>
+    [Pure]
+    public override Boolean IsReadOnly { get; } = false;
 }
 
 // Non-Public
-partial class CollectionBase<TElement> : ReadOnlyCollectionBase<TElement>
+partial class CollectionBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex, TElement>
 {
     /// <summary>
-    /// Initializes a new empty instance of the <see cref="CollectionBase{T}"/> class.
+    /// Initializes a new empty instance of the <see cref="CollectionBase{TIndex, TElement}"/> class.
     /// </summary>
-    protected CollectionBase() : 
-        base() 
+    protected CollectionBase() :
+        base()
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="CollectionBase{T}"/> class having the specified collection of items.
+    /// Initializes a new instance of the <see cref="CollectionBase{TIndex, TElement}"/> class having the specified collection of items.
     /// </summary>
     /// <param name="collection">The initial collection of items in this list.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected CollectionBase([DisallowNull] IEnumerable<TElement?> collection) : 
-        base(collection: collection,
-             exactCapacity: false) 
+    protected CollectionBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection) :
+        base(collection: collection)
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="CollectionBase{T}"/> class having the specified collection of items.
+    /// Initializes a new instance of the <see cref="CollectionBase{TIndex, TElement}"/> class having the specified collection of items.
     /// </summary>
     /// <param name="collection">The initial collection of items in this list.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected CollectionBase([DisallowNull] IEnumerable<TElement?> collection,
-                             Boolean exactCapacity) :
-        base(collection: collection,
-             exactCapacity: exactCapacity)
+    protected CollectionBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection) :
+        base(collection: collection)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CollectionBase{TIndex, TElement}"/> class having the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The initial collection of items in this list.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected CollectionBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection) :
+        base(collection: collection)
     { }
 
 #pragma warning disable
@@ -71,62 +60,111 @@ partial class CollectionBase<TElement> : ReadOnlyCollectionBase<TElement>
 #pragma warning restore
 }
 
-// IContentAddable<T>
-partial class CollectionBase<TElement> : IContentAddable<TElement?>
-{
-    /// <inheritdoc />
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="NotAllowed" />
-    public virtual Boolean Add([AllowNull] TElement? item) =>
-        IContentAddable<TElement?>.Add(this,
-                            item);
-
-    /// <summary>
-    /// Adds the elements of the specified collection to the end of the <see cref="CollectionBase{T}"/>.
-    /// </summary>
-    /// <param name="collection">The collection of items to add.</param>
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    /// <exception cref="NotAllowed" />
-    public virtual void AddRange([DisallowNull] IEnumerable<TElement?> collection) =>
-        IContentAddable<TElement?>.AddRange(this,
-                                            collection);
-}
-
 // ICollection<T>
-partial class CollectionBase<TElement> : ICollection<TElement?>
+partial class CollectionBase<TIndex, TElement> : ICollection<TElement?>
 {
     void ICollection<TElement?>.Add([AllowNull] TElement? item) =>
-        IContentAddable<TElement?>.Add(this,
-                            item);
+        this.AppendInternal(item: item);
 
+    void ICollection<TElement?>.CopyTo(TElement?[] array, 
+                                       Int32 arrayIndex) =>
+        this.CopyTo(array: array,
+                    index: arrayIndex);
+}
+
+// IContentClearable
+partial class CollectionBase<TIndex, TElement> : IContentClearable
+{
     /// <inheritdoc />
-    [Pure]
-    public override Boolean IsReadOnly { get; } = false;
+    /// <exception cref="NotAllowed" />
+    public void Clear() =>
+        this.ClearInternal();
+}
+
+// IContentRemovable
+partial class CollectionBase<TIndex, TElement> : IContentRemovable
+{
+    Boolean IContentRemovable.Remove(Object item) =>
+        item is TElement element &&
+        this.Remove(item: element);
 }
 
 // IContentRemovable<T>
-partial class CollectionBase<TElement> : IContentRemovable<TElement?>
+partial class CollectionBase<TIndex, TElement> : IContentRemovable<TElement?>
 {
-    /// <summary>
-    /// Removes all elements from the <see cref="CollectionBase{T}"/>.
-    /// </summary>
-    /// <exception cref="NotAllowed" />
-    public virtual void Clear() =>
-        IContentRemovable<TElement?>.Clear(this);
-
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    public virtual Boolean Remove([AllowNull] TElement? item) =>
-        IContentRemovable<TElement?>.Remove(this,
-                                            item);
+    public Boolean Remove([AllowNull] TElement? item) =>
+        this.RemoveInternal(item: item);
 
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="IndexOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public virtual Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate) =>
-        IContentRemovable<TElement?>.RemoveAll(this,
-                                               predicate);
+    public Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        ExceptionHelpers.ThrowIfArgumentNull(predicate);
+
+        Int32 result = 0;
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
+        {
+            if (predicate(arg: kv.Value))
+            {
+                if (this.RemoveAtInternal(index: kv.Key))
+                {
+                    result++;
+                }
+            }
+        }
+
+        return result;
+    }
+}
+
+// IContentInsertable<T>
+partial class CollectionBase<TIndex, TElement> : IContentInsertable<TIndex>
+{
+    void IContentInsertable<TIndex>.Insert(in TIndex index, 
+                                           Object item)
+    {
+        if (item is TElement element)
+        {
+            this.InsertInternal(index: index, 
+                                item: element);
+            return;
+        }
+        throw new InvalidCastException();
+    }
+}
+
+// IContentInsertable<T, U>
+partial class CollectionBase<TIndex, TElement> : IContentInsertable<TIndex, TElement?>
+{
+    /// <inheritdoc/>
+    public void Insert([DisallowNull] in TIndex index, 
+                       TElement? item) =>
+            this.InsertInternal(index: index,
+                                item: item);
+
+    /// <inheritdoc/>
+    public void InsertRange([DisallowNull] in TIndex index, 
+                            [DisallowNull] IEnumerable<TElement?> collection)
+    {
+        TIndex current = index;
+        foreach (TElement? element in collection)
+        {
+            this.InsertInternal(index: current,
+                                item: element);
+            current += TIndex.One;
+        }
+    }
+}
+
+// IContentIndexRemovable<T>
+partial class CollectionBase<TIndex, TElement> : IContentIndexRemovable<TIndex>
+{
+    /// <inheritdoc/>
+    public void RemoveAt([DisallowNull] in TIndex index) =>
+        this.RemoveAtInternal(index: index);
 }

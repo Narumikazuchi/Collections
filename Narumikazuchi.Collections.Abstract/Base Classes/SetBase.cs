@@ -1,66 +1,132 @@
 ﻿namespace Narumikazuchi.Collections.Abstract;
 
 /// <summary>
-/// Represents a strongly typed collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="SetBase{TElement}"/> can be specified
+/// Represents a strongly typed collection where every object is only contained once. The procedure to check whether the object is already in the <see cref="SetBase{TIndex, TElement}"/> can be specified
 /// with a corresponding <see cref="IEqualityComparer{T}"/> object or a <see cref="EqualityComparison{T}"/> delegate.
 /// </summary>
-public abstract partial class SetBase<TElement>
+public abstract partial class SetBase<TIndex, TElement>
+    where TIndex : ISignedNumber<TIndex>
 { }
 
 // Non-Public
-partial class SetBase<TElement> : ReadOnlySetBase<TElement>
+partial class SetBase<TIndex, TElement> : ReadOnlySetBase<TIndex, TElement>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SetBase{TElement}"/> class.
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class.
     /// </summary>
     protected SetBase() :
         base()
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="SetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected SetBase([DisallowNull] IEnumerable<TElement?> collection,
-                      Boolean exactCapacity) :
+    protected SetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection) :
         base(collection: collection,
-             comparer: null,
-             exactCapacity: exactCapacity)
+             comparer: null)
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="SetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
     /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected SetBase([DisallowNull] IEnumerable<TElement?> collection,
-                      [DisallowNull] EqualityComparison<TElement?> comparison,
-                      Boolean exactCapacity) :
+    protected SetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
+                      [DisallowNull] EqualityComparison<TElement?> comparison) :
          base(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison),
-              exactCapacity: exactCapacity)
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
     { }
     /// <summary>
-    /// Initializes a new instance of the <see cref="SetBase{TElement}"/> class containing the specified collection of items.
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
     /// <param name="collection">The collection of items in this list.</param>
     /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
-    /// <param name="exactCapacity">Whether to resize the internal array to the exact size of the passed in collection.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    protected SetBase([DisallowNull] IEnumerable<TElement?> collection,
-                      [AllowNull] IEqualityComparer<TElement?>? comparer,
-                      Boolean exactCapacity) :
+    protected SetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
+                      [AllowNull] IEqualityComparer<TElement?>? comparer) :
         base(collection: collection,
-              comparer: comparer,
-              exactCapacity: exactCapacity)
+             comparer: comparer)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection) :
+        base(collection: collection,
+             comparer: null)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
+                      [DisallowNull] EqualityComparison<TElement?> comparison) :
+         base(collection: collection,
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
+                      [AllowNull] IEqualityComparer<TElement?>? comparer) :
+        base(collection: collection,
+             comparer: comparer)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection) :
+        base(collection: collection,
+             comparer: null)
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparison">The delegate that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
+                      [DisallowNull] EqualityComparison<TElement?> comparison) :
+         base(collection: collection,
+              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+    { }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
+    /// </summary>
+    /// <param name="collection">The collection of items in this list.</param>
+    /// <param name="comparer">The comparer that is used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="NotAllowed" />
+    protected SetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
+                      [AllowNull] IEqualityComparer<TElement?>? comparer) :
+        base(collection: collection,
+             comparer: comparer)
     { }
 
 #pragma warning disable
@@ -73,76 +139,91 @@ partial class SetBase<TElement> : ReadOnlySetBase<TElement>
 }
 
 // IContentAddable<T>
-partial class SetBase<TElement> : IContentAddable<TElement?>
+partial class SetBase<TIndex, TElement> : IContentAddable<TElement?>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="NotAllowed"/>
     public virtual Boolean Add([AllowNull] TElement? item) =>
-        !this.Contains(item) &&
-        IContentAddable<TElement?>.Add(this,
-                                       item);
+        !this.Contains(item: item) &&
+        this.AppendInternal(item: item);
 
-    /// <summary>
-    /// Adds the elements of the specified collection to the end of the <see cref="CollectionBase{T}"/>.
-    /// </summary>
-    /// <param name="collection">The collection of items to add.</param>
+    /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="ArgumentOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public virtual void AddRange([DisallowNull] IEnumerable<TElement?> collection) =>
-        IContentAddable<TElement?>.AddRange(this,
-                                            collection.Except(this));
+    public virtual void AddRange([DisallowNull] IEnumerable<TElement?> collection)
+    {
+        foreach (TElement? item in collection)
+        {
+            if (!this.Contains(item: item))
+            {
+                this.AppendInternal(item: item);
+            }
+        }
+    }
 }
 
 // ICollection<T>
-partial class SetBase<TElement> : ICollection<TElement?>
+partial class SetBase<TIndex, TElement> : ICollection<TElement?>
 {
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="NotAllowed" />
     void ICollection<TElement?>.Add([AllowNull] TElement? item) =>
         this.Add(item: item);
+
+    void ICollection<TElement?>.CopyTo(TElement?[] array,
+                                       Int32 arrayIndex) =>
+        this.CopyTo(array: array,
+                    index: arrayIndex);
+}
+
+// IContentRemovable
+partial class SetBase<TIndex, TElement> : IContentRemovable
+{
+    Boolean IContentRemovable.Remove(Object item) =>
+        item is TElement element &&
+        this.Remove(item: element);
 }
 
 // IContentRemovable<T>
-partial class SetBase<TElement> : IContentRemovable<TElement?>
+partial class SetBase<TIndex, TElement> : IContentRemovable<TElement?>
 {
-    /// <summary>
-    /// Removes all elements from the <see cref="CollectionBase{T}"/>.
-    /// </summary>
+    /// <inheritdoc/>
     /// <exception cref="NotAllowed" />
     public virtual void Clear() =>
-        IContentRemovable<TElement?>.Clear(this);
+        this.ClearInternal();
 
-    /// <summary>
-    /// Removes the first occurrence of a specific object from the <see cref="CollectionBase{T}"/>.
-    /// </summary>
-    /// <param name="item">The object to remove from the <see cref="CollectionBase{T}"/>. The value can be null for reference types.</param>
-    /// <returns>
-    /// <see langword="true"/> if item is successfully removed; otherwise, <see langword="false"/>.
-    /// This method also returns <see langword="false"/> if item was not found in the original <see cref="CollectionBase{T}"/>.
-    /// </returns>
+    /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
     public virtual Boolean Remove([AllowNull] TElement? item) =>
-        IContentRemovable<TElement?>.Remove(this,
-                                            item);
+        this.RemoveInternal(item: item);
 
-    /// <summary>
-    /// Removes all items from the <see cref="CollectionBase{T}"/> that match the specified condition.
-    /// </summary>
-    /// <param name="predicate">The condition to determine if an item should be removed.</param>
-    /// <returns>The number of items removed from the list</returns>
+    /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="IndexOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public virtual Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate) =>
-        IContentRemovable<TElement?>.RemoveAll(this,
-                                               predicate);
+    public virtual Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate)
+    {
+        Collection<TIndex> indecies = new();
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
+        {
+            if (predicate.Invoke(arg: kv.Value))
+            {
+                indecies.Add(item: kv.Key);
+            }
+        }
+
+        for (Int32 i = 0; i < indecies.Count; i++)
+        {
+            this.RemoveAtInternal(index: indecies[i]);
+        }
+
+        return indecies.Count;
+    }
 }
 
 // ISet<T>
-partial class SetBase<TElement> : ISet<TElement?>
+partial class SetBase<TIndex, TElement> : ISet<TElement?>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
@@ -192,38 +273,28 @@ partial class SetBase<TElement> : ISet<TElement?>
             return;
         }
 
-        BitArray arr = new(length: this._size);
-
-        foreach (TElement? item in other)
+        Collection<TIndex> indecies = new();
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            Int32 index = Array.IndexOf(array: this._items,
-                                        value: item);
-            if (index >= 0)
+            foreach (TElement? item in other)
             {
-                arr.Set(index: index,
-                        value: true);
+                if (item is null && 
+                    kv.Value is null)
+                {
+                    continue;
+                }
+                if (item is not null &&
+                    item.Equals(kv.Value))
+                {
+                    continue;
+                }
+                indecies.Add(item: kv.Key);
             }
         }
 
-        for (Int32 i = this._size - 1; i > 0; i--)
+        for (Int32 i = 0; i < indecies.Count; i++)
         {
-            if (!arr.Get(index: i))
-            {
-                lock (this._syncRoot)
-                {
-                    this._size--;
-                    if (i < this._size)
-                    {
-                        Array.Copy(sourceArray: this._items,
-                                   sourceIndex: i + 1,
-                                   destinationArray: this._items,
-                                   destinationIndex: i,
-                                   length: this._size - i);
-                    }
-                    this._items[this._size] = default;
-                    this._version++;
-                }
-            }
+            this.RemoveAtInternal(index: indecies[i]);
         }
     }
 
@@ -249,44 +320,27 @@ partial class SetBase<TElement> : ISet<TElement?>
             return;
         }
 
-        Int32 current = this._size;
-        BitArray toRemove = new(length: current);
-        List<Int32> added = new();
-
-        foreach (TElement? item in other)
+        Collection<TIndex> indecies = new();
+        foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            Int32 index = Array.IndexOf(array: this._items,
-                                        value: item);
-            if (index >= 0 &&
-                !added.Contains(item: index))
+            foreach (TElement? item in other)
             {
-                toRemove.Set(index: index,
-                             value: true);
-                continue;
-            }
-            added.Add(item: this._size);
-            this.Add(item: item);
-        }
-
-        for (Int32 i = current - 1; i > 0; i--)
-        {
-            if (toRemove.Get(index: i))
-            {
-                lock (this._syncRoot)
+                if (item is null &&
+                    kv.Value is null)
                 {
-                    this._size--;
-                    if (i < this._size)
-                    {
-                        Array.Copy(sourceArray: this._items,
-                                   sourceIndex: i + 1,
-                                   destinationArray: this._items,
-                                   destinationIndex: i,
-                                   length: this._size - i);
-                    }
-                    this._items[this._size] = default;
-                    this._version++;
+                    indecies.Add(item: kv.Key);
+                }
+                if (item is not null &&
+                    item.Equals(kv.Value))
+                {
+                    indecies.Add(item: kv.Key);
                 }
             }
+        }
+
+        for (Int32 i = 0; i < indecies.Count; i++)
+        {
+            this.RemoveAtInternal(index: indecies[i]);
         }
     }
 

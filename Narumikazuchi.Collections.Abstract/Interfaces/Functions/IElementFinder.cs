@@ -20,7 +20,8 @@ public interface IElementFinder<TElement>
     /// <param name="predicate">The condition to check items against.</param>
     /// <returns>The first item matching the condition or <see langword="default"/> if no item in this list matches the condition</returns>
     [Pure]
-    public TElement Find([DisallowNull] Func<TElement, Boolean> predicate);
+    [return: MaybeNull]
+    public TElement? Find([DisallowNull] Func<TElement, Boolean> predicate);
 
     /// <summary>
     /// Retrieves all items in the <see cref="IElementFinder{TElement}"/> that match the specified condition.
@@ -47,5 +48,6 @@ public interface IElementFinder<TElement>
     /// <param name="predicate">The condition to check items against.</param>
     /// <returns>The last item matching the condition or <see langword="default"/> if no item in this list matches the condition</returns>
     [Pure]
-    public TElement FindLast([DisallowNull] Func<TElement, Boolean> predicate);
+    [return: MaybeNull]
+    public TElement? FindLast([DisallowNull] Func<TElement, Boolean> predicate);
 }
