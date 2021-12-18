@@ -156,10 +156,7 @@ partial class SetBase<TIndex, TElement> : IContentAddable<TElement?>
     {
         foreach (TElement? item in collection)
         {
-            if (!this.Contains(item: item))
-            {
-                this.AppendInternal(item: item);
-            }
+            this.Add(item: item);
         }
     }
 }

@@ -33,14 +33,7 @@ partial class FastCollectionBase<TIndex, TElement>
                 values[i].First = -1;
                 values[i].Last = -1;
             }
-            entries[i].Key = default;
-            entries[i].KeyHashcode = -1;
-            entries[i].ValueHashcode = -1;
-            entries[i].NextKey = -1;
-            entries[i].PreviousKey = -1;
-            entries[i].NextValue = -1;
-            entries[i].PreviousValue = -1;
-            entries[i].Value = default;
+            entries[i].Reset();
         }
     }
 
@@ -54,7 +47,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = 0; i < this._count; i++)
+            for (Int32 i = 0; i < this._entries.Length; i++)
             {
                 if (this._version != v)
                 {
@@ -66,6 +59,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return this._entries[i].Key;
             }
@@ -83,7 +80,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = this._count - 1; i > 0; i--)
+            for (Int32 i = this._entries.Length - 1; i > 0; i--)
             {
                 if (this._version != v)
                 {
@@ -95,6 +92,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return this._entries[i].Key;
             }
@@ -112,7 +113,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = 0; i < this._count; i++)
+            for (Int32 i = 0; i < this._entries.Length; i++)
             {
                 if (this._version != v)
                 {
@@ -124,6 +125,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return this._entries[i].Value;
             }
@@ -141,7 +146,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = this._count - 1; i > 0; i--)
+            for (Int32 i = this._entries.Length - 1; i > 0; i--)
             {
                 if (this._version != v)
                 {
@@ -153,6 +158,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return this._entries[i].Value;
             }
@@ -170,7 +179,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = 0; i < this._count; i++)
+            for (Int32 i = 0; i < this._entries.Length; i++)
             {
                 if (this._version != v)
                 {
@@ -182,6 +191,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key,
                                                                  value: this._entries[i].Value);
@@ -200,7 +213,7 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 v = this._version;
         lock (this._syncRoot)
         {
-            for (Int32 i = this._count - 1; i > 0; i--)
+            for (Int32 i = this._entries.Length - 1; i > 0; i--)
             {
                 if (this._version != v)
                 {
@@ -212,6 +225,10 @@ partial class FastCollectionBase<TIndex, TElement>
                     ex.Data.Add(key: "Altered Version",
                                 value: this._version);
                     throw ex;
+                }
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
                 }
                 yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key,
                                                                  value: this._entries[i].Value);
@@ -259,10 +276,7 @@ partial class FastCollectionBase<TIndex, TElement>
         for (Int32 i = this._keys[target].First; i >= 0; i = this._entries[i].NextKey)
         {
             if (this._entries[i].KeyHashcode == hashcode &&
-                ((item is not null &&
-                item.Equals(this._entries[i].Value)) ||
-                (item is null &&
-                this._entries[i].Value is null)))
+                index.Equals(this._entries[i].Key))
             {
                 this._entries[i].Value = item;
                 this._entries[i].ValueHashcode = item is null
@@ -280,6 +294,7 @@ partial class FastCollectionBase<TIndex, TElement>
 
         Int32 insert = this._count++;
 
+        this._entries[insert].IsUsed = true;
         this._entries[insert].KeyHashcode = hashcode;
         this._entries[insert].Key = index;
         this._entries[insert].Value = item;
@@ -335,12 +350,12 @@ partial class FastCollectionBase<TIndex, TElement>
                             : item.GetHashCode() & MAXARRAYSIZE;
         Int32 target = hashcode % this._values.Length;
 
-        for (Int32 i = this._values[target].First; i >= 0; i = this._entries[i].NextKey)
+        ref __CollectionBucket currentValue = ref this._values[target];
+        for (Int32 i = currentValue.First; i >= 0; i = this._entries[i].NextValue)
         {
             if (this._entries[i].ValueHashcode == hashcode)
             {
-                __CollectionEntry<TIndex, TElement?> currentEntry = this._entries[i];
-                ref __CollectionBucket currentValue = ref this._values[target];
+                ref __CollectionEntry<TIndex, TElement?> currentEntry = ref this._entries[i];
                 if (currentValue.First == currentValue.Last)
                 {
                     currentValue.First = -1;
@@ -356,26 +371,25 @@ partial class FastCollectionBase<TIndex, TElement>
                 }
                 else
                 {
-                    this._entries[currentEntry.PreviousKey].NextKey = currentEntry.NextKey;
-                    this._entries[currentEntry.NextKey].PreviousKey = currentEntry.PreviousKey;
-                    this._entries[currentEntry.PreviousValue].NextValue = currentEntry.NextValue;
-                    this._entries[currentEntry.NextValue].PreviousValue = currentEntry.PreviousValue;
+                    if (currentEntry.PreviousKey > -1)
+                    {
+                        this._entries[currentEntry.PreviousKey].NextKey = currentEntry.NextKey;
+                    }
+                    if (currentEntry.NextKey > -1)
+                    {
+                        this._entries[currentEntry.NextKey].PreviousKey = currentEntry.PreviousKey;
+                    }
+                    if (currentEntry.PreviousValue > -1)
+                    {
+                        this._entries[currentEntry.PreviousValue].NextValue = currentEntry.NextValue;
+                    }
+                    if (currentEntry.NextValue > -1)
+                    {
+                        this._entries[currentEntry.NextValue].PreviousValue = currentEntry.PreviousValue;
+                    }
                 }
 
-                Array.Copy(sourceArray: this._entries,
-                           sourceIndex: i + 1,
-                           destinationArray: this._entries,
-                           destinationIndex: i,
-                           length: this._count - i - 1);
-
-                this._entries[this._count].Key = default;
-                this._entries[this._count].Value = default;
-                this._entries[this._count].KeyHashcode = -1;
-                this._entries[this._count].ValueHashcode = -1;
-                this._entries[this._count].NextKey = -1;
-                this._entries[this._count].PreviousKey = -1;
-                this._entries[this._count].NextValue = -1;
-                this._entries[this._count].PreviousValue = -1;
+                currentEntry.Reset();
 
                 this._count--;
 
@@ -398,12 +412,12 @@ partial class FastCollectionBase<TIndex, TElement>
         Int32 hashcode = index.GetHashCode() & MAXARRAYSIZE;
         Int32 target = hashcode % this._keys.Length;
 
-        for (Int32 i = this._keys[target].First; i >= 0; i = this._entries[i].NextKey)
+        ref __CollectionBucket currentKey = ref this._keys[target];
+        for (Int32 i = currentKey.First; i >= 0; i = this._entries[i].NextKey)
         {
             if (this._entries[i].KeyHashcode == hashcode)
             {
-                __CollectionEntry<TIndex, TElement?> currentEntry = this._entries[i];
-                ref __CollectionBucket currentKey = ref this._keys[target];
+                ref __CollectionEntry<TIndex, TElement?> currentEntry = ref this._entries[i];
                 if (currentKey.First == currentKey.Last)
                 {
                     currentKey.First = -1;
@@ -419,26 +433,25 @@ partial class FastCollectionBase<TIndex, TElement>
                 }
                 else
                 {
-                    this._entries[currentEntry.PreviousKey].NextKey = currentEntry.NextKey;
-                    this._entries[currentEntry.NextKey].PreviousKey = currentEntry.PreviousKey;
-                    this._entries[currentEntry.PreviousValue].NextValue = currentEntry.NextValue;
-                    this._entries[currentEntry.NextValue].PreviousValue = currentEntry.PreviousValue;
+                    if (currentEntry.PreviousKey > -1)
+                    {
+                        this._entries[currentEntry.PreviousKey].NextKey = currentEntry.NextKey;
+                    }
+                    if (currentEntry.NextKey > -1)
+                    {
+                        this._entries[currentEntry.NextKey].PreviousKey = currentEntry.PreviousKey;
+                    }
+                    if (currentEntry.PreviousValue > -1)
+                    {
+                        this._entries[currentEntry.PreviousValue].NextValue = currentEntry.NextValue;
+                    }
+                    if (currentEntry.NextValue > -1)
+                    {
+                        this._entries[currentEntry.NextValue].PreviousValue = currentEntry.PreviousValue;
+                    }
                 }
 
-                Array.Copy(sourceArray: this._entries,
-                           sourceIndex: i + 1,
-                           destinationArray: this._entries,
-                           destinationIndex: i,
-                           length: this._count - i - 1);
-
-                this._entries[this._count].Key = default;
-                this._entries[this._count].Value = default;
-                this._entries[this._count].KeyHashcode = -1;
-                this._entries[this._count].ValueHashcode = -1;
-                this._entries[this._count].NextKey = -1;
-                this._entries[this._count].PreviousKey = -1;
-                this._entries[this._count].NextValue = -1;
-                this._entries[this._count].PreviousValue = -1;
+                currentEntry.Reset();
 
                 this._count--;
 
@@ -467,9 +480,9 @@ partial class FastCollectionBase<TIndex, TElement>
                    sourceIndex: 0,
                    destinationArray: newEntries,
                    destinationIndex: 0,
-                   length: this._count);
+                   length: this._entries.Length);
 
-        for (Int32 i = 0; i < this._count; i++)
+        for (Int32 i = 0; i < this._entries.Length; i++)
         {
             if (newEntries[i].KeyHashcode >= 0)
             {
@@ -509,6 +522,27 @@ partial class FastCollectionBase<TIndex, TElement>
         this._keys = newKeys;
         this._values = newValues;
         this._entries = newEntries;
+    }
+
+    private static Boolean ItemIsEqual(in Int32 hashcode,
+                                       in __CollectionEntry<TIndex, TElement?> entry,
+                                       TElement? element)
+    {
+        if (entry.ValueHashcode != hashcode)
+        {
+            return false;
+        }
+        if (element is null &&
+            entry.Value is null)
+        {
+            return true;
+        }
+        if (element is not null &&
+            element.Equals(entry.Value))
+        {
+            return true;
+        }
+        return false;
     }
 
     /// <summary>
@@ -625,7 +659,7 @@ partial class FastCollectionBase<TIndex, TElement> : IConvertToArray<TElement?[]
             }
 
             TElement?[] array = new TElement?[this._count];
-            for (Int32 i = 0; i < this._count; i++)
+            for (Int32 i = 0; i < this._entries.Length; i++)
             {
                 array[i] = this._entries[i].Value;
             }
@@ -655,7 +689,9 @@ partial class FastCollectionBase<TIndex, TElement> : IElementContainer<TElement?
                             : item.GetHashCode() & MAXARRAYSIZE;
         for (Int32 i = this._values[hashcode % this._values.Length].First; i >= 0; i = this._entries[i].NextValue)
         {
-            if (this._entries[i].ValueHashcode == hashcode)
+            if (ItemIsEqual(hashcode: hashcode,
+                            entry: this._entries[i],
+                            element: item))
             {
                 return true;
             }
@@ -712,7 +748,9 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
 
         for (Int32 i = this._values[target].First; i >= 0; i = this._entries[i].NextValue)
         {
-            if (hashcode == this._entries[i].ValueHashcode)
+            if (ItemIsEqual(hashcode: hashcode,
+                            entry: this._entries[i],
+                            element: item))
             {
                 if (indexDefault is not null &&
                     indexDefault.CompareTo(this._entries[i].Key) == 0)
@@ -743,7 +781,9 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
 
         for (Int32 i = this._values[target].Last; i >= 0; i = this._entries[i].PreviousValue)
         {
-            if (hashcode == this._entries[i].ValueHashcode)
+            if (ItemIsEqual(hashcode: hashcode,
+                            entry: this._entries[i],
+                            element: item))
             {
                 if (indexDefault is not null &&
                     indexDefault.CompareTo(this._entries[i].Key) == 0)
@@ -762,7 +802,7 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
     }
 
     /// <inheritdoc/>
-    public TElement? this[[DisallowNull] TIndex index]
+    public virtual TElement? this[[DisallowNull] TIndex index]
     {
         get
         {
@@ -780,6 +820,7 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
             }
             throw new KeyNotFoundException();
         }
+        set => throw new NotSupportedException();
     }
 }
 
