@@ -233,8 +233,8 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentSegmentable<TIn
     }
 }
 
-// IElementFinder<T>
-partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement?>
+// IElementFinder<T, U>
+partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement?, TElement?>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
@@ -282,15 +282,16 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        Collection<TElement?> result = new();
+        __Collection<TElement?> result = new();
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
             if (predicate.Invoke(arg: element))
             {
-                result.Add(item: element);
+                result.Insert(index: result.Count,
+                              item: element);
             }
         }
-        return result.AsIReadOnlyCollection2<Collection<TElement?>, TElement?>();
+        return result;
     }
 
     /// <inheritdoc/>
@@ -302,16 +303,17 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        Collection<TElement?> result = new();
+        __Collection<TElement?> result = new();
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
             if (predicate.Invoke(arg: element))
             {
                 continue;
             }
-            result.Add(item: element);
+            result.Insert(index: result.Count,
+                          item: element);
         }
-        return result.AsIReadOnlyCollection2<Collection<TElement?>, TElement?>();
+        return result;
     }
 
     /// <inheritdoc/>
