@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a collection that can be filtered.
 /// </summary>
-public interface IFilterable<TElement> : 
+public interface IFilterable<out TElement> : 
     IEnumerable<TElement>
 {
     /// <summary>

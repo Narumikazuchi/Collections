@@ -3,7 +3,7 @@
 /// <summary>
 /// Allows the conversion of all items in the collection into a different type.
 /// </summary>
-public interface IContentConvertable<TElement>
+public interface IContentConvertable<out TElement>
 {
     /// <summary>
     /// Converts all elements in the <see cref="IContentConvertable{T}"/> into another type and returns an <see cref="ICollection{T}"/>

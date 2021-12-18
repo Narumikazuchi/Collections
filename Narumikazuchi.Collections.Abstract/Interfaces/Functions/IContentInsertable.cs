@@ -17,7 +17,7 @@ public interface IContentInsertable<TIndex>
 /// <summary>
 /// Allows the emplacement of an item at a specified index instead of the end of a collection.
 /// </summary>
-public interface IContentInsertable<TIndex, TElement> :
+public interface IContentInsertable<TIndex, in TElement> :
     IContentInsertable<TIndex>
 {
     /// <summary>

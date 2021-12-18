@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a strongly-typed, index-accessible collection that can be searched through.
 /// </summary>
-public interface IIndexFinder<TIndex, TElement>
+public interface IIndexFinder<TIndex, out TElement>
     where TIndex : IComparable<TIndex>
 {
     /// <summary>

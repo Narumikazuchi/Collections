@@ -3,7 +3,7 @@
 /// <summary>
 /// Allows the content of a collection to be copied over to an array of type <typeparamref name="TArray"/>.
 /// </summary>
-public interface IContentCopyable<TIndex, TArray>
+public interface IContentCopyable<TIndex, in TArray>
 {
     /// <summary>
     /// Copies the elements of the <see cref="IContentCopyable{TIndex, TArray}"/> to the specified <typeparamref name="TArray"/> starting at the specified index <typeparamref name="TIndex"/>.

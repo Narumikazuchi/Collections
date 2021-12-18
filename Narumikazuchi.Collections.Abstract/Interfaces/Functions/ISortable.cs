@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an <see cref="IEnumerable{T}"/> that can be sorted.
 /// </summary>
-public interface ISortable<TElement> : 
+public interface ISortable<out TElement> : 
     IEnumerable<TElement>
 {
     /// <summary>

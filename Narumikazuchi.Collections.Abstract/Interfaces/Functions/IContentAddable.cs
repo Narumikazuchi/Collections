@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a collection which allows the addition of items to itself.
 /// </summary>
-public interface IContentAddable<TElement>
+public interface IContentAddable<in TElement>
 {
     /// <summary>
     /// Adds an object to the end of the <see cref="IContentAddable{TElement}"/>.

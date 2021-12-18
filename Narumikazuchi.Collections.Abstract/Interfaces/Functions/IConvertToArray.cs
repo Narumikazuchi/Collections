@@ -3,7 +3,7 @@
 /// <summary>
 /// The functionality to copy the contents of this object into an array of type <typeparamref name="TArray"/>.
 /// </summary>
-public interface IConvertToArray<TArray>
+public interface IConvertToArray<out TArray>
 {
     /// <summary>
     /// Creates a shallow copy of the contents of this <see cref="IConvertToArray{TArray}"/> and returns it as an array.

@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an <see cref="IEnumerable{T}"/> that can be automatically sorted upon collection change.
 /// </summary>
-public interface IAutoSortable<TElement> : 
+public interface IAutoSortable<out TElement> : 
     ISortable<TElement>
 {
     /// <summary>
