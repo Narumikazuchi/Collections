@@ -1,14 +1,13 @@
-﻿namespace Narumikazuchi.Collections
+﻿namespace Narumikazuchi.Collections;
+
+/// <summary>
+/// Defines the Traversal method for a <see cref="BinaryTree{T}"/>.
+/// </summary>
+public enum BinaryTraversalMethod
 {
-    /// <summary>
-    /// Defines the Traversal method for a <see cref="BinaryTree{T}"/>.
-    /// </summary>
-    public enum BinaryTraversalMethod
-    {
 #pragma warning disable
-        PreOrder = 0,
-        InOrder,
-        PostOrder
+    PreOrder = 0,
+    InOrder,
+    PostOrder
 #pragma warning restore
-    }
 }
