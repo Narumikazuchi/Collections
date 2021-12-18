@@ -77,7 +77,7 @@ partial class CollectionBase<TIndex, TElement> : IContentClearable
 {
     /// <inheritdoc />
     /// <exception cref="NotAllowed" />
-    public void Clear() =>
+    public virtual void Clear() =>
         this.ClearInternal();
 }
 
@@ -95,30 +95,35 @@ partial class CollectionBase<TIndex, TElement> : IContentRemovable<TElement?>
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
-    public Boolean Remove([AllowNull] TElement? item) =>
+    public virtual Boolean Remove([AllowNull] TElement? item) =>
         this.RemoveInternal(item: item);
 
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="IndexOutOfRangeException" />
     /// <exception cref="NotAllowed" />
-    public Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate)
+    public virtual Int32 RemoveAll([DisallowNull] Func<TElement?, Boolean> predicate)
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        Int32 result = 0;
+        Collection<TIndex> remove = new();
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            if (predicate(arg: kv.Value))
+            if (predicate.Invoke(arg: kv.Value))
             {
-                if (this.RemoveAtInternal(index: kv.Key))
-                {
-                    result++;
-                }
+                remove.Add(kv.Key);
             }
         }
 
-        return result;
+        Int32 skipped = 0;
+        foreach(TIndex key in remove)
+        {
+            if (!this.RemoveAtInternal(index: key))
+            {
+                skipped++;
+            }
+        }
+        return remove.Count - skipped;
     }
 }
 
@@ -142,14 +147,14 @@ partial class CollectionBase<TIndex, TElement> : IContentInsertable<TIndex>
 partial class CollectionBase<TIndex, TElement> : IContentInsertable<TIndex, TElement?>
 {
     /// <inheritdoc/>
-    public void Insert([DisallowNull] in TIndex index, 
-                       TElement? item) =>
+    public virtual void Insert([DisallowNull] in TIndex index, 
+                               TElement? item) =>
             this.InsertInternal(index: index,
                                 item: item);
 
     /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in TIndex index, 
-                            [DisallowNull] IEnumerable<TElement?> collection)
+    public virtual void InsertRange([DisallowNull] in TIndex index, 
+                                    [DisallowNull] IEnumerable<TElement?> collection)
     {
         TIndex current = index;
         foreach (TElement? element in collection)
@@ -165,6 +170,6 @@ partial class CollectionBase<TIndex, TElement> : IContentInsertable<TIndex, TEle
 partial class CollectionBase<TIndex, TElement> : IContentIndexRemovable<TIndex>
 {
     /// <inheritdoc/>
-    public void RemoveAt([DisallowNull] in TIndex index) =>
+    public virtual void RemoveAt([DisallowNull] in TIndex index) =>
         this.RemoveAtInternal(index: index);
 }
