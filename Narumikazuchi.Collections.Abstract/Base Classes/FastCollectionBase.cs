@@ -3,6 +3,8 @@
 /// <summary>
 /// Represents a collection which occupies more memory in favor of speed.
 /// </summary>
+[Browsable(false)]
+[EditorBrowsable(EditorBrowsableState.Never)]
 public abstract partial class FastCollectionBase<TIndex, TElement>
     where TIndex : ISignedNumber<TIndex>
 { }
