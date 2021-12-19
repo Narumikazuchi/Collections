@@ -604,6 +604,48 @@ partial class FastCollectionBase<TIndex, TElement>
 #pragma warning restore
 }
 
+// IAsyncEnumerable<T>
+partial class FastCollectionBase<TIndex, TElement> : IAsyncEnumerable<TElement?>
+{
+    async IAsyncEnumerator<TElement?> IAsyncEnumerable<TElement?>.GetAsyncEnumerator(CancellationToken cancellationToken)
+    {
+        Int32 v = this._version;
+        for (Int32 i = 0; i < this._entries.Length; i++)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                yield break;
+            }
+            if (this._version != v)
+            {
+                NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
+                ex.Data.Add(key: "Index",
+                            value: i);
+                ex.Data.Add(key: "Fixed Version",
+                            value: v);
+                ex.Data.Add(key: "Altered Version",
+                            value: this._version);
+                throw ex;
+            }
+            __CollectionEntry<TIndex, TElement?>? current = await Task.Run(() =>
+            {
+                if (this._entries[i].IsUsed)
+                {
+                    return new __CollectionEntry<TIndex, TElement?>?(this._entries[i]);
+                }
+                return null;
+            });
+            if (!current.HasValue)
+            {
+                continue;
+            }
+            yield return current.Value
+                                .Value;
+        }
+        yield break;
+    }
+}
+
 // ICollection
 partial class FastCollectionBase<TIndex, TElement> : ICollection
 {
