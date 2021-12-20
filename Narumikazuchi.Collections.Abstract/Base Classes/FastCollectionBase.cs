@@ -5,6 +5,7 @@
 /// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
+[DebuggerDisplay("Count: {Count}")]
 public abstract partial class FastCollectionBase<TIndex, TElement>
     where TIndex : ISignedNumber<TIndex>
 { }
@@ -443,6 +444,27 @@ partial class FastCollectionBase<TIndex, TElement>
                     {
                         this._entries[currentEntry.NextKey].PreviousKey = currentEntry.PreviousKey;
                     }
+                }
+                hashcode = currentEntry.Value is null
+                                ? Int32.MaxValue
+                                : currentEntry.Value.GetHashCode() & MAXARRAYSIZE;
+                target = hashcode % this._values.Length;
+                ref __CollectionBucket currentValue = ref this._values[target];
+                if (currentValue.First == currentValue.Last)
+                {
+                    currentValue.First = -1;
+                    currentValue.Last = -1;
+                }
+                else if (currentValue.First == i)
+                {
+                    currentValue.First = currentEntry.NextValue;
+                }
+                else if (currentValue.Last == i)
+                {
+                    currentValue.Last = currentEntry.PreviousValue;
+                }
+                else
+                {
                     if (currentEntry.PreviousValue > -1)
                     {
                         this._entries[currentEntry.PreviousValue].NextValue = currentEntry.NextValue;
@@ -705,6 +727,10 @@ partial class FastCollectionBase<TIndex, TElement> : IConvertToArray<TElement?[]
             TElement?[] array = new TElement?[this._count];
             for (Int32 i = 0; i < this._entries.Length; i++)
             {
+                if (!this._entries[i].IsUsed)
+                {
+                    continue;
+                }
                 array[i] = this._entries[i].Value;
             }
             return array;

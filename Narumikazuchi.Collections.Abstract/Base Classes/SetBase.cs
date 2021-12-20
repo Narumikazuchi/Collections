@@ -6,7 +6,10 @@
 /// </summary>
 public abstract partial class SetBase<TIndex, TElement>
     where TIndex : ISignedNumber<TIndex>
-{ }
+{
+    /// <inheritdoc/>
+    public override Boolean IsReadOnly { get; } = false;
+}
 
 // Non-Public
 partial class SetBase<TIndex, TElement> : ReadOnlySetBase<TIndex, TElement>
@@ -273,25 +276,31 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
         Collection<TIndex> indecies = new();
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
+            Boolean remove = true;
             foreach (TElement? item in other)
             {
                 if (item is null && 
                     kv.Value is null)
                 {
-                    continue;
+                    remove = false;
+                    break;
                 }
                 if (item is not null &&
                     item.Equals(kv.Value))
                 {
-                    continue;
+                    remove = false;
+                    break;
                 }
+            }
+            if (remove)
+            {
                 indecies.Add(item: kv.Key);
             }
         }
 
-        for (Int32 i = 0; i < indecies.Count; i++)
+        foreach (TIndex index in indecies)
         {
-            this.RemoveAtInternal(index: indecies[i]);
+            this.RemoveAtInternal(index: index);
         }
     }
 
