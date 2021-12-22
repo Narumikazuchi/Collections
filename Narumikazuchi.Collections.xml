@@ -1120,21 +1120,6 @@
             Gets the direction this collection is sorted in.
             </summary>
         </member>
-        <member name="T:Narumikazuchi.Collections.Abstract.ISynchronized">
-            <summary>
-            Represents an object that is synchronized (thread safe).
-            </summary>
-        </member>
-        <member name="P:Narumikazuchi.Collections.Abstract.ISynchronized.IsSynchronized">
-            <summary>
-            Gets a value indicating whether access to this <see cref="T:Narumikazuchi.Collections.Abstract.ISynchronized"/> is synchronized (thread safe).
-            </summary>
-        </member>
-        <member name="P:Narumikazuchi.Collections.Abstract.ISynchronized.SyncRoot">
-            <summary>
-            Gets the object mutex used to synchronize access to this <see cref="T:Narumikazuchi.Collections.Abstract.ISynchronized"/>.
-            </summary>
-        </member>
         <member name="T:Narumikazuchi.Collections.ItemMoveDirection">
             <summary>
             Specifies in which direction an item inside a list can be moved.

@@ -33,8 +33,8 @@ public static class Enumerable
         ReferenceEquals(objA: set.Comparer, 
                         objB: comparer) 
             ? set 
-            : new(comparer: comparer, 
-                    collection: source);
+            : new(comparer: comparer!, 
+                  collection: source);
     /// <summary>
     /// Creates a <see cref="ObservableSet{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
@@ -49,7 +49,7 @@ public static class Enumerable
         {
             return set;
         }
-        return new(comparison: comparison,
+        return new(comparison: comparison!,
                    collection: source);
     }
 
@@ -64,7 +64,7 @@ public static class Enumerable
                 : new(collection: source);
 
     /// <summary>
-    /// Creates a <see cref="BinaryTree{TElement}"/> from an <see cref="IEnumerable{T}"/>.
+    /// Creates a <see cref="Trie{TElement}"/> from an <see cref="IEnumerable{String}"/>.
     /// </summary>
     [return: NotNull]
     public static Trie<TElement> ToTrie<TElement>(this IEnumerable<String> source) 

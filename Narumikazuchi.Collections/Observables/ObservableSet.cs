@@ -7,7 +7,7 @@
 /// <remarks>
 /// If neither <see cref="IEqualityComparer{T}"/> nor <see cref="EqualityComparison{T}"/> are specified, the register will compare the references for classes or check each field/property for values types.
 /// </remarks>
-public partial class ObservableSet<TElement> : SetBase<Int32, TElement?>
+public partial class ObservableSet<TElement> : SetBase<Int32, TElement?>, IObservableSet<TElement?>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableSet{TElement}"/> class.

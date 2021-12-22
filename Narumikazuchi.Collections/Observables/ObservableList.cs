@@ -1,9 +1,9 @@
 ﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
-/// Represents a strongly typed list of objects, which reports changes, can be accessed by index, searched and sorted. 
+/// Represents a strongly typed list of objects, which reports changes, can be accessed by index and searched. 
 /// </summary>
-public partial class ObservableList<TElement> : CollectionBase<Int32, TElement>
+public partial class ObservableList<TElement> : CollectionBase<Int32, TElement>, IObservableList<TElement?>
 {
     /// <summary>
     /// Initializes a new empty instance of the <see cref="ObservableList{T}"/> class.
