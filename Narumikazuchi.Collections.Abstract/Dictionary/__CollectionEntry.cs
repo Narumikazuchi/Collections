@@ -5,8 +5,8 @@ internal struct __CollectionEntry<TKey, TValue>
 {
     public void Reset()
     {
-        this.Key = default;
-        this.Value = default;
+        this.Key = default!;
+        this.Value = default!;
         this.IsUsed = false;
         this.KeyHashcode = -1;
         this.ValueHashcode = -1;

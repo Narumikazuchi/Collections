@@ -81,9 +81,9 @@ partial struct __ListWrapper<TList, TElement> : IContentConvertable<TElement>
         ExceptionHelpers.ThrowIfArgumentNull(converter);
 
         Collection<TOutput> result = new();
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            result.Add(item: converter.Invoke(input: item));
+            result.Add(item: converter.Invoke(input: item!));
         }
         return result;
     }
@@ -121,9 +121,9 @@ partial struct __ListWrapper<TList, TElement> : IContentForEach<TElement>
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(action);
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            action.Invoke(obj: item);
+            action.Invoke(obj: item!);
         }
     }
 }
@@ -158,14 +158,14 @@ partial struct __ListWrapper<TList, TElement> : IContentInsertable<Int32, TEleme
         if (this._source is List<TElement> list)
         {
             list.InsertRange(index: index,
-                             collection: collection);
+                             collection: collection!);
             return;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(collection);
 
         Int32 i = index;
-        foreach (TElement item in collection)
+        foreach (TElement? item in collection)
         {
             this._source.Insert(index: i++,
                                 item: item);
@@ -197,11 +197,11 @@ partial struct __ListWrapper<TList, TElement> : IContentRemovable<TElement>
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         Collection<TElement> remove = new();
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
-                remove.Add(item: item);
+                remove.Add(item: item!);
             }
         }
 
@@ -318,9 +318,9 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
                 return true;
             }
@@ -342,9 +342,9 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
                 return item;
             }
@@ -357,25 +357,25 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         if (this._source is TElement[] array)
         {
             return new __Collection<TElement>(Array.FindAll(array: array,
-                                                            match: input => predicate.Invoke(input)));
+                                                            match: input => predicate.Invoke(input)))!;
         }
         if (this._source is List<TElement> list)
         {
-            return new __Collection<TElement>(list.FindAll(match: input => predicate.Invoke(input)));
+            return new __Collection<TElement>(list.FindAll(match: input => predicate.Invoke(input)))!;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         __Collection<TElement> result = new();
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
                 result.Insert(index: result.Count,
                               item: item);
             }
         }
-        return result;
+        return result!;
     }
 
     IElementContainer<TElement> IElementFinder<TElement, TElement>.FindExcept(Func<TElement, Boolean> predicate)
@@ -383,26 +383,26 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         if (this._source is TElement[] array)
         {
             return new __Collection<TElement>(array.Except(Array.FindAll(array: array,
-                                                                         match: input => predicate.Invoke(input))));
+                                                                         match: input => predicate.Invoke(input))))!;
         }
         if (this._source is List<TElement> list)
         {
-            return new __Collection<TElement>(list.Except(list.FindAll(match: input => predicate.Invoke(input))));
+            return new __Collection<TElement>(list.Except(list.FindAll(match: input => predicate.Invoke(input))))!;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         __Collection<TElement> result = new();
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
                 continue;
             }
             result.Insert(index: result.Count,
                           item: item);
         }
-        return result;
+        return result!;
     }
 
     TElement? IElementFinder<TElement, TElement>.FindLast(Func<TElement, Boolean> predicate)
@@ -420,9 +420,9 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         TElement? result = default;
-        foreach (TElement item in this._source)
+        foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(arg: item!))
             {
                 result = item;
             }

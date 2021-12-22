@@ -53,7 +53,7 @@ partial class BinaryNode<TValue>
             node = node.LeftChild;
         }
         this._value = min;
-        return node;
+        return node!;
     }
 
     private static Boolean AreNodesEqual(BinaryNode<TValue> left, 

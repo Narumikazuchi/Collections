@@ -9,10 +9,10 @@ internal readonly struct __FuncEqualityComparer<TElement> : IEqualityComparer<TE
         this.Comparison = comparison;
     }
 
-    public Boolean Equals(TElement left, 
-                          TElement right) => 
-        this.Comparison.Invoke(first: left, 
-                               second: right);
+    public Boolean Equals(TElement? left, 
+                          TElement? right) => 
+        this.Comparison.Invoke(first: left!, 
+                               second: right!);
 
     public Int32 GetHashCode(TElement obj) => 
         obj is null
@@ -24,7 +24,7 @@ internal readonly struct __FuncEqualityComparer<TElement> : IEqualityComparer<TE
     {
         if (typeof(TElement).IsValueType)
         {
-            return first.Equals(obj: second);
+            return first!.Equals(obj: second);
         }
         if (first is IEquatable<TElement> eq)
         {

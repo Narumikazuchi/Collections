@@ -123,7 +123,7 @@ partial class BinaryTree<TValue>
 
         IOrderedEnumerable<TValue> distinct = collection.Distinct()
                                                         .OrderBy(i => i);
-        TValue median = distinct.Median();
+        TValue median = distinct.Median()!;
         this._root = new(value: median, 
                          parent: null);
         foreach (TValue item in distinct)
@@ -153,8 +153,8 @@ partial class BinaryTree<TValue>
         {
             return this.GetDepth(node: node.LeftChild);
         }
-        return Math.Max(val1: this.GetDepth(node: node.LeftChild),
-                        val2: this.GetDepth(node: node.RightChild));
+        return Math.Max(val1: this.GetDepth(node: node.LeftChild!),
+                        val2: this.GetDepth(node: node.RightChild!));
     }
 
     private IEnumerable<BinaryNode<TValue>> TraversePreOrder()

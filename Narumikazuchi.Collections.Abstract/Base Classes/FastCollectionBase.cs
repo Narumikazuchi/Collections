@@ -67,7 +67,7 @@ partial class FastCollectionBase<TIndex, TElement>
                 {
                     continue;
                 }
-                yield return this._entries[i].Key;
+                yield return this._entries[i].Key!;
             }
         }
         yield break;
@@ -100,7 +100,7 @@ partial class FastCollectionBase<TIndex, TElement>
                 {
                     continue;
                 }
-                yield return this._entries[i].Key;
+                yield return this._entries[i].Key!;
             }
         }
         yield break;
@@ -199,7 +199,7 @@ partial class FastCollectionBase<TIndex, TElement>
                 {
                     continue;
                 }
-                yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key,
+                yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key!,
                                                                  value: this._entries[i].Value);
             }
         }
@@ -233,7 +233,7 @@ partial class FastCollectionBase<TIndex, TElement>
                 {
                     continue;
                 }
-                yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key,
+                yield return new KeyValuePair<TIndex, TElement?>(key: this._entries[i].Key!,
                                                                  value: this._entries[i].Value);
             }
         }
@@ -832,7 +832,7 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
                 {
                     return TIndex.NegativeOne;
                 }
-                return this._entries[i].Key;
+                return this._entries[i].Key!;
             }
         }
         return TIndex.NegativeOne;
@@ -865,7 +865,7 @@ partial class FastCollectionBase<TIndex, TElement> : IIndexedReadOnlyCollection<
                 {
                     return TIndex.NegativeOne;
                 }
-                return this._entries[i].Key;
+                return this._entries[i].Key!;
             }
         }
         return TIndex.NegativeOne;

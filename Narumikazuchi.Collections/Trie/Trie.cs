@@ -349,6 +349,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
         return null;
     }
 
+#pragma warning disable CS8631
     /// <inheritdoc/>
     [return: NotNull]
     public IElementContainer<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate)
@@ -409,6 +410,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
         }
         return result.AsGenericElementContainer<Collection<TrieNode<TContent>>, TrieNode<TContent>>();
     }
+#pragma warning restore CS8631
 
     /// <inheritdoc/>
     [return: MaybeNull]
