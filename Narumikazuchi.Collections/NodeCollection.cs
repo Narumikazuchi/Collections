@@ -10,14 +10,15 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
                             Comparison<TNode?> comparison) : 
         base()
     {
-        this.Comparer = new __FuncEqualityComparer<TNode>(equality);
-        this._comparer = new __FuncComparer<TNode?>(comparison);
+        this.Comparer = new __FuncEqualityComparer<TNode>(comparison: equality);
+        this._comparer = new __FuncComparer<TNode?>(comparison: comparison);
     }
 
     internal void Add(in TNode item)
     {
-        this.AppendInternal(item: item);
-        this.Sort(0, this.Count);
+        this.AppendInternal(item);
+        this.Sort(lowBound: 0, 
+                  highBound: this.Count);
     }
 
     internal void Insert(in Int32 index, 
@@ -25,11 +26,12 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
     {
         this.InsertInternal(index: index,
                             item: item);
-        this.Sort(0, this.Count);
+        this.Sort(lowBound: 0,
+                  highBound: this.Count);
     }
 
     internal Boolean Remove(in TNode item) => 
-        this.RemoveInternal(item: item);
+        this.RemoveInternal(item);
 
     internal void Clear() => 
         this.ClearInternal();
@@ -42,9 +44,12 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
             return;
         }
 
-        Int32 split = this.SortPivot(lowBound, highBound);
-        this.Sort(lowBound, split - 1);
-        this.Sort(split + 1, highBound);
+        Int32 split = this.SortPivot(lowBound: lowBound, 
+                                     highBound: highBound);
+        this.Sort(lowBound : lowBound, 
+                  highBound: split - 1);
+        this.Sort(lowBound: split + 1, 
+                  highBound: highBound);
     }
 
     private Int32 SortPivot(Int32 lowBound,
@@ -58,14 +63,16 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
         while (left <= right)
         {
             while (left <= right &&
-                   this._comparer.Compare(x: this[left], 
-                                          y: pivot) <= 0)
+                   this._comparer
+                       .Compare(x: this[left], 
+                                y: pivot) <= 0)
             {
                 ++left;
             }
             while (left <= right &&
-                   this._comparer.Compare(x: this[right],
-                                          y: pivot) > 0)
+                   this._comparer
+                       .Compare(x: this[right],
+                                y: pivot) > 0)
             {
                 --right;
             }

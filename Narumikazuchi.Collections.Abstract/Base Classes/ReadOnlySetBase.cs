@@ -34,9 +34,12 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class.
     /// </summary>
-    protected ReadOnlySetBase() : 
-        base() =>
-            this.Comparer = null;
+    protected ReadOnlySetBase() :
+        base()
+    {
+        this.Comparer = null;
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
     /// </summary>
@@ -59,7 +62,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
     protected ReadOnlySetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
                               [DisallowNull] EqualityComparison<TElement?> comparison) :
          this(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -79,12 +82,15 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
         using IEnumerator<KeyValuePair<TIndex, TElement?>> enumerator = collection.GetEnumerator();
         while (enumerator.MoveNext())
         {
-            if (this.Contains(item: enumerator.Current.Value))
+            if (this.Contains(item: enumerator.Current
+                                              .Value))
             {
                 continue;
             }
-            this.InsertInternal(index: enumerator.Current.Key,
-                                item: enumerator.Current.Value);
+            this.InsertInternal(index: enumerator.Current
+                                                 .Key,
+                                item: enumerator.Current
+                                                .Value);
         }
     }
     /// <summary>
@@ -109,7 +115,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
     protected ReadOnlySetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
                               [DisallowNull] EqualityComparison<TElement?> comparison) :
          this(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -129,12 +135,15 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
         using IEnumerator<(TIndex, TElement?)> enumerator = collection.GetEnumerator();
         while (enumerator.MoveNext())
         {
-            if (this.Contains(item: enumerator.Current.Item2))
+            if (this.Contains(item: enumerator.Current
+                                              .Item2))
             {
                 continue;
             }
-            this.InsertInternal(index: enumerator.Current.Item1,
-                                item: enumerator.Current.Item2);
+            this.InsertInternal(index: enumerator.Current
+                                                 .Item1,
+                                item: enumerator.Current
+                                                .Item2);
         }
     }
     /// <summary>
@@ -159,7 +168,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
     protected ReadOnlySetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
                               [DisallowNull] EqualityComparison<TElement?> comparison) :
          this(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlySetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -179,12 +188,15 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
         using IEnumerator<Tuple<TIndex, TElement?>> enumerator = collection.GetEnumerator();
         while (enumerator.MoveNext())
         {
-            if (this.Contains(item: enumerator.Current.Item2))
+            if (this.Contains(item: enumerator.Current
+                                              .Item2))
             {
                 continue;
             }
-            this.InsertInternal(index: enumerator.Current.Item1,
-                                item: enumerator.Current.Item2);
+            this.InsertInternal(index: enumerator.Current
+                                                 .Item1,
+                                item: enumerator.Current
+                                                .Item2);
         }
     }
 
@@ -201,16 +213,20 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
         foreach (TElement? item in other)
         {
             Int32 index = -1;
-            for (Int32 i = 0; i < this.Count; i++)
+            for (Int32 i = 0; 
+                 i < this.Count; 
+                 i++)
             {
                 if (item is null &&
-                    this._entries[i].Value is null)
+                    this._entries[i]
+                        .Value is null)
                 {
                     index = i;
                     break;
                 }
                 if (item is not null &&
-                    item.Equals(this._entries[i].Value))
+                    item.Equals(this._entries[i]
+                                    .Value))
                 {
                     index = i;
                     break;
@@ -218,7 +234,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
             }
             if (index >= 0)
             {
-                if (!arr.Get(index: index))
+                if (!arr.Get(index))
                 {
                     arr.Set(index: index,
                             value: true);
@@ -226,9 +242,11 @@ partial class ReadOnlySetBase<TIndex, TElement> : ReadOnlyCollectionBase<TIndex,
             }
         }
 
-        for (Int32 i = 0; i < arr.Count; i++)
+        for (Int32 i = 0; 
+             i < arr.Count; 
+             i++)
         {
-            if (!arr.Get(index: i))
+            if (!arr.Get(i))
             {
                 return false;
             }
@@ -273,7 +291,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : IReadOnlySet<TElement?>
             }
         }
 
-        return this.FindInOther(other: other);
+        return this.FindInOther(other);
     }
 
     /// <inheritdoc/>
@@ -329,7 +347,7 @@ partial class ReadOnlySetBase<TIndex, TElement> : IReadOnlySet<TElement?>
             return false;
         }
 
-        return this.FindInOther(other: other);
+        return this.FindInOther(other);
     }
 
     /// <inheritdoc/>
@@ -339,8 +357,8 @@ partial class ReadOnlySetBase<TIndex, TElement> : IReadOnlySet<TElement?>
     {
         ExceptionHelpers.ThrowIfArgumentNull(other);
 
-        if ((other is ICollection<TElement?> collection &&
-            collection.Count == 0) ||
+        if (other is ICollection<TElement?> collection &&
+            collection.Count == 0 ||
             other == this)
         {
             return true;

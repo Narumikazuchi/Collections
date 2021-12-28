@@ -102,21 +102,25 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : ICollection
         if (array is not KeyValuePair<TIndex, TElement?>[]
                   and not Object[])
         {
-            ArrayTypeMismatchException ex = new(message: ARRAY_TYPE_MISMATCH);
-            ex.Data.Add(key: "Required Type",
-                        value: typeof(TElement).FullName);
-            ex.Data.Add(key: "Array Type",
-                        value: array.GetType()
-                                    .GetElementType()?.FullName);
-            throw ex;
+            ArrayTypeMismatchException exception = new(message: ARRAY_TYPE_MISMATCH);
+            exception.Data
+                     .Add(key: "Required Type",
+                          value: typeof(TElement).FullName);
+            exception.Data
+                     .Add(key: "Array Type",
+                          value: array.GetType()
+                                      .GetElementType()?
+                                      .FullName);
+            throw exception;
         }
         if (index < 0)
         {
-            ArgumentOutOfRangeException ex = new(paramName: nameof(index),
+            ArgumentOutOfRangeException exception = new(paramName: nameof(index),
                                                  message: INDEX_LESS_THAN_ZERO);
-            ex.Data.Add(key: "Index",
-                        value: index);
-            throw ex;
+            exception.Data
+                     .Add(key: "Index",
+                          value: index);
+            throw exception;
         }
 
         Int32 i = 0;
@@ -147,14 +151,16 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentConvertable<TEl
         {
             if (this.Version != v)
             {
-                NotAllowed ex = new(auxMessage: COLLECTION_CHANGED);
-                ex.Data.Add(key: "Fixed Version",
-                            value: v);
-                ex.Data.Add(key: "Altered Version",
-                            value: this.Version);
-                throw ex;
+                NotAllowed exception = new(auxMessage: COLLECTION_CHANGED);
+                exception.Data
+                         .Add(key: "Fixed Version",
+                              value: v);
+                exception.Data
+                         .Add(key: "Altered Version",
+                              value: this.Version);
+                throw exception;
             }
-            result.Add(item: converter.Invoke(input: element));
+            result.Add(converter.Invoke(input: element));
         }
         return result;
     }
@@ -198,7 +204,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentForEach<TElemen
 
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            action.Invoke(obj: element);
+            action.Invoke(element);
         }
     }
 }
@@ -214,7 +220,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentSegmentable<TIn
     public virtual ICollection<TElement?> GetRange([DisallowNull] in TIndex startIndex,
                                                    [DisallowNull] in TIndex endIndex)
     {
-        if (endIndex.CompareTo(startIndex) <= 0)
+        if (endIndex.CompareTo(other: startIndex) <= 0)
         {
             // No or negative count
             throw new ArgumentException(message: "The endIndex parameter needs to be larger than the startIndex parameter.",
@@ -223,10 +229,12 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IContentSegmentable<TIn
         Collection<TElement?> result = new();
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            if (kv.Key.CompareTo(other: startIndex) >= 0 &&
-                kv.Key.CompareTo(other: endIndex) <= 0)
+            if (kv.Key
+                  .CompareTo(other: startIndex) >= 0 &&
+                kv.Key
+                  .CompareTo(other: endIndex) <= 0)
             {
-                result.Add(item: kv.Value);
+                result.Add(kv.Value);
             }
         }
         return result;
@@ -246,7 +254,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
 
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            if (predicate.Invoke(arg: element))
+            if (predicate.Invoke(element))
             {
                 return true;
             }
@@ -265,7 +273,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
 
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            if (predicate.Invoke(arg: element))
+            if (predicate.Invoke(element))
             {
                 return element;
             }
@@ -285,7 +293,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
         __Collection<TElement?> result = new();
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            if (predicate.Invoke(arg: element))
+            if (predicate.Invoke(element))
             {
                 result.Insert(index: result.Count,
                               item: element);
@@ -306,7 +314,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
         __Collection<TElement?> result = new();
         foreach (TElement? element in this.GetValuesFirstToLast())
         {
-            if (predicate.Invoke(arg: element))
+            if (predicate.Invoke(element))
             {
                 continue;
             }
@@ -327,7 +335,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IElementFinder<TElement
 
         foreach (TElement? element in this.GetValuesLastToFirst())
         {
-            if (predicate.Invoke(arg: element))
+            if (predicate.Invoke(element))
             {
                 return element;
             }
@@ -349,7 +357,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IIndexFinder<TIndex, TE
 
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            if (predicate.Invoke(arg: kv.Value))
+            if (predicate.Invoke(kv.Value))
             {
                 return kv.Key;
             }
@@ -368,12 +376,14 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IIndexFinder<TIndex, TE
 
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            if (kv.Key.CompareTo(other: startIndex) < 0 ||
-                kv.Key.CompareTo(other: endIndex) > 0)
+            if (kv.Key
+                  .CompareTo(other: startIndex) < 0 ||
+                kv.Key
+                  .CompareTo(other: endIndex) > 0)
             {
                 continue;
             }
-            if (predicate.Invoke(arg: kv.Value))
+            if (predicate.Invoke(kv.Value))
             {
                 return kv.Key;
             }
@@ -391,7 +401,7 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IIndexFinder<TIndex, TE
 
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsLastToFirst())
         {
-            if (predicate.Invoke(arg: kv.Value))
+            if (predicate.Invoke(kv.Value))
             {
                 return kv.Key;
             }
@@ -410,12 +420,14 @@ partial class ReadOnlyCollectionBase<TIndex, TElement> : IIndexFinder<TIndex, TE
 
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsLastToFirst())
         {
-            if (kv.Key.CompareTo(other: startIndex) < 0 ||
-                kv.Key.CompareTo(other: endIndex) > 0)
+            if (kv.Key
+                  .CompareTo(other: startIndex) < 0 ||
+                kv.Key
+                  .CompareTo(other: endIndex) > 0)
             {
                 continue;
             }
-            if (predicate.Invoke(arg: kv.Value))
+            if (predicate.Invoke(kv.Value))
             {
                 return kv.Key;
             }

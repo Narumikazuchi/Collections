@@ -42,7 +42,7 @@ partial class ObservableList<TElement> : IContentClearable
     }
 }
 
-// IContentInsertable
+// IContentInsertable<T, U>
 partial class ObservableList<TElement> : IContentInsertable<Int32, TElement?>
 {
     /// <inheritdoc />
@@ -50,14 +50,15 @@ partial class ObservableList<TElement> : IContentInsertable<Int32, TElement?>
                                 TElement? item)
     {
         this.OnPropertyChanging(nameof(this.Count));
-        base.Insert(index, item);
+        base.Insert(index: index, 
+                    item: item);
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
-                                                                        item));
+        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add,
+                                                                      changedItem: item));
     }
 }
 
-// IContentClearable
+// IContentIndexRemovable<T>
 partial class ObservableList<TElement> : IContentIndexRemovable<Int32>
 {
     /// <inheritdoc />
@@ -77,7 +78,7 @@ partial class ObservableList<TElement> : IContentIndexRemovable<Int32>
     }
 }
 
-// IReadOnlyList
+// IReadOnlyList<T>
 partial class ObservableList<TElement> : IReadOnlyList<TElement?>
 {
     /// <inheritdoc />
@@ -107,8 +108,8 @@ partial class ObservableList<TElement> : INotifyCollectionChanged
     /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
     /// </summary>
     protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e) =>
-        this.CollectionChanged?.Invoke(this, 
-                                       e);
+        this.CollectionChanged?.Invoke(sender: this, 
+                                       e: e);
 }
 
 // INotifyPropertyChanging
@@ -121,8 +122,8 @@ partial class ObservableList<TElement> : INotifyPropertyChanging
     /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
     /// </summary>
     protected void OnPropertyChanging(String propertyName) =>
-        this.PropertyChanging?.Invoke(this, 
-                                      new PropertyChangingEventArgs(propertyName));
+        this.PropertyChanging?.Invoke(sender: this, 
+                                      e: new PropertyChangingEventArgs(propertyName));
 }
 
 // INotifyPropertyChanged
@@ -135,6 +136,6 @@ partial class ObservableList<TElement> : INotifyPropertyChanged
     /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
     /// </summary>
     protected void OnPropertyChanged(String propertyName) =>
-        this.PropertyChanged?.Invoke(this, 
-                                     new PropertyChangedEventArgs(propertyName));
+        this.PropertyChanged?.Invoke(sender: this, 
+                                     e: new PropertyChangedEventArgs(propertyName));
 }

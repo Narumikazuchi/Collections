@@ -6,7 +6,7 @@
 [DebuggerDisplay("{Value}")]
 public sealed partial class BinaryNode<TValue>
 {
-#pragma warning disable
+#pragma warning disable CS1591
     public static implicit operator TValue(BinaryNode<TValue> node) => 
         node.Value;
 #pragma warning restore
@@ -17,14 +17,16 @@ public sealed partial class BinaryNode<TValue>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     [MaybeNull]
-    public BinaryNode<TValue>? LeftChild => this.Left;
+    public BinaryNode<TValue>? LeftChild => 
+        this.Left;
     /// <summary>
     /// Gets the right child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no right sided child node.
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     [MaybeNull]
-    public BinaryNode<TValue>? RightChild => this.Right;
+    public BinaryNode<TValue>? RightChild => 
+        this.Right;
 }
 
 // Non-Public
@@ -37,9 +39,12 @@ partial class BinaryNode<TValue>
 
         this._value = value;
         this.Parent = parent;
-        this.Depth = parent is null 
-                        ? 0 
-                        : parent.Depth + 1;
+        if (parent is null)
+        {
+            this.Depth = 0;
+            return;
+        }
+        this.Depth = parent.Depth + 1;
     }
 
     internal BinaryNode<TValue> SetToMinBranchValue()
@@ -49,7 +54,8 @@ partial class BinaryNode<TValue>
         while (node is not null &&
                node.LeftChild is not null)
         {
-            min = node.LeftChild.Value;
+            min = node.LeftChild
+                      .Value;
             node = node.LeftChild;
         }
         this._value = min;
@@ -58,7 +64,8 @@ partial class BinaryNode<TValue>
 
     private static Boolean AreNodesEqual(BinaryNode<TValue> left, 
                                          BinaryNode<TValue> right) =>
-        left.Value.CompareTo(other: right.Value) == 0;
+        left.Value
+            .CompareTo(right.Value) == 0;
 
     private static Int32 CompareNodes(BinaryNode<TValue>? left,
                                       BinaryNode<TValue>? right)
@@ -75,7 +82,8 @@ partial class BinaryNode<TValue>
         {
             return -1;
         }
-        return left.Value.CompareTo(other: right.Value);
+        return left.Value
+                   .CompareTo(right.Value);
     }
 
     internal BinaryNode<TValue>? Left
@@ -87,11 +95,13 @@ partial class BinaryNode<TValue>
             this._children.Clear();
             if (this._left is not null)
             {
-                this._children.Add(item: this._left);
+                this._children
+                    .Add(this._left);
             }
             if (this._right is not null)
             {
-                this._children.Add(item: this._right);
+                this._children
+                    .Add(this._right);
             }
         }
     }
@@ -104,11 +114,13 @@ partial class BinaryNode<TValue>
             this._children.Clear();
             if (this._left is not null)
             {
-                this._children.Add(item: this._left);
+                this._children
+                    .Add(this._left);
             }
             if (this._right is not null)
             {
-                this._children.Add(item: this._right);
+                this._children
+                    .Add(this._right);
             }
         }
     }
@@ -146,7 +158,8 @@ partial class BinaryNode<TValue> : ITreeNode<BinaryNode<TValue>, TValue>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     [Pure]
     public Boolean IsLeaf => 
-        this._children.Count == 0;
+        this._children
+            .Count == 0;
 
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

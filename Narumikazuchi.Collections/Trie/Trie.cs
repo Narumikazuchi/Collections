@@ -10,10 +10,12 @@ public sealed partial class Trie<TContent>
     /// <summary>
     /// Instantiates an empty <see cref="Trie{TContent}"/>.
     /// </summary>
-    public Trie() => 
-        this._root = new(trie: this, 
-                         value: '^', 
+    public Trie()
+    {
+        this._root = new(trie: this,
+                         value: '^',
                          parent: null);
+    }
 
     /// <summary>
     /// Traverses through the <see cref="Trie{TContent}"/> and returns the inserted words in alphabetic order.
@@ -23,14 +25,15 @@ public sealed partial class Trie<TContent>
     {
         lock (this._syncRoot)
         {
-            foreach (TrieNode<TContent>? child in this._root.Children)
+            foreach (TrieNode<TContent>? child in this._root
+                                                      .Children)
             {
                 if (child is null)
                 {
                     continue;
                 }
 
-                foreach (String word in this.TraverseInternal(child))
+                foreach (String word in this.TraverseInternal(parent: child))
                 {
                     yield return word;
                 }
@@ -74,7 +77,8 @@ partial class Trie<TContent>
     private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent,
                                                  String? wordStart)
     {
-        String start = wordStart + parent.Value.ToString();
+        String start = wordStart + parent.Value
+                                         .ToString();
 
         if (parent.IsLeaf ||
             parent.IsWord)
@@ -135,7 +139,9 @@ partial class Trie<TContent> : IContentClearable
     {
         lock (this._syncRoot)
         {
-            this._root.Children.Clear();
+            this._root
+                .Children
+                .Clear();
             this._words = 0;
         }
     }
@@ -178,39 +184,42 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
                                      options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
-            TrieNode<TContent>? current = this.Find(predicate: (prefix) => prefix == word);
+            TrieNode<TContent>? current = this.Find(prefix => prefix == word);
             if (current is null)
             {
                 continue;
             }
 
-            this.PropertyChanging?.Invoke(this,
-                                          new(propertyName: nameof(this.Count)));
+            this.PropertyChanging?.Invoke(sender: this,
+                                          e: new(nameof(this.Count)));
             lock (this._syncRoot)
             {
                 if (current.Depth < word.Length)
                 {
                     this._words++;
                 }
-                for (Int32 i = (Int32)current.Depth; i < word.Length; i++)
+                for (Int32 i = (Int32)current.Depth; 
+                     i < word.Length; 
+                     i++)
                 {
                     TrieNode<TContent> newNode = new(trie: this,
                                                      value: word[i],
                                                      parent: current);
-                    current.Children.Add(item: newNode);
+                    current.Children
+                           .Add(newNode);
                     current = newNode;
                 }
                 current.IsWord = true;
                 foreach (TContent? item in collection)
                 {
-                    current.Add(item: item);
+                    current.Add(item);
                 }
             }
-            this.PropertyChanged?.Invoke(this,
-                                         new(propertyName: nameof(this.Count)));
-            this.CollectionChanged?.Invoke(this,
-                                           new(action: NotifyCollectionChangedAction.Add,
-                                               changedItem: word));
+            this.PropertyChanged?.Invoke(sender: this,
+                                         e: new(nameof(this.Count)));
+            this.CollectionChanged?.Invoke(sender: this,
+                                           e: new(action: NotifyCollectionChangedAction.Add,
+                                                  changedItem: word));
         }
     }
 }
@@ -220,7 +229,7 @@ partial class Trie<TContent> : IContentRemovable
 {
     Boolean IContentRemovable.Remove(Object item) =>
         item is String word &&
-        this.Remove(item: word);
+        this.Remove(word);
 }
 
 // IContentRemovable<T>
@@ -235,12 +244,12 @@ partial class Trie<TContent> : IContentRemovable<String>
                                     options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
-            this.PropertyChanging?.Invoke(this,
-                                          new(propertyName: nameof(this.Count)));
+            this.PropertyChanging?.Invoke(sender: this,
+                                          e: new(nameof(this.Count)));
             lock (this._syncRoot)
             {
                 this._words--;
-                TrieNode<TContent>? node = this.Find(predicate: (prefix) => prefix == word);
+                TrieNode<TContent>? node = this.Find(prefix => prefix == word);
                 if (node is null)
                 {
                     continue;
@@ -257,16 +266,17 @@ partial class Trie<TContent> : IContentRemovable<String>
                         {
                             break;
                         }
-                        parent.Children.Remove(item: node);
+                        parent.Children
+                              .Remove(node);
                         node = parent;
                     }
                 }
             }
-            this.PropertyChanged?.Invoke(this,
-                                         new(propertyName: nameof(this.Count)));
-            this.CollectionChanged?.Invoke(this,
-                                           new(action: NotifyCollectionChangedAction.Remove,
-                                               changedItem: word));
+            this.PropertyChanged?.Invoke(sender: this,
+                                         e: new(nameof(this.Count)));
+            this.CollectionChanged?.Invoke(sender: this,
+                                           e: new(action: NotifyCollectionChangedAction.Remove,
+                                                  changedItem: word));
         }
         return result;
     }
@@ -277,17 +287,21 @@ partial class Trie<TContent> : IContentRemovable<String>
         Collection<String> remove = new();
         foreach (String? word in this.Traverse())
         {
-            if (predicate.Invoke(arg: word))
+            if (predicate.Invoke(word))
             {
-                remove.Add(item: word);
+                remove.Add(word);
             }
         }
 
+        Int32 skipped = 0;
         foreach (String? word in remove)
         {
-            this.Remove(item: word);
+            if (!this.Remove(word))
+            {
+                ++skipped;
+            }
         }
-        return remove.Count;
+        return remove.Count - skipped;
     }
 }
 
@@ -312,7 +326,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             String first = word.ToLower()
                                .Split(separator: DefaultSeparators,
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(arg: first))
+            if (predicate.Invoke(first))
             {
                 return true;
             }
@@ -331,10 +345,12 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             String first = word.ToLower()
                                .Split(separator: DefaultSeparators,
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(arg: first))
+            if (predicate.Invoke(first))
             {
                 TrieNode<TContent> result = this._root;
-                for (Int32 i = 0; i < word.Length; i++)
+                for (Int32 i = 0; 
+                     i < word.Length; 
+                     i++)
                 {
                     TrieNode<TContent>? temp = result.FindChildNode(word[i]);
                     if (temp is null)
@@ -362,10 +378,12 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             String first = word.ToLower()
                                .Split(separator: DefaultSeparators,
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(arg: first))
+            if (predicate.Invoke(first))
             {
                 TrieNode<TContent> current = this._root;
-                for (Int32 i = 0; i < word.Length; i++)
+                for (Int32 i = 0;
+                     i < word.Length; 
+                     i++)
                 {
                     TrieNode<TContent>? temp = current.FindChildNode(word[i]);
                     if (temp is null)
@@ -374,7 +392,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
                     }
                     current = temp;
                 }
-                result.Add(item: current);
+                result.Add(current);
             }
         }
         return result.AsGenericElementContainer<Collection<TrieNode<TContent>>, TrieNode<TContent>>();
@@ -392,12 +410,14 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             String first = word.ToLower()
                                .Split(separator: DefaultSeparators,
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(arg: first))
+            if (predicate.Invoke(first))
             {
                 continue;
             }
             TrieNode<TContent> current = this._root;
-            for (Int32 i = 0; i < word.Length; i++)
+            for (Int32 i = 0; 
+                 i < word.Length; 
+                 i++)
             {
                 TrieNode<TContent>? temp = current.FindChildNode(word[i]);
                 if (temp is null)
@@ -406,7 +426,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
                 }
                 current = temp;
             }
-            result.Add(item: current);
+            result.Add(current);
         }
         return result.AsGenericElementContainer<Collection<TrieNode<TContent>>, TrieNode<TContent>>();
     }
@@ -424,10 +444,12 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             String first = word.ToLower()
                                .Split(separator: DefaultSeparators,
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(arg: first))
+            if (predicate.Invoke(first))
             {
                 TrieNode<TContent> current = this._root;
-                for (Int32 i = 0; i < word.Length; i++)
+                for (Int32 i = 0; 
+                     i < word.Length; 
+                     i++)
                 {
                     TrieNode<TContent>? temp = current.FindChildNode(word[i]);
                     if (temp is null)

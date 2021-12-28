@@ -3,8 +3,10 @@
 internal readonly partial struct __ListWrapper<TList, TElement>
     where TList : ICollection, ICollection<TElement?>, IList, IList<TElement?>, IReadOnlyCollection<TElement?>, IReadOnlyList<TElement?>
 {
-    public __ListWrapper(TList source) =>
+    public __ListWrapper(TList source)
+    {
         this._source = source;
+    }
 
     public static explicit operator TList(__ListWrapper<TList, TElement> source) =>
         source._source;
@@ -21,17 +23,20 @@ partial struct __ListWrapper<TList, TElement> : ICollection
 {
     void ICollection.CopyTo(Array array,
                             Int32 index) =>
-        this._source.CopyTo(array: array,
-                            index: index);
+        this._source
+            .CopyTo(array: array,
+                    index: index);
 
     Int32 ICollection.Count =>
         ((ICollection)this._source).Count;
 
     Boolean ICollection.IsSynchronized =>
-        this._source.IsSynchronized;
+        this._source
+            .IsSynchronized;
 
     Object ICollection.SyncRoot =>
-        this._source.SyncRoot;
+        this._source
+            .SyncRoot;
 }
 
 // IContentAddable<T>
@@ -39,15 +44,18 @@ partial struct __ListWrapper<TList, TElement> : IContentAddable<TElement>
 {
     Boolean IContentAddable<TElement>.Add(TElement item)
     {
-        this._source.Add(item: item);
+        this._source
+            .Add(item);
         return true;
     }
 
     void IContentAddable<TElement>.AddRange(IEnumerable<TElement> collection)
     {
+        ExceptionHelpers.ThrowIfArgumentNull(collection);
         foreach (TElement item in collection)
         {
-            this._source.Add(item: item);
+            this._source
+                .Add(item);
         }
     }
 }
@@ -66,7 +74,7 @@ partial struct __ListWrapper<TList, TElement> : IContentConvertable<TElement>
     {
         if (this._source is List<TElement> list)
         {
-            return list.ConvertAll(converter: converter);
+            return list.ConvertAll(converter);
         }
         if (this._source is TElement[] array)
         {
@@ -75,7 +83,7 @@ partial struct __ListWrapper<TList, TElement> : IContentConvertable<TElement>
         }
         if (this._source is ImmutableList<TElement> immutable)
         {
-            return immutable.ConvertAll(converter: input => converter.Invoke(input));
+            return immutable.ConvertAll(input => converter.Invoke(input));
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(converter);
@@ -83,7 +91,7 @@ partial struct __ListWrapper<TList, TElement> : IContentConvertable<TElement>
         Collection<TOutput> result = new();
         foreach (TElement? item in this._source)
         {
-            result.Add(item: converter.Invoke(input: item!));
+            result.Add(converter.Invoke(item!));
         }
         return result;
     }
@@ -94,8 +102,9 @@ partial struct __ListWrapper<TList, TElement> : IContentCopyable<Int32, TElement
 {
     void IContentCopyable<Int32, TElement[]>.CopyTo(TElement[] array,
                                                     in Int32 index) =>
-        this._source.CopyTo(array: array,
-                            index: index);
+        this._source
+            .CopyTo(array: array,
+                    index: index);
 }
 
 // IContentForEach<T>
@@ -105,7 +114,7 @@ partial struct __ListWrapper<TList, TElement> : IContentForEach<TElement>
     {
         if (this._source is List<TElement> list)
         {
-            list.ForEach(action: action);
+            list.ForEach(action);
             return;
         }
         if (this._source is TElement[] array)
@@ -116,14 +125,14 @@ partial struct __ListWrapper<TList, TElement> : IContentForEach<TElement>
         }
         if (this._source is ImmutableList<TElement> immutable)
         {
-            immutable.ForEach(action: action);
+            immutable.ForEach(action);
             return;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(action);
         foreach (TElement? item in this._source)
         {
-            action.Invoke(obj: item!);
+            action.Invoke(item!);
         }
     }
 }
@@ -132,7 +141,7 @@ partial struct __ListWrapper<TList, TElement> : IContentForEach<TElement>
 partial struct __ListWrapper<TList, TElement> : IContentIndexRemovable<Int32>
 {
     void IContentIndexRemovable<Int32>.RemoveAt(in Int32 index) =>
-        ((IList)this._source).RemoveAt(index: index);
+        ((IList)this._source).RemoveAt(index);
 }
 
 // IContentInsertable<T>
@@ -140,8 +149,9 @@ partial struct __ListWrapper<TList, TElement> : IContentInsertable<Int32>
 {
     void IContentInsertable<Int32>.Insert(in Int32 index, 
                                           Object item) =>
-        this._source.Insert(index: index,
-                            value: item);
+        this._source
+            .Insert(index: index,
+                    value: item);
 }
 
 // IContentInsertable<T, U>
@@ -149,8 +159,9 @@ partial struct __ListWrapper<TList, TElement> : IContentInsertable<Int32, TEleme
 {
     void IContentInsertable<Int32, TElement>.Insert(in Int32 index, 
                                                     TElement item) =>
-        this._source.Insert(index: index,
-                            item: item);
+        this._source
+            .Insert(index: index,
+                    item: item);
 
     void IContentInsertable<Int32, TElement>.InsertRange(in Int32 index, 
                                                          IEnumerable<TElement?> collection)
@@ -167,8 +178,9 @@ partial struct __ListWrapper<TList, TElement> : IContentInsertable<Int32, TEleme
         Int32 i = index;
         foreach (TElement? item in collection)
         {
-            this._source.Insert(index: i++,
-                                item: item);
+            this._source
+                .Insert(index: i++,
+                        item: item);
         }
     }
 }
@@ -178,20 +190,22 @@ partial struct __ListWrapper<TList, TElement> : IContentRemovable
 {
     Boolean IContentRemovable.Remove(Object item) =>
         item is TElement element &&
-        this._source.Remove(element);
+        this._source
+            .Remove(element);
 }
 
 // IContentRemovable<T>
 partial struct __ListWrapper<TList, TElement> : IContentRemovable<TElement>
 {
     Boolean IContentRemovable<TElement>.Remove(TElement item) =>
-        this._source.Remove(item);
+        this._source
+            .Remove(item);
 
     Int32 IContentRemovable<TElement>.RemoveAll(Func<TElement, Boolean> predicate)
     {
         if (this._source is List<TElement> list)
         {
-            return list.RemoveAll(match: input => predicate.Invoke(input));
+            return list.RemoveAll(input => predicate.Invoke(input));
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
@@ -199,16 +213,17 @@ partial struct __ListWrapper<TList, TElement> : IContentRemovable<TElement>
         Collection<TElement> remove = new();
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
-                remove.Add(item: item!);
+                remove.Add(item!);
             }
         }
 
         Int32 skipped = 0;
         foreach (TElement item in remove)
         {
-            if (!this._source.Remove(item))
+            if (!this._source
+                     .Remove(item))
             {
                 skipped++;
             }
@@ -230,9 +245,11 @@ partial struct __ListWrapper<TList, TElement> : IContentSegmentable<Int32, TElem
         }
 
         Collection<TElement> range = new();
-        for (Int32 i = startIndex; i < endIndex; i++)
+        for (Int32 i = startIndex; 
+             i < endIndex; 
+             i++)
         {
-            range.Add(item: ((IReadOnlyList<TElement>)this._source)[i]);
+            range.Add(((IReadOnlyList<TElement>)this._source)[i]);
         }
         return range;
     }
@@ -281,8 +298,9 @@ partial struct __ListWrapper<TList, TElement> : IConvertToArray<TElement[]>
         }
 
         TElement[] result = new TElement[((ICollection)this._source).Count];
-        this._source.CopyTo(array: result,
-                            arrayIndex: 0);
+        this._source
+            .CopyTo(array: result,
+                    arrayIndex: 0);
         return result;
     }
 }
@@ -291,14 +309,16 @@ partial struct __ListWrapper<TList, TElement> : IConvertToArray<TElement[]>
 partial struct __ListWrapper<TList, TElement> : IElementContainer
 {
     Boolean IElementContainer.Contains(Object? item) =>
-        this._source.Contains(item);
+        this._source
+            .Contains(value: item);
 }
 
 // IElementContainer<T>
 partial struct __ListWrapper<TList, TElement> : IElementContainer<TElement?>
 {
     Boolean IElementContainer<TElement?>.Contains(TElement? item) =>
-        this._source.Contains(item: item);
+        this._source
+            .Contains(item: item);
 }
 
 // IElementFinder<T, U>
@@ -313,14 +333,14 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         }
         if (this._source is List<TElement> list)
         {
-            return list.Exists(match: input => predicate.Invoke(input));
+            return list.Exists(input => predicate.Invoke(input));
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
                 return true;
             }
@@ -337,14 +357,14 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         }
         if (this._source is List<TElement> list)
         {
-            return list.Find(match: input => predicate.Invoke(input));
+            return list.Find(input => predicate.Invoke(input));
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
                 return item;
             }
@@ -356,12 +376,12 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
     {
         if (this._source is TElement[] array)
         {
-            return new __Collection<TElement>(Array.FindAll(array: array,
-                                                            match: input => predicate.Invoke(input)))!;
+            return new __Collection<TElement>(source: Array.FindAll(array: array,
+                                                                    match: input => predicate.Invoke(input)))!;
         }
         if (this._source is List<TElement> list)
         {
-            return new __Collection<TElement>(list.FindAll(match: input => predicate.Invoke(input)))!;
+            return new __Collection<TElement>(source: list.FindAll(input => predicate.Invoke(input)))!;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
@@ -369,7 +389,7 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         __Collection<TElement> result = new();
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
                 result.Insert(index: result.Count,
                               item: item);
@@ -382,12 +402,12 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
     {
         if (this._source is TElement[] array)
         {
-            return new __Collection<TElement>(array.Except(Array.FindAll(array: array,
-                                                                         match: input => predicate.Invoke(input))))!;
+            return new __Collection<TElement>(source: array.Except(Array.FindAll(array: array,
+                                                                                 match: input => predicate.Invoke(input))))!;
         }
         if (this._source is List<TElement> list)
         {
-            return new __Collection<TElement>(list.Except(list.FindAll(match: input => predicate.Invoke(input))))!;
+            return new __Collection<TElement>(source: list.Except(list.FindAll(input => predicate.Invoke(input))))!;
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
@@ -395,7 +415,7 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         __Collection<TElement> result = new();
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
                 continue;
             }
@@ -414,7 +434,7 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         }
         if (this._source is List<TElement> list)
         {
-            return list.FindLast(match: input => predicate.Invoke(input));
+            return list.FindLast(input => predicate.Invoke(input));
         }
 
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
@@ -422,7 +442,7 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
         TElement? result = default;
         foreach (TElement? item in this._source)
         {
-            if (predicate.Invoke(arg: item!))
+            if (predicate.Invoke(item!))
             {
                 result = item;
             }
@@ -435,14 +455,16 @@ partial struct __ListWrapper<TList, TElement> : IElementFinder<TElement, TElemen
 partial struct __ListWrapper<TList, TElement> : IEnumerable
 {
     IEnumerator IEnumerable.GetEnumerator() =>
-        this._source.GetEnumerator();
+        this._source
+            .GetEnumerator();
 }
 
 // IEnumerable<T>
 partial struct __ListWrapper<TList, TElement> : IEnumerable<TElement?>
 {
     IEnumerator<TElement?> IEnumerable<TElement?>.GetEnumerator() =>
-        this._source.GetEnumerator();
+        this._source
+            .GetEnumerator();
 }
 
 // IIndexedReadOnlyCollection<T>
@@ -452,7 +474,8 @@ partial struct __ListWrapper<TList, TElement> : IIndexedReadOnlyCollection<Int32
     {
         if (item is TElement element)
         {
-            return this._source.IndexOf(item: element);
+            return this._source
+                       .IndexOf(item: element);
         }
         return -1;
     }
@@ -461,7 +484,8 @@ partial struct __ListWrapper<TList, TElement> : IIndexedReadOnlyCollection<Int32
     {
         if (item is TElement element)
         {
-            TElement?[] array = this._source.ToArray();
+            TElement?[] array = this._source
+                                    .ToArray();
             return Array.LastIndexOf(array: array,
                                      value: element);
         }
@@ -476,9 +500,10 @@ partial struct __ListWrapper<TList, TElement> : IIndexedReadOnlyCollection<Int32
 partial struct __ListWrapper<TList, TElement> : IIndexedReadOnlyCollection<Int32, TElement?>
 {
     Int32 IIndexedReadOnlyCollection<Int32, TElement?>.IndexOf(TElement? item) =>
-        this._source.IndexOf(item: item);
+        this._source
+            .IndexOf(item: item);
     Int32 IIndexedReadOnlyCollection<Int32, TElement?>.LastIndexOf(TElement? item) =>
-        ((IIndexedReadOnlyCollection<Int32>)this).LastIndexOf(item: item);
+        ((IIndexedReadOnlyCollection<Int32>)this).LastIndexOf(item);
 
     TElement? IIndexedReadOnlyCollection<Int32, TElement?>.this[Int32 index] =>
         ((IIndexedReadOnlyCollection<Int32, TElement?>)this._source)[index];
@@ -496,16 +521,18 @@ partial struct __ListWrapper<TList, TElement> : IIndexFinder<Int32, TElement>
         }
         if (this._source is List<TElement> list)
         {
-            return list.FindIndex(match: input => predicate.Invoke(input));
+            return list.FindIndex(input => predicate.Invoke(input));
         }
         if (this._source is ImmutableList<TElement> immutable)
         {
-            return immutable.FindIndex(match: input => predicate.Invoke(input));
+            return immutable.FindIndex(input => predicate.Invoke(input));
         }
 
-        for (Int32 i = 0; i < ((ICollection)this._source).Count; i++)
+        for (Int32 i = 0; 
+             i < ((ICollection)this._source).Count; 
+             i++)
         {
-            if (predicate.Invoke(arg: ((IReadOnlyList<TElement>)this._source)[i]))
+            if (predicate.Invoke(((IReadOnlyList<TElement>)this._source)[i]))
             {
                 return i;
             }
@@ -536,9 +563,11 @@ partial struct __ListWrapper<TList, TElement> : IIndexFinder<Int32, TElement>
                                        match: input => predicate.Invoke(input));
         }
 
-        for (Int32 i = startIndex; i < endIndex; i++)
+        for (Int32 i = startIndex; 
+             i < endIndex; 
+             i++)
         {
-            if (predicate.Invoke(arg: ((IReadOnlyList<TElement>)this._source)[i]))
+            if (predicate.Invoke(((IReadOnlyList<TElement>)this._source)[i]))
             {
                 return i;
             }
@@ -555,16 +584,18 @@ partial struct __ListWrapper<TList, TElement> : IIndexFinder<Int32, TElement>
         }
         if (this._source is List<TElement> list)
         {
-            return list.FindLastIndex(match: input => predicate.Invoke(input));
+            return list.FindLastIndex(input => predicate.Invoke(input));
         }
         if (this._source is ImmutableList<TElement> immutable)
         {
-            return immutable.FindLastIndex(match: input => predicate.Invoke(input));
+            return immutable.FindLastIndex(input => predicate.Invoke(input));
         }
 
-        for (Int32 i = ((ICollection)this._source).Count - 1; i > 0; i--)
+        for (Int32 i = ((ICollection)this._source).Count - 1; 
+             i > 0; 
+             i--)
         {
-            if (predicate.Invoke(arg: ((IReadOnlyList<TElement>)this._source)[i]))
+            if (predicate.Invoke(((IReadOnlyList<TElement>)this._source)[i]))
             {
                 return i;
             }
@@ -595,9 +626,11 @@ partial struct __ListWrapper<TList, TElement> : IIndexFinder<Int32, TElement>
                                            match: input => predicate.Invoke(input));
         }
 
-        for (Int32 i = endIndex; i > startIndex; i--)
+        for (Int32 i = endIndex; 
+             i > startIndex; 
+             i--)
         {
-            if (predicate.Invoke(arg: ((IReadOnlyList<TElement>)this._source)[i]))
+            if (predicate.Invoke(((IReadOnlyList<TElement>)this._source)[i]))
             {
                 return i;
             }
@@ -624,8 +657,10 @@ partial struct __ListWrapper<TList, TElement> : IReadOnlyList<TElement?>
 partial struct __ListWrapper<TList, TElement> : ISynchronized
 {
     Boolean ISynchronized.IsSynchronized =>
-        this._source.IsSynchronized;
+        this._source
+            .IsSynchronized;
 
     Object ISynchronized.SyncRoot =>
-        this._source.SyncRoot;
+        this._source
+            .SyncRoot;
 }

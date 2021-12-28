@@ -4,7 +4,6 @@
 /// Represents a strongly typed list of objects, which reports changes, can be accessed by index and searched. 
 /// </summary>
 public interface IObservableList<TElement> :
-    IAsyncEnumerable<TElement>,
     ICollection,
     ICollection<TElement>,
     ICollectionImmutability,

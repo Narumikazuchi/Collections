@@ -42,7 +42,7 @@ partial class SetBase<TIndex, TElement> : ReadOnlySetBase<TIndex, TElement>
     protected SetBase([DisallowNull] IEnumerable<KeyValuePair<TIndex, TElement?>> collection,
                       [DisallowNull] EqualityComparison<TElement?> comparison) :
          base(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -79,7 +79,7 @@ partial class SetBase<TIndex, TElement> : ReadOnlySetBase<TIndex, TElement>
     protected SetBase([DisallowNull] IEnumerable<(TIndex, TElement?)> collection,
                       [DisallowNull] EqualityComparison<TElement?> comparison) :
          base(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -116,7 +116,7 @@ partial class SetBase<TIndex, TElement> : ReadOnlySetBase<TIndex, TElement>
     protected SetBase([DisallowNull] IEnumerable<Tuple<TIndex, TElement?>> collection,
                       [DisallowNull] EqualityComparison<TElement?> comparison) :
          base(collection: collection,
-              comparer: new __FuncEqualityComparer<TElement?>(comparison))
+              comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison))
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="SetBase{TIndex, TElement}"/> class containing the specified collection of items.
@@ -149,7 +149,7 @@ partial class SetBase<TIndex, TElement> : IContentAddable<TElement?>
     /// <exception cref="NotAllowed"/>
     public virtual Boolean Add([AllowNull] TElement? item) =>
         !this.Contains(item: item) &&
-        this.AppendInternal(item: item);
+        this.AppendInternal(item);
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
@@ -159,7 +159,7 @@ partial class SetBase<TIndex, TElement> : IContentAddable<TElement?>
     {
         foreach (TElement? item in collection)
         {
-            this.Add(item: item);
+            this.Add(item);
         }
     }
 }
@@ -168,7 +168,7 @@ partial class SetBase<TIndex, TElement> : IContentAddable<TElement?>
 partial class SetBase<TIndex, TElement> : ICollection<TElement?>
 {
     void ICollection<TElement?>.Add([AllowNull] TElement? item) =>
-        this.Add(item: item);
+        this.Add(item);
 
     void ICollection<TElement?>.CopyTo(TElement?[] array,
                                        Int32 arrayIndex) =>
@@ -181,7 +181,7 @@ partial class SetBase<TIndex, TElement> : IContentRemovable
 {
     Boolean IContentRemovable.Remove(Object item) =>
         item is TElement element &&
-        this.Remove(item: element);
+        this.Remove(element);
 }
 
 // IContentRemovable<T>
@@ -196,7 +196,7 @@ partial class SetBase<TIndex, TElement> : IContentRemovable<TElement?>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="NotAllowed" />
     public virtual Boolean Remove([AllowNull] TElement? item) =>
-        this.RemoveInternal(item: item);
+        this.RemoveInternal(item);
 
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException" />
@@ -207,15 +207,17 @@ partial class SetBase<TIndex, TElement> : IContentRemovable<TElement?>
         Collection<TIndex> indecies = new();
         foreach (KeyValuePair<TIndex, TElement?> kv in this.GetKeyValuePairsFirstToLast())
         {
-            if (predicate.Invoke(arg: kv.Value))
+            if (predicate.Invoke(kv.Value))
             {
-                indecies.Add(item: kv.Key);
+                indecies.Add(kv.Key);
             }
         }
 
-        for (Int32 i = 0; i < indecies.Count; i++)
+        for (Int32 i = 0; 
+             i < indecies.Count; 
+             i++)
         {
-            this.RemoveAtInternal(index: indecies[i]);
+            this.RemoveAtInternal(indecies[i]);
         }
 
         return indecies.Count;
@@ -248,7 +250,7 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
 
         foreach (TElement? item in other)
         {
-            this.Remove(item: item);
+            this.Remove(item);
         }
     }
 
@@ -294,13 +296,13 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
             }
             if (remove)
             {
-                indecies.Add(item: kv.Key);
+                indecies.Add(kv.Key);
             }
         }
 
         foreach (TIndex index in indecies)
         {
-            this.RemoveAtInternal(index: index);
+            this.RemoveAtInternal(index);
         }
     }
 
@@ -316,7 +318,7 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
 
         if (this.Count == 0)
         {
-            this.UnionWith(other: other);
+            this.UnionWith(other);
             return;
         }
 
@@ -334,19 +336,19 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
                 if (item is null &&
                     kv.Value is null)
                 {
-                    indecies.Add(item: kv.Key);
+                    indecies.Add(kv.Key);
                 }
                 if (item is not null &&
                     item.Equals(kv.Value))
                 {
-                    indecies.Add(item: kv.Key);
+                    indecies.Add(kv.Key);
                 }
             }
         }
 
         for (Int32 i = 0; i < indecies.Count; i++)
         {
-            this.RemoveAtInternal(index: indecies[i]);
+            this.RemoveAtInternal(indecies[i]);
         }
     }
 
@@ -367,7 +369,7 @@ partial class SetBase<TIndex, TElement> : ISet<TElement?>
 
         foreach (TElement? item in other)
         {
-            this.Add(item: item);
+            this.Add(item);
         }
     }
 }

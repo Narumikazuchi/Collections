@@ -8,7 +8,6 @@
 /// If neither <see cref="IEqualityComparer{T}"/> nor <see cref="EqualityComparison{T}"/> are specified, the register will compare the references for classes or check each field/property for values types.
 /// </remarks>
 public interface IObservableSet<TElement> :
-    IAsyncEnumerable<TElement>,
     ICollection,
     ICollection<TElement>,
     ICollectionImmutability,

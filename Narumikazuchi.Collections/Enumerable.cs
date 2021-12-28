@@ -9,32 +9,46 @@ public static class Enumerable
     /// Creates a <see cref="ObservableList{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
     [return: NotNull]
-    public static ObservableList<TElement> ToObservableList<TElement>(this IEnumerable<TElement> source) =>
-        source is ObservableList<TElement> list
-            ? list
-            : new(collection: source);
+    public static ObservableList<TElement> ToObservableList<TElement>(this IEnumerable<TElement> source)
+    {
+        if (source is ObservableList<TElement> original)
+        {
+            return original;
+        }
+        return new(collection: source);
+    }
 
 
     /// <summary>
     /// Creates a <see cref="ObservableSet{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
     [return: NotNull]
-    public static ObservableSet<TElement> ToObservableSet<TElement>(this IEnumerable<TElement> source) =>
-        source is ObservableSet<TElement> set 
-            ? set 
-            : new(collection: source);
+    public static ObservableSet<TElement> ToObservableSet<TElement>(this IEnumerable<TElement> source)
+    {
+        if (source is ObservableSet<TElement> original)
+        {
+            return original;
+        }
+        return new(collection: source);
+    }
     /// <summary>
     /// Creates a <see cref="ObservableSet{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
     [return: NotNull]
     public static ObservableSet<TElement> ToObservableSet<TElement>(this IEnumerable<TElement> source, 
-                                                                    [AllowNull] IEqualityComparer<TElement>? comparer) =>
-        source is ObservableSet<TElement> set && 
-        ReferenceEquals(objA: set.Comparer, 
-                        objB: comparer) 
-            ? set 
-            : new(comparer: comparer!, 
-                  collection: source);
+                                                                    [AllowNull] IEqualityComparer<TElement>? comparer)
+    {
+        if (source is ObservableSet<TElement> original &&
+            (original.Comparer is null &&
+            comparer is null ||
+            comparer is not null &&
+            comparer.Equals(original.Comparer)))
+        {
+            return original;
+        }
+        return new(collection: source,
+                   comparer: comparer!);
+    }
     /// <summary>
     /// Creates a <see cref="ObservableSet{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
@@ -43,14 +57,14 @@ public static class Enumerable
                                                                     [DisallowNull] EqualityComparison<TElement> comparison) 
     {
         ExceptionHelpers.ThrowIfArgumentNull(comparison);
-        if (source is ObservableSet<TElement> set &&
-            set.Comparer is __FuncEqualityComparer<TElement> func &&
+        if (source is ObservableSet<TElement> original &&
+            original.Comparer is __FuncEqualityComparer<TElement> func &&
             func.Comparison == comparison)
         {
-            return set;
+            return original;
         }
-        return new(comparison: comparison!,
-                   collection: source);
+        return new(collection: source,
+                   comparison: comparison!);
     }
 
     /// <summary>
@@ -58,20 +72,28 @@ public static class Enumerable
     /// </summary>
     [return: NotNull]
     public static BinaryTree<TElement> ToBinaryTree<TElement>(this IEnumerable<TElement> source) 
-        where TElement : IComparable<TElement> =>
-            source is BinaryTree<TElement> tree 
-                ? tree 
-                : new(collection: source);
+        where TElement : IComparable<TElement>
+    {
+        if (source is BinaryTree<TElement> original)
+        {
+            return original;
+        }
+        return new(collection: source);
+    }
 
     /// <summary>
     /// Creates a <see cref="Trie{TElement}"/> from an <see cref="IEnumerable{String}"/>.
     /// </summary>
     [return: NotNull]
     public static Trie<TElement> ToTrie<TElement>(this IEnumerable<String> source) 
-        where TElement : class =>
-            source is Trie<TElement> trie 
-                ? trie 
-                : new(collection: source);
+        where TElement : class
+    {
+        if (source is Trie<TElement> original)
+        {
+            return original;
+        }
+        return new(collection: source);
+    }
 
     /// <summary>
     /// Returns the item <typeparamref name="TElement"/> at the center of the collection.
@@ -85,7 +107,12 @@ public static class Enumerable
             return default;
         }
 
-        if (source is IReadOnlyList<TElement> list)
+        if (source is IReadOnlyList<TElement> rlist)
+        {
+            return rlist[rlist.Count / 2];
+        }
+
+        if (source is IList<TElement> list)
         {
             return list[list.Count / 2];
         }
@@ -128,7 +155,7 @@ public static class Enumerable
 
         foreach (TElement item in other)
         {
-            source.Add(item: item);
+            source.Add(item);
         }
     }
 
@@ -174,7 +201,7 @@ public static class Enumerable
         }
 
         TElement item = list[index];
-        list.RemoveAt(index: index);
+        list.RemoveAt(index);
         if (positions > 0)
         {
             list.Insert(index: index + positions,
@@ -192,7 +219,7 @@ public static class Enumerable
                                           [MaybeNull] TElement item, 
                                           in ItemMoveDirection direction)
     {
-        Int32 index = list.IndexOf(item: item);
+        Int32 index = list.IndexOf(item);
         if (index == -1)
         {
             return;
@@ -228,13 +255,13 @@ public static class Enumerable
             return;
         }
 
-        Int32 index = list.IndexOf(item: item);
+        Int32 index = list.IndexOf(item);
         if (index == -1)
         {
             return;
         }
 
-        list.RemoveAt(index: index);
+        list.RemoveAt(index);
         if (positions > 0)
         {
             list.Insert(index: index + positions,

@@ -13,8 +13,9 @@ public sealed partial class TrieNode<TContent>
     [Pure]
     [return: MaybeNull]
     public TrieNode<TContent>? FindChildNode(Char value) => 
-        this.Children.FirstOrDefault(n => n is not null &&
-                                          n.Value == Char.ToLower(value));
+        this.Children
+            .FirstOrDefault(n => n is not null &&
+                                 n.Value == Char.ToLower(c: value));
 
     /// <inheritdoc/>
     [return: MaybeNull]
@@ -41,14 +42,17 @@ partial class TrieNode<TContent>
                       TrieNode<TContent>? parent)
     {
         this._trie = trie;
-        this._children = new(AreNodesEqual,
-                             CompareNodes);
-        this._items = new ObservableSet<TContent>(AreItemsEqual);
-        this.Value = Char.ToLower(value);
+        this._children = new(equality: AreNodesEqual,
+                             comparison: CompareNodes);
+        this._items = new ObservableSet<TContent>(comparison: AreItemsEqual);
+        this.Value = Char.ToLower(c: value);
         this.Parent = parent;
-        this.Depth = parent is null 
-                        ? 0 
-                        : parent.Depth + 1;
+        if (parent is null)
+        {
+            this.Depth = 0;
+            return;
+        }
+        this.Depth = parent.Depth + 1;
     }
 
     private static Boolean AreItemsEqual(TContent? left, 
@@ -66,8 +70,8 @@ partial class TrieNode<TContent>
         {
             return eq.Equals(right);
         }
-        return ReferenceEquals(left,
-                               right);
+        return ReferenceEquals(objA: left,
+                               objB: right);
     }
 
     private static Boolean AreNodesEqual(TrieNode<TContent> left, 
@@ -89,17 +93,26 @@ partial class TrieNode<TContent>
         {
             return -1;
         }
-        return left.Value.CompareTo(right.Value);
+        return left.Value
+                   .CompareTo(value: right.Value);
+    }
+
+    private static IEnumerable<TContent?> ChildSelector(TrieNode<TContent>? child)
+    {
+        if (child is null)
+        {
+            return Array.Empty<TContent?>();
+        }
+        return child.Items;
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal Boolean IsWord { get; set; }
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal IEnumerable<TContent?> ChildItems => 
-        this._children.SelectMany<TrieNode<TContent>?, TContent?>(child => child is null
-                                                                            ? Array.Empty<TContent?>()
-                                                                            : child.Items)
-                      .Union(this._items);
+        this._children 
+            .SelectMany(selector: ChildSelector)
+            .Union(second: this._items);
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     internal readonly ObservableSet<TContent> _items;
@@ -113,13 +126,16 @@ partial class TrieNode<TContent>
 partial class TrieNode<TContent> : ICollection
 {
     Int32 ICollection.Count =>
-        this._items.Count;
+        this._items
+            .Count;
 
     Boolean ICollection.IsSynchronized =>
-        this._items.IsSynchronized;
+        this._items
+            .IsSynchronized;
 
     Object ICollection.SyncRoot =>
-        this._items.SyncRoot;
+        this._items
+            .SyncRoot;
 
     void ICollection.CopyTo(Array array, 
                             Int32 index) =>
@@ -132,7 +148,8 @@ partial class TrieNode<TContent> : IContentAddable<TContent?>
 {
     /// <inheritdoc/>
     public Boolean Add(TContent? item) =>
-        this._items.Add(item);
+        this._items
+            .Add(item);
 
     /// <inheritdoc/>
     public void AddRange([DisallowNull] IEnumerable<TContent?> collection)
@@ -141,37 +158,42 @@ partial class TrieNode<TContent> : IContentAddable<TContent?>
 
         foreach (TContent? item in collection)
         {
-            this._items.Add(item);
+            this._items
+                .Add(item);
         }
     }
 }
 
-// IContentAddable<T>
+// IContentClearable
 partial class TrieNode<TContent> : IContentClearable
 {
     /// <inheritdoc/>
     public void Clear() =>
-        this._items.Clear();
+        this._items
+            .Clear();
 }
 
-// IContentAddable<T>
+// IContentRemovable
 partial class TrieNode<TContent> : IContentRemovable
 {
     Boolean IContentRemovable.Remove(Object item) =>
         item is TContent content &&
-        this.Remove(item: content);
+        this.Remove(content);
 }
 
-// IContentAddable<T>
+// IContentRemovable<T>
 partial class TrieNode<TContent> : IContentRemovable<TContent?>
 {
     /// <inheritdoc/>
     public Boolean Remove(TContent? item)
     {
-        if (this._items.Contains(item: item))
+        if (this._items
+                .Contains(item: item))
         {
-            return this._items.Remove(item: item);
+            return this._items
+                       .Remove(item);
         }
+
         foreach (TrieNode<TContent>? child in this.Children)
         {
             if (child is null)
@@ -180,7 +202,7 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
             }
             if (child.Contains(item: item))
             {
-                return child.Remove(item: item);
+                return child.Remove(item);
             }
         }
 
@@ -195,9 +217,9 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
         Collection<TContent?> remove = new();
         foreach (TContent? item in this._items)
         {
-            if (predicate.Invoke(arg: item))
+            if (predicate.Invoke(item))
             {
-                remove.Add(item: item);
+                remove.Add(item);
             }
         }
 
@@ -210,22 +232,26 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
 
             foreach (TContent? item in child.Items)
             {
-                if (predicate.Invoke(arg: item))
+                if (predicate.Invoke(item))
                 {
-                    remove.Add(item: item);
+                    remove.Add(item);
                 }
             }
         }
 
+        Int32 skipped = 0;
         foreach (TContent? item in remove)
         {
-            this.Remove(item: item);
+            if (!this.Remove(item))
+            {
+                ++skipped;
+            }
         }
-        return remove.Count;
+        return remove.Count - skipped;
     }
 }
 
-// IContentAddable<T>
+// IElementContainer
 partial class TrieNode<TContent> : IElementContainer
 {
     Boolean IElementContainer.Contains(Object? item) =>
@@ -233,12 +259,13 @@ partial class TrieNode<TContent> : IElementContainer
         this.Contains(item: content);
 }
 
-// IContentAddable<T>
+// IElementContainer<T>
 partial class TrieNode<TContent> : IElementContainer<TContent?>
 {
     /// <inheritdoc/>
     public Boolean Contains(TContent? item) =>
-        this._items.Contains(item: item);
+        this._items
+            .Contains(item: item);
 }
 
 // IEnumerable
@@ -259,10 +286,11 @@ partial class TrieNode<TContent> : IEnumerable<TContent?>
 partial class TrieNode<TContent> : IReadOnlyCollection<TContent?>
 {
     Int32 IReadOnlyCollection<TContent?>.Count =>
-        this._items.Count;
+        this._items
+            .Count;
 }
 
-// Non-Public
+// IContentTreeNode<T, U, V>
 partial class TrieNode<TContent> : IContentTreeNode<TrieNode<TContent>, Char, TContent> 
     where TContent : class
 {
@@ -282,18 +310,29 @@ partial class TrieNode<TContent> : IContentTreeNode<TrieNode<TContent>, Char, TC
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     [Pure]
-    public Boolean IsLeaf => this._children.Count == 0;
+    public Boolean IsLeaf => 
+        this._children
+            .Count == 0;
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
     [NotNull]
     [Pure]
-    public NodeCollection<TrieNode<TContent>, Char> Children => this._children;
+    public NodeCollection<TrieNode<TContent>, Char> Children => 
+        this._children;
 
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     [NotNull]
-    public IEnumerable<TContent?> Items =>
-        this._trie.ParentsKnowChildItems
-                ? this.ChildItems
-                : this._items;
+    public IEnumerable<TContent?> Items
+    {
+        get
+        {
+            if (this._trie
+                    .ParentsKnowChildItems)
+            {
+                return this.ChildItems;
+            }
+            return this._items;
+        }
+    }
 }
