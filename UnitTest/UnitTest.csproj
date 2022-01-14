@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Narumikazuchi.Collections.Abstract\Narumikazuchi.Collections.Abstract.csproj" />
+    <ProjectReference Include="..\Narumikazuchi.Collections\Narumikazuchi.Collections.csproj" />
   </ItemGroup>
 
 </Project>
