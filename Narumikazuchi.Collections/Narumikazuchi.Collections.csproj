@@ -43,7 +43,7 @@ For more information visit https://github.com/Narumikazuchi/Collections/wiki.</D
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Collections_Abstract\Narumikazuchi.Collections.Abstract\Narumikazuchi.Collections.Abstract.csproj" />
+    <ProjectReference Include="..\submodules\Abstract\Narumikazuchi.Collections.Abstract\Narumikazuchi.Collections.Abstract.csproj" />
   </ItemGroup>
 
 </Project>
