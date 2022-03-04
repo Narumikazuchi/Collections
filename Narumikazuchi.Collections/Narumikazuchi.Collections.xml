@@ -1,0 +1,530 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Narumikazuchi.Collections</name>
+    </assembly>
+    <members>
+        <member name="T:Narumikazuchi.Collections.BinaryNode`1">
+            <summary>
+            Represents a node of a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.LeftChild">
+            <summary>
+            Gets the left child <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/>. Returns <see langword="null"/> if the <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/> has no left sided child node.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.RightChild">
+            <summary>
+            Gets the right child <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/>. Returns <see langword="null"/> if the <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/> has no right sided child node.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.Value">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.Parent">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.Depth">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.IsLeaf">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryNode`1.Children">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.BinaryTraversalMethod">
+            <summary>
+            Defines the Traversal method for a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.BinaryTree`1">
+            <summary>
+            Represents a fast binary lookup data structure.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.#ctor(`0)">
+            <summary>
+            Instantiates a new <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> with the <paramref name="rootValue"/> as root node.
+            </summary>
+            <param name="rootValue">The value of the root node.</param>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Exists(`0)">
+            <summary>
+            Determines if the specified value exists in the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="value">The value to lookup.</param>
+            <returns><see langword="true"/> if the specified value is found in the tree; otherwise, <see langword="false"/></returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Find(`0)">
+            <summary>
+            Finds the <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/> with the highest depth matching the specified value.
+            </summary>
+            <param name="value">The value to lookup in the tree.</param>
+            <returns>The <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/> which contains the specified value or <see langword="null"/> if no node with such value exists in the tree.</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.GetDepth">
+            <summary>
+            Gets the depth of the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <returns>The depth of the deepest node in the tree</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.LowBound">
+            <summary>
+            Determines the lowest value in the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.HighBound">
+            <summary>
+            Determines the highest value in the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Traverse(Narumikazuchi.Collections.BinaryTraversalMethod@)">
+            <summary>
+            Returns an <see cref="T:System.Collections.Generic.IEnumerable`1"/> containing the traversed <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> in the traversed order.
+            </summary>
+            <param name="method">The method to use when traversing.</param>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryTree`1.ThrowExceptionOnDuplicate">
+            <summary>
+            Gets or sets if an exception should be thrown when trying to add a duplicate.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Add(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Remove(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.RemoveAll(System.Func{`0,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.BinaryTree`1.RootNode">
+            <summary>
+            Gets the root for the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.Enumerable">
+            <summary>
+            Extends the <see cref="T:System.Collections.Generic.IEnumerable`1"/> interface.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToObservableList``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToObservableSet``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToObservableSet``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToObservableSet``1(System.Collections.Generic.IEnumerable{``0},Narumikazuchi.EqualityComparison{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToBinaryTree``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.ToTrie``1(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.Trie`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.Median``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns the item <typeparamref name="TElement"/> at the center of the collection.
+            </summary>
+            <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.AddRange``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the specified collection to this collection.
+            </summary>
+            <param name="source"></param>
+            <param name="other">The collection to add.</param>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@)">
+            <summary>
+            Moves the item at the given index one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+            <summary>
+            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@)">
+            <summary>
+            Moves the item one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Enumerable.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+            <summary>
+            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.IContentTree`3">
+            <summary>
+            Represents any tree data structure where the nodes contain other content besides their value.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.IContentTree`3.ParentsKnowChildItems">
+            <summary>
+            Gets or sets if a parent <typeparamref name="TNode"/> should have a reference to the items of it's child-nodes in it's own <see cref="P:Narumikazuchi.Collections.IContentTreeNode`3.Items"/>.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.IContentTreeNode`3">
+            <summary>
+            Represents a node inside a tree structure where nodes can hold contents.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.IContentTreeNode`3.Items">
+            <summary>
+            Gets a collection of items which are either attached to this <typeparamref name="TNode"/> or 
+            are attached to any of its child-nodes (only when <see cref="P:Narumikazuchi.Collections.IContentTree`3.ParentsKnowChildItems"/> for the parent is set to <see langword="true"/>).
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.IObservableList`1">
+            <summary>
+            Represents a strongly typed list of objects, which reports changes, can be accessed by index and searched. 
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.IObservableSet`1">
+            <summary>
+            Represents a collection which reports changes and contains every object is only once. The procedure to check whether the object is already in the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> can be specified
+            with a corresponding <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> or <see cref="T:Narumikazuchi.EqualityComparison`1"/> delegate.
+            </summary>
+            <remarks>
+            If neither <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> nor <see cref="T:Narumikazuchi.EqualityComparison`1"/> are specified, the register will compare the references for classes or check each field/property for values types.
+            </remarks>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ITree`2">
+            <summary>
+            Represents any tree data structure.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITree`2.RootNode">
+            <summary>
+            Gets the root node of this tree structure.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ITreeNode`2">
+            <summary>
+            Represents a node inside any tree structure.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITreeNode`2.Value">
+            <summary>
+            Gets the <typeparamref name="TValue"/> value of this <typeparamref name="TNode"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITreeNode`2.Parent">
+            <summary>
+            Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITreeNode`2.Depth">
+            <summary>
+            Gets the depth of this node in it's corresponding tree. Should be 0 for root nodes.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITreeNode`2.IsLeaf">
+            <summary>
+            Gets whether this <typeparamref name="TNode"/> has no more child-nodes.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ITreeNode`2.Children">
+            <summary>
+            A collection of child-nodes attached to this node.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.NodeCollection`2">
+            <summary>
+            Contains the <see cref="T:Narumikazuchi.Collections.ITreeNode`2"/> objects of any given <see cref="T:Narumikazuchi.Collections.ITree`2"/> as a colleciton of child-nodes.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ObservableList`1">
+            <summary>
+            Represents a strongly typed list of objects, which reports changes, can be accessed by index and searched. 
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor">
+            <summary>
+            Initializes a new empty instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class having the specified collection of items and the specified capacity.
+            </summary>
+            <param name="collection">The initial collection of items in this list.</param>
+            <exception cref="T:System.ArgumentException" />
+            <exception cref="T:System.ArgumentNullException" />
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Clear">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Insert(System.Int32@,`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.RemoveAt(System.Int32@)">
+            <inheritdoc />
+        </member>
+        <member name="P:Narumikazuchi.Collections.ObservableList`1.Item(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableList`1.CollectionChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableList`1.CollectionChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanging">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.OnPropertyChanging(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanging"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.OnPropertyChanged(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ObservableSet`1">
+            <summary>
+            Represents a collection which reports changes and contains every object is only once. The procedure to check whether the object is already in the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> can be specified
+            with a corresponding <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> or <see cref="T:Narumikazuchi.EqualityComparison`1"/> delegate.
+            </summary>
+            <remarks>
+            If neither <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> nor <see cref="T:Narumikazuchi.EqualityComparison`1"/> are specified, the register will compare the references for classes or check each field/property for values types.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor(Narumikazuchi.EqualityComparison{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class using the specified function to check items for equality.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class with the specified collection as items.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor(Narumikazuchi.EqualityComparison{`0},System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class with the specified collection as items using the specified function to check items for equality.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor(System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class using the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> to check items for equality.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.#ctor(System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableSet`1"/> class with the specified collection as items using the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> to check items for equality.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.Add(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.Clear">
+            <inheritdoc />
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableSet`1.CollectionChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableSet`1.CollectionChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableSet`1.PropertyChanging">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.OnPropertyChanging(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableSet`1.PropertyChanging"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.ObservableSet`1.PropertyChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableSet`1.OnPropertyChanged(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.ObservableSet`1.PropertyChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.Trie`1">
+            <summary>
+            Represents a very fast but memory costly word lookup data structure. Includes the attaching of objects of type <typeparamref name="TContent"/> to any individual <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor">
+            <summary>
+            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Traverse">
+            <summary>
+            Traverses through the <see cref="T:Narumikazuchi.Collections.Trie`1"/> and returns the inserted words in alphabetic order.
+            </summary>
+            <returns>An <see cref="T:System.Collections.IEnumerable"/> which iterates through all inserted words of this <see cref="T:Narumikazuchi.Collections.Trie`1"/></returns>
+        </member>
+        <member name="F:Narumikazuchi.Collections.Trie`1.DefaultSeparators">
+            <summary>
+            An array containing the default seperators used by the <see cref="M:Narumikazuchi.Collections.Trie`1.Insert(System.String@,`0)"/> functions.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String@,`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Remove(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.RemoveAll(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.ParentsKnowChildItems">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Exists(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Find(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindAll(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindExcept(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindLast(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.CollectionChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.CollectionChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanging">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanging(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanging"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanged(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.IsSynchronized">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.SyncRoot">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.RootNode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.TrieNode`1">
+            <summary>
+            Represents a node in a <see cref="T:Narumikazuchi.Collections.Trie`1"/> data structure. Items of type <typeparamref name="TContent"/> can be attached to this <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.FindChildNode(System.Char)">
+            <summary>
+            Finds the child-node with the specified value. Returns <see langword="null"/> if no <see cref="T:Narumikazuchi.Collections.TrieNode`1"/> with the specified value exists.
+            </summary>
+            <param name="value">The value to lookup in the child-nodes of the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.</param>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Add(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Remove(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.RemoveAll(System.Func{`0,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Contains(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.Value">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.Parent">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.Depth">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.IsLeaf">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.Children">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.TrieNode`1.Items">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>
