@@ -54,9 +54,8 @@ public static class Enumerable
     /// </summary>
     [return: NotNull]
     public static ObservableSet<TElement> ToObservableSet<TElement>(this IEnumerable<TElement> source, 
-                                                                    [DisallowNull] EqualityComparison<TElement> comparison) 
+                                                                    [DisallowNull] EqualityComparison<TElement> comparison!!) 
     {
-        ExceptionHelpers.ThrowIfArgumentNull(comparison);
         if (source is ObservableSet<TElement> original &&
             original.Comparer is __FuncEqualityComparer<TElement> func &&
             func.Comparison == comparison)
@@ -149,10 +148,8 @@ public static class Enumerable
     /// <param name="source"></param>
     /// <param name="other">The collection to add.</param>
     public static void AddRange<TElement>(this ICollection<TElement> source, 
-                                          [DisallowNull] IEnumerable<TElement> other)
+                                          [DisallowNull] IEnumerable<TElement> other!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(other);
-
         foreach (TElement item in other)
         {
             source.Add(item);

@@ -7,8 +7,10 @@
 public sealed partial class BinaryNode<TValue>
 {
 #pragma warning disable CS1591
-    public static implicit operator TValue(BinaryNode<TValue> node) => 
-        node.Value;
+    public static implicit operator TValue(BinaryNode<TValue> node)
+    {
+        return node.Value;
+    }
 #pragma warning restore
 
     /// <summary>
@@ -32,12 +34,10 @@ public sealed partial class BinaryNode<TValue>
 // Non-Public
 partial class BinaryNode<TValue>
 {
-    internal BinaryNode(in TValue value, 
+    internal BinaryNode(in TValue value!!, 
                         BinaryNode<TValue>? parent)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(value);
-
-        this._value = value;
+        m_Value = value;
         this.Parent = parent;
         if (parent is null)
         {
@@ -58,12 +58,12 @@ partial class BinaryNode<TValue>
                       .Value;
             node = node.LeftChild;
         }
-        this._value = min;
+        m_Value = min;
         return node!;
     }
 
-    private static Boolean AreNodesEqual(BinaryNode<TValue> left, 
-                                         BinaryNode<TValue> right) =>
+    private static Boolean AreNodesEqual(BinaryNode<TValue> left!!, 
+                                         BinaryNode<TValue> right!!) =>
         left.Value
             .CompareTo(right.Value) == 0;
 
@@ -88,52 +88,48 @@ partial class BinaryNode<TValue>
 
     internal BinaryNode<TValue>? Left
     {
-        get => this._left;
+        get => m_Left;
         set
         {
-            this._left = value;
-            this._children.Clear();
-            if (this._left is not null)
+            m_Left = value;
+            m_Children.Clear();
+            if (m_Left is not null)
             {
-                this._children
-                    .Add(this._left);
+                m_Children.Add(m_Left);
             }
-            if (this._right is not null)
+            if (m_Right is not null)
             {
-                this._children
-                    .Add(this._right);
+                m_Children.Add(m_Right);
             }
         }
     }
     internal BinaryNode<TValue>? Right
     {
-        get => this._right;
+        get => m_Right;
         set
         {
-            this._right = value;
-            this._children.Clear();
-            if (this._left is not null)
+            m_Right = value;
+            m_Children.Clear();
+            if (m_Left is not null)
             {
-                this._children
-                    .Add(this._left);
+                m_Children.Add(m_Left);
             }
-            if (this._right is not null)
+            if (m_Right is not null)
             {
-                this._children
-                    .Add(this._right);
+                m_Children.Add(m_Right);
             }
         }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly NodeCollection<BinaryNode<TValue>, TValue> _children = new(equality: AreNodesEqual,
-                                                                                comparison: CompareNodes);
+    private readonly NodeCollection<BinaryNode<TValue>, TValue> m_Children = new(equality: AreNodesEqual,
+                                                                                 comparison: CompareNodes);
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private TValue _value;
+    private TValue m_Value;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private BinaryNode<TValue>? _left = null;
+    private BinaryNode<TValue>? m_Left = null;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private BinaryNode<TValue>? _right = null;
+    private BinaryNode<TValue>? m_Right = null;
 }
 
 // ITreeNode<T, U>
@@ -144,7 +140,7 @@ partial class BinaryNode<TValue> : ITreeNode<BinaryNode<TValue>, TValue>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     public TValue Value => 
-        this._value;
+        m_Value;
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
@@ -158,12 +154,11 @@ partial class BinaryNode<TValue> : ITreeNode<BinaryNode<TValue>, TValue>
     [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     [Pure]
     public Boolean IsLeaf => 
-        this._children
-            .Count == 0;
+        m_Children.Count == 0;
 
     /// <inheritdoc/>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     public NodeCollection<BinaryNode<TValue>, TValue> Children => 
-        this._children;
+        m_Children;
 }

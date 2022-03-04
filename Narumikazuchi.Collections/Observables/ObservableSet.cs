@@ -18,14 +18,14 @@ public partial class ObservableSet<TElement> : SetBase<Int32, TElement?>, IObser
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableSet{TElement}"/> class using the specified function to check items for equality.
     /// </summary>
-    public ObservableSet([DisallowNull] EqualityComparison<TElement?> comparison) : 
+    public ObservableSet([DisallowNull] EqualityComparison<TElement?> comparison!!) : 
         base(collection: Array.Empty<(Int32, TElement?)>(), 
              comparison: comparison) 
     { }
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableSet{TElement}"/> class with the specified collection as items.
     /// </summary>
-    public ObservableSet([DisallowNull] IEnumerable<TElement?> collection) : 
+    public ObservableSet([DisallowNull] IEnumerable<TElement?> collection!!) : 
         base() 
     {
         this.Comparer = __FuncEqualityComparer<TElement?>.Default;
@@ -37,8 +37,8 @@ public partial class ObservableSet<TElement> : SetBase<Int32, TElement?>, IObser
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableSet{TElement}"/> class with the specified collection as items using the specified function to check items for equality.
     /// </summary>
-    public ObservableSet([DisallowNull] EqualityComparison<TElement?> comparison, 
-                         [DisallowNull] IEnumerable<TElement?> collection) : 
+    public ObservableSet([DisallowNull] EqualityComparison<TElement?> comparison!!, 
+                         [DisallowNull] IEnumerable<TElement?> collection!!) : 
         this(comparer: new __FuncEqualityComparer<TElement?>(comparison: comparison),
              collection: collection)
     { }
@@ -55,7 +55,7 @@ public partial class ObservableSet<TElement> : SetBase<Int32, TElement?>, IObser
     /// Initializes a new instance of the <see cref="ObservableSet{TElement}"/> class with the specified collection as items using the specified <see cref="IEqualityComparer{T}"/> to check items for equality.
     /// </summary>
     public ObservableSet([AllowNull] IEqualityComparer<TElement?>? comparer, 
-                         [DisallowNull] IEnumerable<TElement?> collection) : 
+                         [DisallowNull] IEnumerable<TElement?> collection!!) : 
         base()
     {
         this.Comparer = comparer;
@@ -79,8 +79,8 @@ partial class ObservableSet<TElement> : IContentAddable<TElement?>
         }
 
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add,
-                                                                      changedItem: item));
+        this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                     changedItem: item));
         return true;
     }
 }
@@ -94,7 +94,7 @@ partial class ObservableSet<TElement> : IContentClearable
         this.OnPropertyChanging(nameof(this.Count));
         base.Clear();
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
+        this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Reset));
     }
 }
 
@@ -107,9 +107,10 @@ partial class ObservableSet<TElement> : INotifyCollectionChanged
     /// <summary>
     /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
     /// </summary>
-    protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e) =>
-        this.CollectionChanged?.Invoke(sender: this, 
-                                       e: e);
+    protected void OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs!!) =>
+        this.CollectionChanged?
+            .Invoke(sender: this, 
+                    e: eventArgs);
 }
 
 // INotifyPropertyChanging
@@ -121,9 +122,10 @@ partial class ObservableSet<TElement> : INotifyPropertyChanging
     /// <summary>
     /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
     /// </summary>
-    protected void OnPropertyChanging(String propertyName) =>
-        this.PropertyChanging?.Invoke(sender: this, 
-                                      e: new PropertyChangingEventArgs(propertyName));
+    protected void OnPropertyChanging(String propertyName!!) =>
+        this.PropertyChanging?
+            .Invoke(sender: this, 
+                    e: new(propertyName));
 }
 
 // INotifyPropertyChanged
@@ -135,7 +137,8 @@ partial class ObservableSet<TElement> : INotifyPropertyChanged
     /// <summary>
     /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
     /// </summary>
-    protected void OnPropertyChanged(String propertyName) =>
-        this.PropertyChanged?.Invoke(sender: this, 
-                                     e: new PropertyChangedEventArgs(propertyName));
+    protected void OnPropertyChanged(String propertyName!!) =>
+        this.PropertyChanged?
+            .Invoke(sender: this, 
+                    e: new(propertyName));
 }

@@ -5,15 +5,16 @@
 /// </summary>
 [DebuggerDisplay("Depth = {GetDepth()}")]
 public sealed partial class BinaryTree<TValue>
+    where TValue : IComparable<TValue>
 {
     /// <summary>
     /// Instantiates a new <see cref="BinaryTree{TValue}"/> with the <paramref name="rootValue"/> as root node.
     /// </summary>
     /// <param name="rootValue">The value of the root node.</param>
-    public BinaryTree([DisallowNull] TValue rootValue)
+    public BinaryTree([DisallowNull] TValue rootValue!!)
     {
-        this._root = new BinaryNode<TValue>(value: rootValue,
-                                            parent: null);
+        m_Root = new BinaryNode<TValue>(value: rootValue,
+                                        parent: null);
     }
 
     /// <summary>
@@ -22,7 +23,7 @@ public sealed partial class BinaryTree<TValue>
     /// <param name="value">The value to lookup.</param>
     /// <returns><see langword="true"/> if the specified value is found in the tree; otherwise, <see langword="false"/></returns>
     [Pure]
-    public Boolean Exists([DisallowNull] TValue value) =>
+    public Boolean Exists([DisallowNull] TValue value!!) =>
         this.Find(value) is not null;
 
     /// <summary>
@@ -32,11 +33,9 @@ public sealed partial class BinaryTree<TValue>
     /// <returns>The <see cref="BinaryNode{TValue}"/> which contains the specified value or <see langword="null"/> if no node with such value exists in the tree.</returns>
     [Pure]
     [return: MaybeNull]
-    public BinaryNode<TValue>? Find([DisallowNull] TValue value)
+    public BinaryNode<TValue>? Find([DisallowNull] TValue value!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(value);
-
-        BinaryNode<TValue>? node = this._root;
+        BinaryNode<TValue>? node = m_Root;
         Int32 compare = value.CompareTo(node.Value);
         while (node is not null &&
                compare != 0)
@@ -62,7 +61,7 @@ public sealed partial class BinaryTree<TValue>
     /// </summary>
     /// <returns>The depth of the deepest node in the tree</returns>
     public UInt32 GetDepth() => 
-        this.GetDepth(node: this._root);
+        this.GetDepth(node: m_Root);
 
     /// <summary>
     /// Determines the lowest value in the <see cref="BinaryTree{TValue}"/>.
@@ -70,7 +69,7 @@ public sealed partial class BinaryTree<TValue>
     [Pure]
     public TValue LowBound()
     {
-        BinaryNode<TValue> node = this._root;
+        BinaryNode<TValue> node = m_Root;
         while (node.LeftChild is not null)
         {
             node = node.LeftChild;
@@ -84,7 +83,7 @@ public sealed partial class BinaryTree<TValue>
     [Pure]
     public TValue HighBound()
     {
-        BinaryNode<TValue> node = this._root;
+        BinaryNode<TValue> node = m_Root;
         while (node.RightChild is not null)
         {
             node = node.RightChild;
@@ -97,7 +96,7 @@ public sealed partial class BinaryTree<TValue>
     /// </summary>
     /// <param name="method">The method to use when traversing.</param>
     [Pure]
-    public IEnumerable<BinaryNode<TValue>> Traverse(BinaryTraversalMethod method) => method switch
+    public IEnumerable<BinaryNode<TValue>> Traverse(in BinaryTraversalMethod method) => method switch
     {
         BinaryTraversalMethod.PreOrder => this.TraversePreOrder(),
         BinaryTraversalMethod.InOrder => this.TraverseInOrder(),
@@ -115,9 +114,8 @@ public sealed partial class BinaryTree<TValue>
 // Non-Public
 partial class BinaryTree<TValue>
 {
-    internal BinaryTree(IEnumerable<TValue> collection)
+    internal BinaryTree(IEnumerable<TValue> collection!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(collection);
         if (!collection.Any())
         {
             throw new ArgumentException(message: CANNOT_CREATE_FROM_EMPTY_COLLECTION);
@@ -126,8 +124,8 @@ partial class BinaryTree<TValue>
         IOrderedEnumerable<TValue> distinct = collection.Distinct()
                                                         .OrderBy(i => i);
         TValue median = distinct.Median()!;
-        this._root = new(value: median, 
-                         parent: null);
+        m_Root = new(value: median, 
+                     parent: null);
         foreach (TValue item in distinct)
         {
             if (item.CompareTo(median) == 0)
@@ -138,7 +136,7 @@ partial class BinaryTree<TValue>
         }
     }
 
-    private UInt32 GetDepth(BinaryNode<TValue> node)
+    private UInt32 GetDepth(BinaryNode<TValue> node!!)
     {
         if (node.LeftChild is null &&
             node.RightChild is null)
@@ -163,12 +161,12 @@ partial class BinaryTree<TValue>
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraversePreOrder(nodes: nodes, 
-                              current: this._root);
+                              current: m_Root);
         return nodes;
     }
 
-    private void TraversePreOrder(IList<BinaryNode<TValue>> nodes, 
-                                  BinaryNode<TValue> current)
+    private void TraversePreOrder(IList<BinaryNode<TValue>> nodes!!, 
+                                  BinaryNode<TValue> current!!)
     {
         nodes.Add(current);
         if (current.LeftChild is not null)
@@ -187,12 +185,12 @@ partial class BinaryTree<TValue>
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraverseInOrder(nodes: nodes, 
-                             current: this._root);
+                             current: m_Root);
         return nodes;
     }
 
-    private void TraverseInOrder(IList<BinaryNode<TValue>> nodes, 
-                                 BinaryNode<TValue> current)
+    private void TraverseInOrder(IList<BinaryNode<TValue>> nodes!!, 
+                                 BinaryNode<TValue> current!!)
     {
         if (current.LeftChild is not null)
         {
@@ -211,12 +209,12 @@ partial class BinaryTree<TValue>
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraversePostOrder(nodes: nodes, 
-                               current: this._root);
+                               current: m_Root);
         return nodes;
     }
 
-    private void TraversePostOrder(IList<BinaryNode<TValue>> nodes, 
-                                   BinaryNode<TValue> current)
+    private void TraversePostOrder(IList<BinaryNode<TValue>> nodes!!, 
+                                   BinaryNode<TValue> current!!)
     {
         if (current.LeftChild is not null)
         {
@@ -232,9 +230,8 @@ partial class BinaryTree<TValue>
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private BinaryNode<TValue> _root;
+    private readonly BinaryNode<TValue> m_Root;
 
-#pragma warning disable IDE1006
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create BinaryTree from empty IEnumerable.";
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -243,18 +240,15 @@ partial class BinaryTree<TValue>
     private const String ALREADY_EXISTS = "A node with the specified value already exists.";
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private const String CANNOT_REMOVE_ROOT = "The root of a tree cannot be removed.";
-#pragma warning restore
 }
 
 // IContentAddable<T>
 partial class BinaryTree<TValue> : IContentAddable<TValue>
 {
     /// <inheritdoc/>
-    public Boolean Add([DisallowNull] TValue value)
+    public Boolean Add([DisallowNull] TValue value!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(value);
-
-        BinaryNode<TValue>? node = this._root;
+        BinaryNode<TValue>? node = m_Root;
         Int32 compare = value.CompareTo(node.Value);
         while (node is not null)
         {
@@ -299,7 +293,7 @@ partial class BinaryTree<TValue> : IContentAddable<TValue>
     }
 
     /// <inheritdoc/>
-    public void AddRange([DisallowNull] IEnumerable<TValue> collection)
+    public void AddRange([DisallowNull] IEnumerable<TValue> collection!!)
     {
         foreach (TValue item in collection)
         {
@@ -314,17 +308,15 @@ partial class BinaryTree<TValue> : IContentClearable
     /// <inheritdoc/>
     public void Clear()
     {
-        this._root
-            .Left = null;
-        this._root
-            .Right = null;
+        m_Root.Left = null;
+        m_Root.Right = null;
     }
 }
 
 // IContentRemovable
 partial class BinaryTree<TValue> : IContentRemovable
 {
-    Boolean IContentRemovable.Remove(Object item) =>
+    Boolean IContentRemovable.Remove(Object? item) =>
         item is TValue value &&
         this.Remove(value);
 }
@@ -333,11 +325,9 @@ partial class BinaryTree<TValue> : IContentRemovable
 partial class BinaryTree<TValue> : IContentRemovable<TValue>
 {
     /// <inheritdoc/>
-    public Boolean Remove([DisallowNull] TValue value)
+    public Boolean Remove([DisallowNull] TValue value!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(value);
-        if (value.CompareTo(this._root
-                                .Value) == 0)
+        if (value.CompareTo(m_Root.Value) == 0)
         {
             throw new ArgumentException(message: CANNOT_REMOVE_ROOT);
         }
@@ -352,7 +342,7 @@ partial class BinaryTree<TValue> : IContentRemovable<TValue>
         {
             if (node.Parent is null)
             {
-                throw new NotAllowed(auxMessage: NO_PARENT);
+                throw new NotAllowed(message: NO_PARENT);
             }
             if (node.Parent
                     .LeftChild == node)
@@ -371,7 +361,7 @@ partial class BinaryTree<TValue> : IContentRemovable<TValue>
         {
             if (node.Parent is null)
             {
-                throw new NotAllowed(auxMessage: NO_PARENT);
+                throw new NotAllowed(message: NO_PARENT);
             }
             if (node.Parent
                     .LeftChild == node)
@@ -391,7 +381,7 @@ partial class BinaryTree<TValue> : IContentRemovable<TValue>
             BinaryNode<TValue> min = node.SetToMinBranchValue();
             if (min.Parent is null)
             {
-                throw new NotAllowed(auxMessage: NO_PARENT);
+                throw new NotAllowed(message: NO_PARENT);
             }
             min.Parent
                .Left = null;
@@ -401,10 +391,8 @@ partial class BinaryTree<TValue> : IContentRemovable<TValue>
     }
 
     /// <inheritdoc/>
-    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate)
+    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
         Collection<TValue> remove = new();
         foreach (BinaryNode<TValue>? item in this.TraverseInOrder())
         {
@@ -450,8 +438,7 @@ partial class BinaryTree<TValue> : IEnumerable<TValue>
 }
 
 // ITree<T, U>
-partial class BinaryTree<TValue> : ITree<BinaryNode<TValue>, TValue> 
-    where TValue : IComparable<TValue>
+partial class BinaryTree<TValue> : ITree<BinaryNode<TValue>, TValue>
 {
     /// <summary>
     /// Gets the root for the <see cref="BinaryTree{TValue}"/>.
@@ -460,5 +447,5 @@ partial class BinaryTree<TValue> : ITree<BinaryNode<TValue>, TValue>
     [NotNull]
     [Pure]
     public BinaryNode<TValue> RootNode => 
-        this._root;
+        m_Root;
 }

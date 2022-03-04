@@ -12,9 +12,9 @@ public sealed partial class Trie<TContent>
     /// </summary>
     public Trie()
     {
-        this._root = new(trie: this,
-                         value: '^',
-                         parent: null);
+        m_Root = new(trie: this,
+                     value: '^',
+                     parent: null);
     }
 
     /// <summary>
@@ -23,10 +23,9 @@ public sealed partial class Trie<TContent>
     /// <returns>An <see cref="IEnumerable"/> which iterates through all inserted words of this <see cref="Trie{TContent}"/></returns>
     public IEnumerable<String> Traverse()
     {
-        lock (this._syncRoot)
+        lock (m_SyncRoot)
         {
-            foreach (TrieNode<TContent>? child in this._root
-                                                      .Children)
+            foreach (TrieNode<TContent>? child in m_Root.Children)
             {
                 if (child is null)
                 {
@@ -52,13 +51,9 @@ public sealed partial class Trie<TContent>
 // Non-Public
 partial class Trie<TContent>
 {
-    internal Trie(IEnumerable<String> collection) : 
+    internal Trie(IEnumerable<String> collection!!) : 
         this()
     {
-        if (collection is null)
-        {
-            throw new ArgumentNullException(nameof(collection));
-        }
         if (!collection.Any())
         {
             throw new ArgumentException(CANNOT_CREATE_FROM_EMPTY_COLLECTION);
@@ -71,10 +66,10 @@ partial class Trie<TContent>
         }
     }
 
-    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent) =>
+    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent!!) =>
         this.TraverseInternal(parent: parent,
                               wordStart: String.Empty);
-    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent,
+    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent!!,
                                                  String? wordStart)
     {
         String start = wordStart + parent.Value
@@ -103,26 +98,22 @@ partial class Trie<TContent>
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly Object _syncRoot = new();
+    private readonly Object m_SyncRoot = new();
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly TrieNode<TContent> _root;
+    private readonly TrieNode<TContent> m_Root;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private Int32 _words = 0;
+    private Int32 m_Words = 0;
 
-#pragma warning disable
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create Trie from empty IEnumerable.";
-#pragma warning restore
 }
 
 // ICollection
 partial class Trie<TContent> : ICollection
 {
-    void ICollection.CopyTo(Array array, 
+    void ICollection.CopyTo(Array array!!, 
                             Int32 index)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(array);
-
         foreach (String word in this.Traverse())
         {
             array.SetValue(index: index++,
@@ -137,12 +128,11 @@ partial class Trie<TContent> : IContentClearable
     /// <inheritdoc/>
     public void Clear()
     {
-        lock (this._syncRoot)
+        lock (m_SyncRoot)
         {
-            this._root
-                .Children
-                .Clear();
-            this._words = 0;
+            m_Root.Children
+                  .Clear();
+            m_Words = 0;
         }
     }
 }
@@ -150,7 +140,7 @@ partial class Trie<TContent> : IContentClearable
 // IContentInsertable<T>
 partial class Trie<TContent> : IContentInsertable<String>
 {
-    void IContentInsertable<String>.Insert(in String index, 
+    void IContentInsertable<String>.Insert(in String index!!, 
                                            Object item)
     {
         if (item is TContent content)
@@ -167,18 +157,15 @@ partial class Trie<TContent> : IContentInsertable<String>
 partial class Trie<TContent> : IContentInsertable<String, TContent?>
 {
     /// <inheritdoc/>
-    public void Insert([DisallowNull] in String index,
+    public void Insert([DisallowNull] in String index!!,
                        TContent? item) =>
         this.InsertRange(index: index,
                          collection: new TContent?[] { item });
 
     /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index, 
-                            [DisallowNull] IEnumerable<TContent?> collection)
+    public void InsertRange([DisallowNull] in String index!!, 
+                            [DisallowNull] IEnumerable<TContent?> collection!!)
     {
-        ExceptionHelpers.ThrowIfNullOrEmpty(index);
-        ExceptionHelpers.ThrowIfArgumentNull(collection);
-
         String[] words = index.ToLower()
                               .Split(separator: DefaultSeparators,
                                      options: StringSplitOptions.RemoveEmptyEntries);
@@ -190,13 +177,12 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
                 continue;
             }
 
-            this.PropertyChanging?.Invoke(sender: this,
-                                          e: new(nameof(this.Count)));
-            lock (this._syncRoot)
+            this.OnPropertyChanging(nameof(this.Count));
+            lock (m_SyncRoot)
             {
                 if (current.Depth < word.Length)
                 {
-                    this._words++;
+                    m_Words++;
                 }
                 for (Int32 i = (Int32)current.Depth; 
                      i < word.Length; 
@@ -215,11 +201,9 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
                     current.Add(item);
                 }
             }
-            this.PropertyChanged?.Invoke(sender: this,
-                                         e: new(nameof(this.Count)));
-            this.CollectionChanged?.Invoke(sender: this,
-                                           e: new(action: NotifyCollectionChangedAction.Add,
-                                                  changedItem: word));
+            this.OnPropertyChanged(nameof(this.Count));
+            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                         changedItem: word));
         }
     }
 }
@@ -227,7 +211,7 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
 // IContentRemovable
 partial class Trie<TContent> : IContentRemovable
 {
-    Boolean IContentRemovable.Remove(Object item) =>
+    Boolean IContentRemovable.Remove(Object? item) =>
         item is String word &&
         this.Remove(word);
 }
@@ -236,7 +220,7 @@ partial class Trie<TContent> : IContentRemovable
 partial class Trie<TContent> : IContentRemovable<String>
 {
     /// <inheritdoc/>
-    public Boolean Remove([DisallowNull] String item)
+    public Boolean Remove([DisallowNull] String item!!)
     {
         Boolean result = false;
         String[] words = item.ToLower()
@@ -244,11 +228,10 @@ partial class Trie<TContent> : IContentRemovable<String>
                                     options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
-            this.PropertyChanging?.Invoke(sender: this,
-                                          e: new(nameof(this.Count)));
-            lock (this._syncRoot)
+            this.OnPropertyChanging(nameof(this.Count));
+            lock (m_SyncRoot)
             {
-                this._words--;
+                m_Words--;
                 TrieNode<TContent>? node = this.Find(prefix => prefix == word);
                 if (node is null)
                 {
@@ -272,17 +255,15 @@ partial class Trie<TContent> : IContentRemovable<String>
                     }
                 }
             }
-            this.PropertyChanged?.Invoke(sender: this,
-                                         e: new(nameof(this.Count)));
-            this.CollectionChanged?.Invoke(sender: this,
-                                           e: new(action: NotifyCollectionChangedAction.Remove,
-                                                  changedItem: word));
+            this.OnPropertyChanged(nameof(this.Count));
+            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Remove,
+                                         changedItem: word));
         }
         return result;
     }
 
     /// <inheritdoc/>
-    public Int32 RemoveAll([DisallowNull] Func<String, Boolean> predicate)
+    public Int32 RemoveAll([DisallowNull] Func<String, Boolean> predicate!!)
     {
         Collection<String> remove = new();
         foreach (String? word in this.Traverse())
@@ -317,10 +298,8 @@ partial class Trie<TContent> : IContentTree<TrieNode<TContent>, Char, TContent>
 partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
 {
     /// <inheritdoc/>
-    public Boolean Exists([DisallowNull] Func<String, Boolean> predicate)
+    public Boolean Exists([DisallowNull] Func<String, Boolean> predicate!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
         foreach (String word in this.Traverse())
         {
             String first = word.ToLower()
@@ -336,10 +315,8 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
 
     /// <inheritdoc/>
     [return: MaybeNull]
-    public TrieNode<TContent>? Find([DisallowNull] Func<String, Boolean> predicate)
+    public TrieNode<TContent>? Find([DisallowNull] Func<String, Boolean> predicate!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
         foreach (String word in this.Traverse())
         {
             String first = word.ToLower()
@@ -347,7 +324,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
             if (predicate.Invoke(first))
             {
-                TrieNode<TContent> result = this._root;
+                TrieNode<TContent> result = m_Root;
                 for (Int32 i = 0; 
                      i < word.Length; 
                      i++)
@@ -368,7 +345,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
 #pragma warning disable CS8631
     /// <inheritdoc/>
     [return: NotNull]
-    public IElementContainer<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate)
+    public IElementContainer<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate!!)
     {
         ExceptionHelpers.ThrowIfArgumentNull(predicate);
 
@@ -380,7 +357,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
             if (predicate.Invoke(first))
             {
-                TrieNode<TContent> current = this._root;
+                TrieNode<TContent> current = m_Root;
                 for (Int32 i = 0;
                      i < word.Length; 
                      i++)
@@ -400,10 +377,8 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
 
     /// <inheritdoc/>
     [return: NotNull]
-    public IElementContainer<TrieNode<TContent>> FindExcept([DisallowNull] Func<String, Boolean> predicate)
+    public IElementContainer<TrieNode<TContent>> FindExcept([DisallowNull] Func<String, Boolean> predicate!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
         Collection<TrieNode<TContent>> result = new();
         foreach (String word in this.Traverse())
         {
@@ -414,7 +389,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
             {
                 continue;
             }
-            TrieNode<TContent> current = this._root;
+            TrieNode<TContent> current = m_Root;
             for (Int32 i = 0; 
                  i < word.Length; 
                  i++)
@@ -434,10 +409,8 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
 
     /// <inheritdoc/>
     [return: MaybeNull]
-    public TrieNode<TContent>? FindLast([DisallowNull] Func<String, Boolean> predicate)
+    public TrieNode<TContent>? FindLast([DisallowNull] Func<String, Boolean> predicate!!)
     {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
         TrieNode<TContent>? result = null;
         foreach (String word in this.Traverse())
         {
@@ -446,7 +419,7 @@ partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
                                       options: StringSplitOptions.RemoveEmptyEntries)[0];
             if (predicate.Invoke(first))
             {
-                TrieNode<TContent> current = this._root;
+                TrieNode<TContent> current = m_Root;
                 for (Int32 i = 0; 
                      i < word.Length; 
                      i++)
@@ -483,22 +456,46 @@ partial class Trie<TContent> : IEnumerable<String>
 // INotifyCollectionChanged
 partial class Trie<TContent> : INotifyCollectionChanged
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
-}
 
-// INotifyPropertyChanged
-partial class Trie<TContent> : INotifyPropertyChanged
-{
-    /// <inheritdoc/>
-    public event PropertyChangedEventHandler? PropertyChanged;
+    /// <summary>
+    /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
+    /// </summary>
+    private void OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs) =>
+        this.CollectionChanged?
+            .Invoke(sender: this,
+                    e: eventArgs);
 }
 
 // INotifyPropertyChanging
 partial class Trie<TContent> : INotifyPropertyChanging
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public event PropertyChangingEventHandler? PropertyChanging;
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
+    /// </summary>
+    private void OnPropertyChanging(String propertyName) =>
+        this.PropertyChanging?
+            .Invoke(sender: this,
+                    e: new(propertyName));
+}
+
+// INotifyPropertyChanged
+partial class Trie<TContent> : INotifyPropertyChanged
+{
+    /// <inheritdoc />
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
+    /// </summary>
+    private void OnPropertyChanged(String propertyName) =>
+        this.PropertyChanged?
+            .Invoke(sender: this,
+                    e: new(propertyName));
 }
 
 // IReadOnlyCollection<T>
@@ -510,9 +507,9 @@ partial class Trie<TContent> : IReadOnlyCollection<String>
     {
         get
         {
-            lock (this._syncRoot)
+            lock (m_SyncRoot)
             {
-                return this._words;
+                return m_Words;
             }
         }
     }
@@ -529,7 +526,7 @@ partial class Trie<TContent> : ISynchronized
     [Pure]
     [NotNull]
     public Object SyncRoot =>
-        this._syncRoot;
+        m_SyncRoot;
 }
 
 // ITree<T, U>
@@ -543,9 +540,9 @@ partial class Trie<TContent> : ITree<TrieNode<TContent>, Char>
     {
         get
         {
-            lock (this._syncRoot)
+            lock (m_SyncRoot)
             {
-                return this._root;
+                return m_Root;
             }
         }
     }

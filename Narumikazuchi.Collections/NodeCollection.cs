@@ -6,12 +6,12 @@
 public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNode> 
     where TNode : ITreeNode<TNode, TContent>
 {
-    internal NodeCollection(EqualityComparison<TNode> equality,
-                            Comparison<TNode?> comparison) : 
+    internal NodeCollection(EqualityComparison<TNode> equality!!,
+                            Comparison<TNode?> comparison!!) : 
         base()
     {
         this.Comparer = new __FuncEqualityComparer<TNode>(comparison: equality);
-        this._comparer = new __FuncComparer<TNode?>(comparison: comparison);
+        m_Comparer = new __FuncComparer<TNode?>(comparison: comparison);
     }
 
     internal void Add(in TNode item)
@@ -63,16 +63,14 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
         while (left <= right)
         {
             while (left <= right &&
-                   this._comparer
-                       .Compare(x: this[left], 
-                                y: pivot) <= 0)
+                   m_Comparer.Compare(x: this[left], 
+                                      y: pivot) <= 0)
             {
                 ++left;
             }
             while (left <= right &&
-                   this._comparer
-                       .Compare(x: this[right],
-                                y: pivot) > 0)
+                   m_Comparer.Compare(x: this[right],
+                                      y: pivot) > 0)
             {
                 --right;
             }
@@ -96,5 +94,5 @@ public sealed class NodeCollection<TNode, TContent> : ReadOnlySetBase<Int32, TNo
         return right;
     }
 
-    internal IComparer<TNode?> _comparer;
+    internal IComparer<TNode?> m_Comparer;
 }

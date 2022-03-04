@@ -18,7 +18,7 @@ public partial class ObservableList<TElement> : CollectionBase<Int32, TElement>,
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="InvalidOperationException" />
-    public ObservableList([DisallowNull] IEnumerable<TElement?> collection) : 
+    public ObservableList([DisallowNull] IEnumerable<TElement?> collection!!) : 
         base() 
     { 
         foreach (TElement? item in collection)
@@ -38,7 +38,7 @@ partial class ObservableList<TElement> : IContentClearable
         this.OnPropertyChanging(nameof(this.Count));
         base.Clear();
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Reset));
+        this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Reset));
     }
 }
 
@@ -53,8 +53,8 @@ partial class ObservableList<TElement> : IContentInsertable<Int32, TElement?>
         base.Insert(index: index, 
                     item: item);
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add,
-                                                                      changedItem: item));
+        this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                     changedItem: item));
     }
 }
 
@@ -66,15 +66,15 @@ partial class ObservableList<TElement> : IContentIndexRemovable<Int32>
     {
         if (this.IsReadOnly)
         {
-            throw new NotAllowed(auxMessage: COLLECTION_IS_READONLY);
+            throw new NotAllowed(message: COLLECTION_IS_READONLY);
         }
 
         this.OnPropertyChanging(nameof(this.Count));
         TElement? item = this[index];
         base.RemoveAt(index);
         this.OnPropertyChanged(nameof(this.Count));
-        this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Remove,
-                                                                      changedItem: item));
+        this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Remove,
+                                     changedItem: item));
     }
 }
 
@@ -107,9 +107,10 @@ partial class ObservableList<TElement> : INotifyCollectionChanged
     /// <summary>
     /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
     /// </summary>
-    protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e) =>
-        this.CollectionChanged?.Invoke(sender: this, 
-                                       e: e);
+    protected void OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs!!) =>
+        this.CollectionChanged?
+            .Invoke(sender: this, 
+                    e: eventArgs);
 }
 
 // INotifyPropertyChanging
@@ -121,9 +122,10 @@ partial class ObservableList<TElement> : INotifyPropertyChanging
     /// <summary>
     /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
     /// </summary>
-    protected void OnPropertyChanging(String propertyName) =>
-        this.PropertyChanging?.Invoke(sender: this, 
-                                      e: new PropertyChangingEventArgs(propertyName));
+    protected void OnPropertyChanging(String propertyName!!) =>
+        this.PropertyChanging?
+            .Invoke(sender: this, 
+                    e: new(propertyName));
 }
 
 // INotifyPropertyChanged
@@ -135,7 +137,8 @@ partial class ObservableList<TElement> : INotifyPropertyChanged
     /// <summary>
     /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
     /// </summary>
-    protected void OnPropertyChanged(String propertyName) =>
-        this.PropertyChanged?.Invoke(sender: this, 
-                                     e: new PropertyChangedEventArgs(propertyName));
+    protected void OnPropertyChanged(String propertyName!!) =>
+        this.PropertyChanged?
+            .Invoke(sender: this, 
+                    e: new(propertyName));
 }
