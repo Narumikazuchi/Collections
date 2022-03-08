@@ -34,7 +34,7 @@ public sealed partial class BinaryNode<TValue>
 // Non-Public
 partial class BinaryNode<TValue>
 {
-    internal BinaryNode(in TValue value!!, 
+    internal BinaryNode(in TValue value, 
                         BinaryNode<TValue>? parent)
     {
         m_Value = value;
