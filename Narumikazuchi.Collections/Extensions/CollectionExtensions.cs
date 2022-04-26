@@ -159,20 +159,6 @@ public static class CollectionExtensions
             {
                 remove.Add(element);
             }
-            if (source is INotifyPropertyChangingHelper changing)
-            {
-                changing.OnPropertyChanging(nameof(source.Count));
-            }
-            source.Add(element);
-            if (source is INotifyPropertyChangedHelper changed)
-            {
-                changed.OnPropertyChanged(nameof(source.Count));
-            }
-            if (source is INotifyCollectionChangedHelper collection)
-            {
-                collection.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                                   changedItem: element));
-            }
         }
 
         foreach (TElement element in remove)

@@ -6,6 +6,21 @@
 public static class ListExtensions
 {
     /// <summary>
+    /// Returns a read-only <see cref="IReadOnlyList{T}"/> wrapper for the current list.
+    /// </summary>
+    /// <returns>An object that acts as a read-only wrapper around the current <see cref="IList{T}"/>.</returns>
+    public static IReadOnlyList<TElement> AsReadOnly<TElement>(this IList<TElement> source)
+        where TElement : notnull
+    {
+        if (source is List<TElement> list)
+        {
+            return list.AsReadOnly();
+        }
+
+        return new List<TElement>(source.Where(x => x is not null)).AsReadOnly();
+    }
+
+    /// <summary>
     /// Searches the entire sorted <see cref="IList{T}"/> for an element using the default comparer and returns the zero-based index of the element.
     /// </summary>
     /// <param name="source"></param>
@@ -352,7 +367,7 @@ public static class ListExtensions
     {
         ArgumentNullException.ThrowIfNull(predicate);
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
-        count.ThrowIfOutOfRange(1, startIndex);
+        count.ThrowIfOutOfRange(1, startIndex + 1);
 
         for (Int32 i = startIndex;
              i > startIndex - count;

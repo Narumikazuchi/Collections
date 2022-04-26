@@ -26,14 +26,14 @@ public sealed partial class BinaryNode<TValue>
     /// </summary>
     [Pure]
     [MaybeNull]
-    public BinaryNode<TValue>? Parent { get; }
-
+    public BinaryNode<TValue>? Parent =>
+        m_Parent;
     /// <summary>
     /// Gets the left child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no left sided child node.
     /// </summary>
     [Pure]
     [MaybeNull]
-    public BinaryNode<TValue>? LeftChild => 
+    public BinaryNode<TValue>? LeftChild =>
         m_Left;
 
     /// <summary>
@@ -41,7 +41,7 @@ public sealed partial class BinaryNode<TValue>
     /// </summary>
     [Pure]
     [MaybeNull]
-    public BinaryNode<TValue>? RightChild => 
+    public BinaryNode<TValue>? RightChild =>
         m_Right;
 
     /// <summary>
@@ -66,7 +66,7 @@ partial class BinaryNode<TValue>
                         BinaryNode<TValue>? parent)
     {
         m_Value = value;
-        this.Parent = parent;
+        m_Parent = parent;
         if (parent is null)
         {
             this.Depth = 0;
@@ -89,6 +89,9 @@ partial class BinaryNode<TValue>
         m_Value = min;
         return node!;
     }
+
+    internal void SetParent(BinaryNode<TValue>? parent) => 
+        m_Parent = parent;
 
     internal void SetLeftChild(BinaryNode<TValue>? node)
     {
@@ -120,6 +123,8 @@ partial class BinaryNode<TValue>
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private TValue m_Value;
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private BinaryNode<TValue>? m_Parent;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private BinaryNode<TValue>? m_Left = null;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -1,4 +1,6 @@
-﻿namespace Narumikazuchi.Collections;
+﻿using Narumikazuchi.Collections.Linq;
+
+namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a fast binary lookup data structure.
@@ -177,12 +179,22 @@ public sealed partial class BinaryTree<TValue>
             {
                 node.Parent
                     .SetLeftChild(node.RightChild);
+                if (node.RightChild is not null)
+                {
+                    node.RightChild
+                        .SetParent(node.Parent);
+                }
             }
             else if (node.Parent
                          .RightChild == node)
             {
                 node.Parent
                     .SetRightChild(node.RightChild);
+                if (node.RightChild is not null)
+                {
+                    node.RightChild
+                        .SetParent(node.Parent);
+                }
             }
         }
         else if (node.RightChild is null)
@@ -196,12 +208,22 @@ public sealed partial class BinaryTree<TValue>
             {
                 node.Parent
                     .SetLeftChild(node.LeftChild);
+                if (node.LeftChild is not null)
+                {
+                    node.LeftChild
+                        .SetParent(node.Parent);
+                }
             }
             else if (node.Parent
                          .RightChild == node)
             {
                 node.Parent
                     .SetRightChild(node.LeftChild);
+                if (node.LeftChild is not null)
+                {
+                    node.LeftChild
+                        .SetParent(node.Parent);
+                }
             }
         }
         else

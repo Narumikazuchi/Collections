@@ -143,12 +143,12 @@
         <member name="M:Narumikazuchi.Collections.BinaryTree`1.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.CollectionExtensions">
+        <member name="T:Narumikazuchi.Collections.Linq.CollectionExtensions">
             <summary>
             Extends the <see cref="T:System.Collections.Generic.ICollection`1"/> interface.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.AddRange``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.AddRange``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             </summary>
@@ -156,13 +156,13 @@
             <param name="other">The collection to add.</param>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.AsReadOnly``1(System.Collections.Generic.ICollection{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.AsReadOnly``1(System.Collections.Generic.ICollection{``0})">
             <summary>
             Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> wrapper for the current collection.
             </summary>
             <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.ConvertAll``2(System.Collections.Generic.ICollection{``0},System.Converter{``0,``1})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.ConvertAll``2(System.Collections.Generic.ICollection{``0},System.Converter{``0,``1})">
             <summary>
             Converts the elements in the current <see cref="T:System.Collections.Generic.ICollection`1"/> to another type, and returns a list containing the converted elements.
             </summary>
@@ -171,7 +171,7 @@
             <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> of the target type containing the converted elements from the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.Exists``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.Exists``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
             <summary>
             Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains elements that match the conditions defined by the specified predicate.
             </summary>
@@ -180,7 +180,7 @@
             <returns><see langword="true"/> if the <see cref="T:System.Collections.Generic.ICollection`1"/> contains one or more elements that match the conditions defined by the specified predicate; otherwise, <see langword="false"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.FindAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.FindAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
             <summary>
             Retrieves all the elements that match the conditions defined by the specified predicate.
             </summary>
@@ -189,7 +189,7 @@
             <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.ForEach``1(System.Collections.Generic.ICollection{``0},System.Action{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.ForEach``1(System.Collections.Generic.ICollection{``0},System.Action{``0})">
             <summary>
             Performs the specified action on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             </summary>
@@ -197,7 +197,7 @@
             <param name="action">The <see cref="T:System.Action`1"/> delegate to perform on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
             <summary>
             Removes all the elements that match the conditions defined by the specified predicate.
             </summary>
@@ -206,7 +206,7 @@
             <returns>The number of elements removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.CollectionExtensions.TrueForAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.TrueForAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
             <summary>
             Determines whether every element in the <see cref="T:System.Collections.Generic.ICollection`1"/> matches the conditions defined by the specified predicate.
             </summary>
@@ -219,33 +219,39 @@
             </returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="T:Narumikazuchi.Collections.EnumerableExtensions">
+        <member name="T:Narumikazuchi.Collections.Linq.EnumerableExtensions">
             <summary>
             Extends the <see cref="T:System.Collections.Generic.IEnumerable`1"/> interface.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.EnumerableExtensions.ToBinaryTree``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.ToBinaryTree``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Creates a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.EnumerableExtensions.ToTrie``1(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.ToTrie``1(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Creates a <see cref="T:Narumikazuchi.Collections.Trie`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.EnumerableExtensions.Median``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.Median``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Returns the item <typeparamref name="TElement"/> at the center of the collection.
             </summary>
             <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
         </member>
-        <member name="T:Narumikazuchi.Collections.ListExtensions">
+        <member name="T:Narumikazuchi.Collections.Linq.ListExtensions">
             <summary>
             Extends the <see cref="T:System.Collections.Generic.IList`1"/> interface.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.AsReadOnly``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> wrapper for the current list.
+            </summary>
+            <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.IList`1"/>.</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0)">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the default comparer and returns the zero-based index of the element.
             </summary>
@@ -260,7 +266,7 @@
             <exception cref="T:System.ArgumentNullException" />
             <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0,System.Collections.Generic.IComparer{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0,System.Collections.Generic.IComparer{``0})">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
             </summary>
@@ -276,7 +282,7 @@
             <exception cref="T:System.ArgumentNullException" />
             <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,``0,System.Collections.Generic.IComparer{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,``0,System.Collections.Generic.IComparer{``0})">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
             </summary>
@@ -295,7 +301,7 @@
             <exception cref="T:System.ArgumentOutOfRangeException" />
             <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindFirstOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
             <summary>
             Searches for the first element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -304,7 +310,7 @@
             <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
             <summary>
             Searches for the first element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the first occurrence within the
@@ -315,7 +321,7 @@
             <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
             <summary>
             Searches for the first element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the first occurrence within the
@@ -328,7 +334,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
             <summary>
             Searches for the first element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the first occurrence within the
@@ -342,7 +348,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindLastOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
             <summary>
             Searches for the last element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -351,7 +357,7 @@
             <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
             <summary>
             Searches for the last element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the last occurrence within the
@@ -362,7 +368,7 @@
             <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
             <summary>
             Searches for the last element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the last occurrence within the
@@ -375,7 +381,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
             <summary>
             Searches for the last element that matches the conditions defined by the specified 
             predicate, and returns the zero-based index of the last occurrence within the
@@ -389,7 +395,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.GetRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.GetRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
             <summary>
             Creates a shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -400,7 +406,7 @@
             <exception cref="T:System.ArgumentException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.IndexOf``1(System.Collections.Generic.IList{``0},``0)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.IndexOf``1(System.Collections.Generic.IList{``0},``0)">
             <summary>
             Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -409,7 +415,7 @@
             <returns>The zero-based index of the first occurrence of item within the entire <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.InsertRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.InsertRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Inserts the elements of a collection into the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
             </summary>
@@ -419,7 +425,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},``0)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},``0)">
             <summary>
             Searches for the specified object and returns the zero-based index of the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -428,27 +434,27 @@
             <returns>The zero-based index of the last occurrence of item within the entire the <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@)">
             <summary>
             Moves the item at the given index one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
             <summary>
             Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@)">
             <summary>
             Moves the item one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
             <summary>
             Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListExtensions.RemoveRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
+        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.RemoveRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
             <summary>
             Removes a range of elements from the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
