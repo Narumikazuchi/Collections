@@ -5,6 +5,7 @@
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed partial class BinaryNode<TValue>
+    where TValue : IComparable<TValue>
 {
 #pragma warning disable CS1591
     public static implicit operator TValue(BinaryNode<TValue> node)
@@ -14,27 +15,54 @@ public sealed partial class BinaryNode<TValue>
 #pragma warning restore
 
     /// <summary>
+    /// Gets the <typeparamref name="TValue"/> value of this <see cref="BinaryNode{TValue}"/>.
+    /// </summary>
+    [Pure]
+    public TValue Value =>
+        m_Value;
+
+    /// <summary>
+    /// Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
+    /// </summary>
+    [Pure]
+    [MaybeNull]
+    public BinaryNode<TValue>? Parent { get; }
+
+    /// <summary>
     /// Gets the left child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no left sided child node.
     /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     [MaybeNull]
     public BinaryNode<TValue>? LeftChild => 
-        this.Left;
+        m_Left;
+
     /// <summary>
     /// Gets the right child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no right sided child node.
     /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     [Pure]
     [MaybeNull]
     public BinaryNode<TValue>? RightChild => 
-        this.Right;
+        m_Right;
+
+    /// <summary>
+    /// Gets the depth of this node in it's corresponding tree. Should be 0 for root nodes.
+    /// </summary>
+    [Pure]
+    public UInt32 Depth { get; }
+
+    /// <summary>
+    /// Gets whether this <see cref="BinaryNode{TValue}"/> has no more child-nodes.
+    /// </summary>
+    [Pure]
+    public Boolean IsLeaf =>
+        m_Left is null &&
+        m_Right is null;
 }
 
 // Non-Public
 partial class BinaryNode<TValue>
 {
-    internal BinaryNode(in TValue value, 
+    internal BinaryNode(TValue value, 
                         BinaryNode<TValue>? parent)
     {
         m_Value = value;
@@ -62,103 +90,38 @@ partial class BinaryNode<TValue>
         return node!;
     }
 
-    private static Boolean AreNodesEqual(BinaryNode<TValue> left!!, 
-                                         BinaryNode<TValue> right!!) =>
-        left.Value
-            .CompareTo(right.Value) == 0;
-
-    private static Int32 CompareNodes(BinaryNode<TValue>? left,
-                                      BinaryNode<TValue>? right)
+    internal void SetLeftChild(BinaryNode<TValue>? node)
     {
-        if (left is null)
+        if (m_Right is not null &&
+            node is not null &&
+            m_Right.Value is not null &&
+            m_Right.Value
+                   .CompareTo(node.Value) == 0)
         {
-            if (right is null)
-            {
-                return 0;
-            }
-            return 1;
+            return;
         }
-        if (right is null)
-        {
-            return -1;
-        }
-        return left.Value
-                   .CompareTo(right.Value);
+
+        m_Left = node;
     }
 
-    internal BinaryNode<TValue>? Left
+    internal void SetRightChild(BinaryNode<TValue>? node)
     {
-        get => m_Left;
-        set
+        if (m_Left is not null &&
+            node is not null &&
+            m_Left.Value is not null &&
+            m_Left.Value
+                  .CompareTo(node.Value) == 0)
         {
-            m_Left = value;
-            m_Children.Clear();
-            if (m_Left is not null)
-            {
-                m_Children.Add(m_Left);
-            }
-            if (m_Right is not null)
-            {
-                m_Children.Add(m_Right);
-            }
+            return;
         }
-    }
-    internal BinaryNode<TValue>? Right
-    {
-        get => m_Right;
-        set
-        {
-            m_Right = value;
-            m_Children.Clear();
-            if (m_Left is not null)
-            {
-                m_Children.Add(m_Left);
-            }
-            if (m_Right is not null)
-            {
-                m_Children.Add(m_Right);
-            }
-        }
+
+        m_Right = node;
     }
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly NodeCollection<BinaryNode<TValue>, TValue> m_Children = new(equality: AreNodesEqual,
-                                                                                 comparison: CompareNodes);
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private TValue m_Value;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private BinaryNode<TValue>? m_Left = null;
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private BinaryNode<TValue>? m_Right = null;
-}
-
-// ITreeNode<T, U>
-partial class BinaryNode<TValue> : ITreeNode<BinaryNode<TValue>, TValue> 
-    where TValue : IComparable<TValue>
-{
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    [Pure]
-    public TValue Value => 
-        m_Value;
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    [Pure]
-    [MaybeNull]
-    public BinaryNode<TValue>? Parent { get; }
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    [Pure]
-    public UInt32 Depth { get; }
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    [Pure]
-    public Boolean IsLeaf => 
-        m_Children.Count == 0;
-
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    [Pure]
-    public NodeCollection<BinaryNode<TValue>, TValue> Children => 
-        m_Children;
 }

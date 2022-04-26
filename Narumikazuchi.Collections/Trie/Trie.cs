@@ -10,164 +10,188 @@ public sealed partial class Trie<TContent>
     /// <summary>
     /// Instantiates an empty <see cref="Trie{TContent}"/>.
     /// </summary>
-    public Trie()
+    public Trie() :
+        this(s_DefaultSeparators)
+    { }
+    /// <summary>
+    /// Instantiates an empty <see cref="Trie{TContent}"/>.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"/>
+    public Trie([DisallowNull] IEnumerable<Char> separators)
     {
+        ArgumentNullException.ThrowIfNull(separators);
+
         m_Root = new(trie: this,
                      value: '^',
                      parent: null);
+        m_Separators = separators.ToArray();
     }
 
-    /// <summary>
-    /// Traverses through the <see cref="Trie{TContent}"/> and returns the inserted words in alphabetic order.
-    /// </summary>
-    /// <returns>An <see cref="IEnumerable"/> which iterates through all inserted words of this <see cref="Trie{TContent}"/></returns>
-    public IEnumerable<String> Traverse()
+    /// <inheritdoc/>
+    public Boolean Exists([DisallowNull] Func<String, Boolean> predicate)
     {
-        lock (m_SyncRoot)
-        {
-            foreach (TrieNode<TContent>? child in m_Root.Children)
-            {
-                if (child is null)
-                {
-                    continue;
-                }
+        ArgumentNullException.ThrowIfNull(predicate);
 
-                foreach (String word in this.TraverseInternal(parent: child))
-                {
-                    yield return word;
-                }
+        foreach (String word in this.Traverse())
+        {
+            String first = word.ToLower()
+                               .Split(separator: m_Separators,
+                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
+            if (predicate.Invoke(first))
+            {
+                return true;
             }
         }
-        yield break;
+        return false;
     }
 
-    /// <summary>
-    /// An array containing the default seperators used by the <see cref="Insert(in String, TContent?)"/> functions.
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public static readonly Char[] DefaultSeparators = new Char[] { ' ', '.', ',', ';', '(', ')', '[', ']', '{', '}', '/', '\\', '-', '_' };
-}
-
-// Non-Public
-partial class Trie<TContent>
-{
-    internal Trie(IEnumerable<String> collection!!) : 
-        this()
+    /// <inheritdoc/>
+    [return: MaybeNull]
+    public TrieNode<TContent>? Find([DisallowNull] Func<String, Boolean> predicate)
     {
-        if (!collection.Any())
-        {
-            throw new ArgumentException(CANNOT_CREATE_FROM_EMPTY_COLLECTION);
-        }
+        ArgumentNullException.ThrowIfNull(predicate);
 
-        foreach (String word in collection.Distinct())
+        foreach (String word in this.Traverse())
         {
-            this.Insert(index: word,
-                        item: default);
+            String first = word.ToLower()
+                               .Split(separator: m_Separators,
+                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
+            if (predicate.Invoke(first))
+            {
+                TrieNode<TContent> result = m_Root;
+                for (Int32 i = 0;
+                     i < word.Length;
+                     i++)
+                {
+                    TrieNode<TContent>? temp = result.FindChildNode(word[i]);
+                    if (temp is null)
+                    {
+                        throw new NullReferenceException();
+                    }
+                    result = temp;
+                }
+                return result;
+            }
         }
+        return null;
     }
 
-    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent!!) =>
-        this.TraverseInternal(parent: parent,
-                              wordStart: String.Empty);
-    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent!!,
-                                                 String? wordStart)
+    /// <inheritdoc/>
+    [return: NotNull]
+    public IReadOnlyCollection<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate)
     {
-        String start = wordStart + parent.Value
-                                         .ToString();
+        ArgumentNullException.ThrowIfNull(predicate);
 
-        if (parent.IsLeaf ||
-            parent.IsWord)
+        Collection<TrieNode<TContent>> result = new();
+        foreach (String word in this.Traverse())
         {
-            yield return start;
+            String first = word.ToLower()
+                               .Split(separator: m_Separators,
+                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
+            if (predicate.Invoke(first))
+            {
+                TrieNode<TContent> current = m_Root;
+                for (Int32 i = 0;
+                     i < word.Length;
+                     i++)
+                {
+                    TrieNode<TContent>? temp = current.FindChildNode(word[i]);
+                    if (temp is null)
+                    {
+                        throw new NullReferenceException();
+                    }
+                    current = temp;
+                }
+                result.Add(current);
+            }
         }
+        return result;
+    }
 
-        foreach (TrieNode<TContent>? child in parent.Children)
+    /// <inheritdoc/>
+    [return: NotNull]
+    public IReadOnlyCollection<TrieNode<TContent>> FindExcept([DisallowNull] Func<String, Boolean> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        Collection<TrieNode<TContent>> result = new();
+        foreach (String word in this.Traverse())
         {
-            if (child is null)
+            String first = word.ToLower()
+                               .Split(separator: m_Separators,
+                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
+            if (predicate.Invoke(first))
             {
                 continue;
             }
-
-            foreach (String word in this.TraverseInternal(parent: child,
-                                                          wordStart: start))
+            TrieNode<TContent> current = m_Root;
+            for (Int32 i = 0;
+                 i < word.Length;
+                 i++)
             {
-                yield return word;
+                TrieNode<TContent>? temp = current.FindChildNode(word[i]);
+                if (temp is null)
+                {
+                    throw new NullReferenceException();
+                }
+                current = temp;
             }
+            result.Add(current);
         }
-        yield break;
+        return result;
     }
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly Object m_SyncRoot = new();
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly TrieNode<TContent> m_Root;
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private Int32 m_Words = 0;
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create Trie from empty IEnumerable.";
-}
-
-// ICollection
-partial class Trie<TContent> : ICollection
-{
-    void ICollection.CopyTo(Array array!!, 
-                            Int32 index)
+    /// <inheritdoc/>
+    [return: MaybeNull]
+    public TrieNode<TContent>? FindLast([DisallowNull] Func<String, Boolean> predicate)
     {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        TrieNode<TContent>? result = null;
         foreach (String word in this.Traverse())
         {
-            array.SetValue(index: index++,
-                           value: word);
+            String first = word.ToLower()
+                               .Split(separator: m_Separators,
+                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
+            if (predicate.Invoke(first))
+            {
+                TrieNode<TContent> current = m_Root;
+                for (Int32 i = 0;
+                     i < word.Length;
+                     i++)
+                {
+                    TrieNode<TContent>? temp = current.FindChildNode(word[i]);
+                    if (temp is null)
+                    {
+                        throw new NullReferenceException();
+                    }
+                    current = temp;
+                }
+                result = current;
+            }
         }
+        return result;
     }
-}
 
-// IContentClearable
-partial class Trie<TContent> : IContentClearable
-{
-    /// <inheritdoc/>
-    public void Clear()
-    {
-        lock (m_SyncRoot)
-        {
-            m_Root.Children
-                  .Clear();
-            m_Words = 0;
-        }
-    }
-}
-
-// IContentInsertable<T>
-partial class Trie<TContent> : IContentInsertable<String>
-{
-    void IContentInsertable<String>.Insert(in String index, 
-                                           Object item)
-    {
-        if (item is TContent content)
-        {
-            this.Insert(index: index,
-                        item: content);
-            return;
-        }
-        throw new InvalidCastException();
-    }
-}
-
-// IContentInsertable<T, U>
-partial class Trie<TContent> : IContentInsertable<String, TContent?>
-{
     /// <inheritdoc/>
     public void Insert([DisallowNull] in String index,
-                       TContent? item) =>
+                       [DisallowNull] TContent item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
         this.InsertRange(index: index,
-                         collection: new TContent?[] { item });
+                         collection: new TContent[] { item });
+    }
 
     /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index, 
-                            [DisallowNull] IEnumerable<TContent?> collection!!)
+    public void InsertRange([DisallowNull] in String index,
+                            [DisallowNull] IEnumerable<TContent> collection)
     {
+        ArgumentNullException.ThrowIfNull(index);
+        ArgumentNullException.ThrowIfNull(collection);
+
         String[] words = index.ToLower()
-                              .Split(separator: DefaultSeparators,
+                              .Split(separator: m_Separators,
                                      options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
@@ -184,20 +208,25 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
                 {
                     m_Words++;
                 }
-                for (Int32 i = (Int32)current.Depth; 
-                     i < word.Length; 
+                for (Int32 i = (Int32)current.Depth;
+                     i < word.Length;
                      i++)
                 {
                     TrieNode<TContent> newNode = new(trie: this,
                                                      value: word[i],
                                                      parent: current);
-                    current.Children
-                           .Add(newNode);
+                    current.m_Children
+                           .Add(key: word[i],
+                                value: newNode);
                     current = newNode;
                 }
                 current.IsWord = true;
-                foreach (TContent? item in collection)
+                foreach (TContent item in collection)
                 {
+                    if (item is null)
+                    {
+                        continue;
+                    }
                     current.Add(item);
                 }
             }
@@ -206,25 +235,26 @@ partial class Trie<TContent> : IContentInsertable<String, TContent?>
                                          changedItem: word));
         }
     }
-}
 
-// IContentRemovable
-partial class Trie<TContent> : IContentRemovable
-{
-    Boolean IContentRemovable.Remove(Object? item) =>
-        item is String word &&
-        this.Remove(word);
-}
-
-// IContentRemovable<T>
-partial class Trie<TContent> : IContentRemovable<String>
-{
     /// <inheritdoc/>
-    public Boolean Remove([DisallowNull] String item!!)
+    public void Clear()
     {
+        lock (m_SyncRoot)
+        {
+            m_Root.m_Children
+                  .Clear();
+            m_Words = 0;
+        }
+    }
+
+    /// <inheritdoc/>
+    public Boolean Remove([DisallowNull] String item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
         Boolean result = false;
         String[] words = item.ToLower()
-                             .Split(separator: DefaultSeparators,
+                             .Split(separator: m_Separators,
                                     options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
@@ -249,8 +279,8 @@ partial class Trie<TContent> : IContentRemovable<String>
                         {
                             break;
                         }
-                        parent.Children
-                              .Remove(node);
+                        parent.m_Children
+                              .Remove(node.Value);
                         node = parent;
                     }
                 }
@@ -263,8 +293,10 @@ partial class Trie<TContent> : IContentRemovable<String>
     }
 
     /// <inheritdoc/>
-    public Int32 RemoveAll([DisallowNull] Func<String, Boolean> predicate!!)
+    public Int32 RemoveAll([DisallowNull] Func<String, Boolean> predicate)
     {
+        ArgumentNullException.ThrowIfNull(predicate);
+
         Collection<String> remove = new();
         foreach (String? word in this.Traverse())
         {
@@ -284,165 +316,124 @@ partial class Trie<TContent> : IContentRemovable<String>
         }
         return remove.Count - skipped;
     }
+
+    /// <summary>
+    /// Traverses through the <see cref="Trie{TContent}"/> and returns the inserted words in alphabetic order.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable"/> which iterates through all inserted words of this <see cref="Trie{TContent}"/></returns>
+    public IEnumerable<String> Traverse()
+    {
+        lock (m_SyncRoot)
+        {
+            foreach (TrieNode<TContent> child in m_Root.Children)
+            {
+                if (child is null)
+                {
+                    continue;
+                }
+
+                foreach (String word in this.TraverseInternal(parent: child))
+                {
+                    yield return word;
+                }
+            }
+        }
+        yield break;
+    }
+
+    /// <inheritdoc/>
+    [NotNull]
+    [Pure]
+    public TrieNode<TContent> RootNode
+    {
+        get
+        {
+            lock (m_SyncRoot)
+            {
+                return m_Root;
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    [Pure]
+    public Boolean ParentsKnowChildItems
+    {
+        get;
+        set;
+    } = true;
 }
 
-// IContentTree<T, U, V>
-partial class Trie<TContent> : IContentTree<TrieNode<TContent>, Char, TContent>
+// Non-Public
+partial class Trie<TContent>
 {
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    public Boolean ParentsKnowChildItems { get; set; } = true;
-}
-
-// IElementFinder<T, U>
-partial class Trie<TContent> : IElementFinder<String, TrieNode<TContent>>
-{
-    /// <inheritdoc/>
-    public Boolean Exists([DisallowNull] Func<String, Boolean> predicate!!)
+    internal Trie(IEnumerable<String> collection) :
+        this()
     {
-        foreach (String word in this.Traverse())
+        if (!collection.Any())
         {
-            String first = word.ToLower()
-                               .Split(separator: DefaultSeparators,
-                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(first))
-            {
-                return true;
-            }
+            throw new ArgumentException(CANNOT_CREATE_FROM_EMPTY_COLLECTION);
         }
-        return false;
+
+        foreach (String word in collection.Distinct())
+        {
+            this.InsertRange(index: word,
+                             collection: Array.Empty<TContent>());
+        }
     }
 
-    /// <inheritdoc/>
-    [return: MaybeNull]
-    public TrieNode<TContent>? Find([DisallowNull] Func<String, Boolean> predicate!!)
+    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent) =>
+        this.TraverseInternal(parent: parent,
+                              wordStart: String.Empty);
+    private IEnumerable<String> TraverseInternal(TrieNode<TContent> parent,
+                                                 String? wordStart)
     {
-        foreach (String word in this.Traverse())
+        String start = wordStart + parent.Value
+                                         .ToString();
+
+        if (parent.IsLeaf ||
+            parent.IsWord)
         {
-            String first = word.ToLower()
-                               .Split(separator: DefaultSeparators,
-                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(first))
-            {
-                TrieNode<TContent> result = m_Root;
-                for (Int32 i = 0; 
-                     i < word.Length; 
-                     i++)
-                {
-                    TrieNode<TContent>? temp = result.FindChildNode(word[i]);
-                    if (temp is null)
-                    {
-                        throw new NullReferenceException();
-                    }
-                    result = temp;
-                }
-                return result;
-            }
+            yield return start;
         }
-        return null;
-    }
 
-#pragma warning disable CS8631
-    /// <inheritdoc/>
-    [return: NotNull]
-    public IElementContainer<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate!!)
-    {
-        ExceptionHelpers.ThrowIfArgumentNull(predicate);
-
-        Collection<TrieNode<TContent>> result = new();
-        foreach (String word in this.Traverse())
+        foreach (TrieNode<TContent> child in parent.Children)
         {
-            String first = word.ToLower()
-                               .Split(separator: DefaultSeparators,
-                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(first))
-            {
-                TrieNode<TContent> current = m_Root;
-                for (Int32 i = 0;
-                     i < word.Length; 
-                     i++)
-                {
-                    TrieNode<TContent>? temp = current.FindChildNode(word[i]);
-                    if (temp is null)
-                    {
-                        throw new NullReferenceException();
-                    }
-                    current = temp;
-                }
-                result.Add(current);
-            }
-        }
-        return result.AsGenericElementContainer<Collection<TrieNode<TContent>>, TrieNode<TContent>>();
-    }
-
-    /// <inheritdoc/>
-    [return: NotNull]
-    public IElementContainer<TrieNode<TContent>> FindExcept([DisallowNull] Func<String, Boolean> predicate!!)
-    {
-        Collection<TrieNode<TContent>> result = new();
-        foreach (String word in this.Traverse())
-        {
-            String first = word.ToLower()
-                               .Split(separator: DefaultSeparators,
-                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(first))
+            if (child is null)
             {
                 continue;
             }
-            TrieNode<TContent> current = m_Root;
-            for (Int32 i = 0; 
-                 i < word.Length; 
-                 i++)
-            {
-                TrieNode<TContent>? temp = current.FindChildNode(word[i]);
-                if (temp is null)
-                {
-                    throw new NullReferenceException();
-                }
-                current = temp;
-            }
-            result.Add(current);
-        }
-        return result.AsGenericElementContainer<Collection<TrieNode<TContent>>, TrieNode<TContent>>();
-    }
-#pragma warning restore CS8631
 
-    /// <inheritdoc/>
-    [return: MaybeNull]
-    public TrieNode<TContent>? FindLast([DisallowNull] Func<String, Boolean> predicate!!)
-    {
-        TrieNode<TContent>? result = null;
-        foreach (String word in this.Traverse())
-        {
-            String first = word.ToLower()
-                               .Split(separator: DefaultSeparators,
-                                      options: StringSplitOptions.RemoveEmptyEntries)[0];
-            if (predicate.Invoke(first))
+            foreach (String word in this.TraverseInternal(parent: child,
+                                                          wordStart: start))
             {
-                TrieNode<TContent> current = m_Root;
-                for (Int32 i = 0; 
-                     i < word.Length; 
-                     i++)
-                {
-                    TrieNode<TContent>? temp = current.FindChildNode(word[i]);
-                    if (temp is null)
-                    {
-                        throw new NullReferenceException();
-                    }
-                    current = temp;
-                }
-                result = current;
+                yield return word;
             }
         }
-        return result;
+        yield break;
     }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private readonly Object m_SyncRoot = new();
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private readonly TrieNode<TContent> m_Root;
+    private readonly Char[] m_Separators;
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private Int32 m_Words = 0;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private static readonly Char[] s_DefaultSeparators = new Char[] { ' ', '.', ',', ';', '(', ')', '[', ']', '{', '}', '/', '\\', '-', '_' };
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create Trie from empty IEnumerable.";
 }
 
 // IEnumerable
 partial class Trie<TContent> : IEnumerable
 {
     IEnumerator IEnumerable.GetEnumerator() =>
-        ((IEnumerable<String>)this).GetEnumerator();
+        this.Traverse()
+            .GetEnumerator();
 }
 
 // IEnumerable<T> - String
@@ -501,49 +492,7 @@ partial class Trie<TContent> : INotifyPropertyChanged
 // IReadOnlyCollection<T>
 partial class Trie<TContent> : IReadOnlyCollection<String>
 {
-    /// <inheritdoc/>
-    [Pure]
-    public Int32 Count
-    {
-        get
-        {
-            lock (m_SyncRoot)
-            {
-                return m_Words;
-            }
-        }
-    }
-}
-
-// ISynchronized
-partial class Trie<TContent> : ISynchronized
-{
-    /// <inheritdoc/>
-    [Pure]
-    public Boolean IsSynchronized { get; } = true;
-
-    /// <inheritdoc/>
-    [Pure]
-    [NotNull]
-    public Object SyncRoot =>
-        m_SyncRoot;
-}
-
-// ITree<T, U>
-partial class Trie<TContent> : ITree<TrieNode<TContent>, Char>
-{
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    [NotNull]
-    [Pure]
-    public TrieNode<TContent> RootNode
-    {
-        get
-        {
-            lock (m_SyncRoot)
-            {
-                return m_Root;
-            }
-        }
-    }
+    /// <inheritdoc />
+    public Int32 Count =>
+        m_Words;
 }

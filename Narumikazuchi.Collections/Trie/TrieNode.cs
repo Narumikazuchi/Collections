@@ -5,185 +5,62 @@
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed partial class TrieNode<TContent>
+    where TContent : class
 {
     /// <summary>
-    /// Finds the child-node with the specified value. Returns <see langword="null"/> if no <see cref=" TrieNode{T}"/> with the specified value exists.
+    /// Adds an object to the <see cref="TrieNode{TContent}"/>.
     /// </summary>
-    /// <param name="value">The value to lookup in the child-nodes of the <see cref="TrieNode{T}"/>.</param>
-    [Pure]
-    [return: MaybeNull]
-    public TrieNode<TContent>? FindChildNode(Char value) => 
-        this.Children
-            .FirstOrDefault(n => n is not null &&
-                                 n.Value == Char.ToLower(c: value));
-
-    /// <inheritdoc/>
-    [return: MaybeNull]
-    public override String? ToString()
+    /// <param name="item">The value to be added to the <see cref="TrieNode{TContent}"/>.</param>
+    /// <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Boolean Add(TContent item)
     {
-        StringBuilder builder = new();
-        TrieNode<TContent>? current = this;
-        do
-        {
-            builder.Insert(index: 0, 
-                           value: current.Value);
-            current = current.Parent;
-        } while (current is not null &&
-                 current.Parent is not null);
-        return builder.ToString();
-    }
-}
+        ArgumentNullException.ThrowIfNull(item);
 
-// Non-Public
-partial class TrieNode<TContent>
-{
-    internal TrieNode(Trie<TContent> trie!!, 
-                      in Char value, 
-                      TrieNode<TContent>? parent)
-    {
-        m_Trie = trie;
-        m_Children = new(equality: AreNodesEqual,
-                         comparison: CompareNodes);
-        m_Items = new ObservableSet<TContent>(comparison: AreItemsEqual);
-        this.Value = Char.ToLower(c: value);
-        this.Parent = parent;
-        if (parent is null)
-        {
-            this.Depth = 0;
-            return;
-        }
-        this.Depth = parent.Depth + 1;
+        return m_Items.Add(item);
     }
 
-    private static Boolean AreItemsEqual(TContent? left, 
-                                         TContent? right)
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="TrieNode{TContent}"/>.
+    /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] IEnumerable<TContent> collection)
     {
-        if (left is null)
-        {
-            return right is null;
-        }
-        if (right is null)
-        {
-            return false;
-        }
-        if (left is IEquatable<TContent> eq)
-        {
-            return eq.Equals(right);
-        }
-        return ReferenceEquals(objA: left,
-                               objB: right);
-    }
+        ArgumentNullException.ThrowIfNull(collection);
 
-    private static Boolean AreNodesEqual(TrieNode<TContent> left!!, 
-                                         TrieNode<TContent> right!!) =>
-        left.Value == right.Value;
-
-    private static Int32 CompareNodes(TrieNode<TContent>? left,
-                                      TrieNode<TContent>? right)
-    {
-        if (left is null)
+        foreach (TContent item in collection)
         {
-            if (right is null)
+            if (item is null)
             {
-                return 0;
+                continue;
             }
-            return 1;
-        }
-        if (right is null)
-        {
-            return -1;
-        }
-        return left.Value
-                   .CompareTo(value: right.Value);
-    }
-
-    private static IEnumerable<TContent?> ChildSelector(TrieNode<TContent>? child)
-    {
-        if (child is null)
-        {
-            return Array.Empty<TContent?>();
-        }
-        return child.Items;
-    }
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal Boolean IsWord { get; set; }
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal IEnumerable<TContent?> ChildItems => 
-        m_Children.SelectMany(selector: ChildSelector)
-                  .Union(second: m_Items);
-
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal readonly ObservableSet<TContent> m_Items;
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly NodeCollection<TrieNode<TContent>, Char> m_Children;
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private readonly Trie<TContent> m_Trie;
-}
-
-// ICollection
-partial class TrieNode<TContent> : ICollection
-{
-    Int32 ICollection.Count =>
-        m_Items.Count;
-
-    Boolean ICollection.IsSynchronized =>
-        m_Items.IsSynchronized;
-
-    Object ICollection.SyncRoot =>
-        m_Items.SyncRoot;
-
-    void ICollection.CopyTo(Array array!!, 
-                            Int32 index) =>
-        ((ICollection)m_Items).CopyTo(array: array,
-                                      index: index);
-}
-
-// IContentAddable<T>
-partial class TrieNode<TContent> : IContentAddable<TContent?>
-{
-    /// <inheritdoc/>
-    public Boolean Add(TContent? item) =>
-        m_Items.Add(item);
-
-    /// <inheritdoc/>
-    public void AddRange([DisallowNull] IEnumerable<TContent?> collection!!)
-    {
-        foreach (TContent? item in collection)
-        {
             m_Items.Add(item);
         }
     }
-}
 
-// IContentClearable
-partial class TrieNode<TContent> : IContentClearable
-{
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes all elements from the <see cref="TrieNode{TContent}"/>.
+    /// </summary>
     public void Clear() =>
         m_Items.Clear();
-}
 
-// IContentRemovable
-partial class TrieNode<TContent> : IContentRemovable
-{
-    Boolean IContentRemovable.Remove(Object? item) =>
-        item is TContent content &&
-        this.Remove(content);
-}
-
-// IContentRemovable<T>
-partial class TrieNode<TContent> : IContentRemovable<TContent?>
-{
-    /// <inheritdoc/>
-    public Boolean Remove(TContent? item)
+    /// <summary>
+    /// Removes the first occurrence of the specified item from the <see cref="TrieNode{TContent}"/>.
+    /// </summary>
+    /// <param name="item">The item to remove.</param>
+    /// <returns><see langword="true"/> if the item was found and removed; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Boolean Remove(TContent item)
     {
+        ArgumentNullException.ThrowIfNull(item);
+
         if (m_Items.Contains(item: item))
         {
             return m_Items.Remove(item);
         }
 
-        foreach (TrieNode<TContent>? child in this.Children)
+        foreach (TrieNode<TContent> child in this.Children)
         {
             if (child is null)
             {
@@ -198,27 +75,42 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
         return false;
     }
 
-    /// <inheritdoc/>
-    public Int32 RemoveAll([DisallowNull] Func<TContent?, Boolean> predicate!!)
+    /// <summary>
+    /// Removes all objects from the <see cref="TrieNode{TContent}"/> that match the specified condition.
+    /// </summary>
+    /// <param name="predicate">The condition that objects need to meet to be deleted.</param>
+    /// <returns>The amount of items removed</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Int32 RemoveAll([DisallowNull] Func<TContent, Boolean> predicate)
     {
-        Collection<TContent?> remove = new();
-        foreach (TContent? item in m_Items)
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        Collection<TContent> remove = new();
+        foreach (TContent item in m_Items)
         {
+            if (item is null)
+            {
+                continue;
+            }
             if (predicate.Invoke(item))
             {
                 remove.Add(item);
             }
         }
 
-        foreach (TrieNode<TContent>? child in this.Children)
+        foreach (TrieNode<TContent> child in this.Children)
         {
             if (child is null)
             {
                 continue;
             }
 
-            foreach (TContent? item in child.Items)
+            foreach (TContent item in child.Items)
             {
+                if (item is null)
+                {
+                    continue;
+                }
                 if (predicate.Invoke(item))
                 {
                     remove.Add(item);
@@ -227,7 +119,7 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
         }
 
         Int32 skipped = 0;
-        foreach (TContent? item in remove)
+        foreach (TContent item in remove)
         {
             if (!this.Remove(item))
             {
@@ -236,78 +128,86 @@ partial class TrieNode<TContent> : IContentRemovable<TContent?>
         }
         return remove.Count - skipped;
     }
-}
 
-// IElementContainer
-partial class TrieNode<TContent> : IElementContainer
-{
-    Boolean IElementContainer.Contains(Object? item) =>
-        item is TContent content &&
-        this.Contains(item: content);
-}
+    /// <summary>
+    /// Determines whether the <see cref="TrieNode{TContent}"/> contains a specific value.
+    /// </summary>
+    /// <param name="item">The object to locate in the <see cref="TrieNode{TContent}"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="TrieNode{TContent}"/>; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Boolean Contains(TContent item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        
+        return m_Items.Contains(item: item);
+    }
 
-// IElementContainer<T>
-partial class TrieNode<TContent> : IElementContainer<TContent?>
-{
+    /// <summary>
+    /// Finds the child-node with the specified value. Returns <see langword="null"/> if no <see cref=" TrieNode{T}"/> with the specified value exists.
+    /// </summary>
+    /// <param name="value">The value to lookup in the child-nodes of the <see cref="TrieNode{T}"/>.</param>
+    [Pure]
+    [return: MaybeNull]
+    public TrieNode<TContent>? FindChildNode(Char value) => 
+        this.Children
+            .FirstOrDefault(n => n is not null &&
+                                 n.Value == Char.ToLower(c: value));
+
     /// <inheritdoc/>
-    public Boolean Contains(TContent? item) =>
-        m_Items.Contains(item: item);
-}
+    [return: MaybeNull]
+    public override String ToString()
+    {
+        StringBuilder builder = new();
+        TrieNode<TContent>? current = this;
+        do
+        {
+            builder.Insert(index: 0, 
+                           value: current.Value);
+            current = current.Parent;
+        } while (current is not null &&
+                 current.Parent is not null);
+        return builder.ToString();
+    }
 
-// IEnumerable
-partial class TrieNode<TContent> : IEnumerable
-{
-    IEnumerator IEnumerable.GetEnumerator() =>
-        ((IEnumerable<TContent?>)m_Items).GetEnumerator();
-}
-
-// IEnumerable<T>
-partial class TrieNode<TContent> : IEnumerable<TContent?>
-{
-    IEnumerator<TContent?> IEnumerable<TContent?>.GetEnumerator() =>
-        ((IEnumerable<TContent?>)m_Items).GetEnumerator();
-}
-
-// IReadOnlyCollection<T>
-partial class TrieNode<TContent> : IReadOnlyCollection<TContent?>
-{
-    Int32 IReadOnlyCollection<TContent?>.Count =>
-        m_Items.Count;
-}
-
-// IContentTreeNode<T, U, V>
-partial class TrieNode<TContent> : IContentTreeNode<TrieNode<TContent>, Char, TContent> 
-    where TContent : class
-{
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    /// <summary>
+    /// Gets the <see cref="Char"/> value of this <see cref="TrieNode{TContent}"/>.
+    /// </summary>
     [Pure]
     public Char Value { get; }
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+
+    /// <summary>
+    /// Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
+    /// </summary>
     [Pure]
     [MaybeNull]
     public TrieNode<TContent>? Parent { get; }
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+
+    /// <summary>
+    /// Gets the depth of this node in it's corresponding tree. Should be 0 for root nodes.
+    /// </summary>
     [Pure]
     public UInt32 Depth { get; }
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    [Pure]
-    public Boolean IsLeaf => 
-        m_Children.Count == 0;
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-    [NotNull]
-    [Pure]
-    public NodeCollection<TrieNode<TContent>, Char> Children => 
-        m_Children;
 
-    /// <inheritdoc/>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+    /// <summary>
+    /// Gets whether this <see cref="TrieNode{TContent}"/> has no more child-nodes.
+    /// </summary>
+    [Pure]
+    public Boolean IsLeaf =>
+        m_Children.Count == 0;
+
+    /// <summary>
+    /// Gets the child nodes of this <see cref="TrieNode{TContent}"/>.
+    /// </summary>
     [NotNull]
-    public IEnumerable<TContent?> Items
+    [Pure]
+    public IEnumerable<TrieNode<TContent>> Children =>
+        m_Children.Values;
+
+    /// <summary>
+    /// Gets the items associated with this <see cref="TrieNode{TContent}"/>.
+    /// </summary>
+    [NotNull]
+    public IEnumerable<TContent> Items
     {
         get
         {
@@ -318,4 +218,64 @@ partial class TrieNode<TContent> : IContentTreeNode<TrieNode<TContent>, Char, TC
             return m_Items;
         }
     }
+}
+
+// Non-Public
+partial class TrieNode<TContent>
+{
+    internal TrieNode(Trie<TContent> trie, 
+                      in Char value, 
+                      TrieNode<TContent>? parent)
+    {
+        m_Trie = trie;
+        m_Children = new();
+        m_Items = new();
+        this.Value = Char.ToLower(c: value);
+        this.Parent = parent;
+        if (parent is null)
+        {
+            this.Depth = 0;
+            return;
+        }
+        this.Depth = parent.Depth + 1;
+    }
+
+    private static IEnumerable<TContent> ChildSelector(KeyValuePair<Char, TrieNode<TContent>> child)
+    {
+        if (child.Value is null)
+        {
+            return Array.Empty<TContent>();
+        }
+        return child.Value
+                    .Items;
+    }
+
+    internal Boolean IsWord { get; set; }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    internal IEnumerable<TContent> ChildItems => 
+        m_Children.SelectMany(selector: ChildSelector)
+                  .Union(second: m_Items);
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    internal readonly HashSet<TContent> m_Items;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    internal readonly SortedList<Char, TrieNode<TContent>> m_Children;
+
+    private readonly Trie<TContent> m_Trie;
+}
+
+// IEnumerable
+partial class TrieNode<TContent> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        m_Items.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial class TrieNode<TContent> : IEnumerable<TContent?>
+{
+    IEnumerator<TContent?> IEnumerable<TContent?>.GetEnumerator() =>
+        m_Items.GetEnumerator();
 }

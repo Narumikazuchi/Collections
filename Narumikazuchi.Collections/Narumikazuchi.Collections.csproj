@@ -42,7 +42,7 @@ For more information visit https://github.com/Narumikazuchi/Collections/wiki.</D
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\submodules\Abstract\Narumikazuchi.Collections.Abstract\Narumikazuchi.Collections.Abstract.csproj" />
+    <PackageReference Include="Narumikazuchi" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

@@ -11,8 +11,11 @@ public sealed partial class BinaryTree<TValue>
     /// Instantiates a new <see cref="BinaryTree{TValue}"/> with the <paramref name="rootValue"/> as root node.
     /// </summary>
     /// <param name="rootValue">The value of the root node.</param>
-    public BinaryTree([DisallowNull] TValue rootValue!!)
+    /// <exception cref="ArgumentNullException"/>
+    public BinaryTree([DisallowNull] TValue rootValue)
     {
+        ArgumentNullException.ThrowIfNull(rootValue);
+
         m_Root = new BinaryNode<TValue>(value: rootValue,
                                         parent: null);
     }
@@ -22,19 +25,27 @@ public sealed partial class BinaryTree<TValue>
     /// </summary>
     /// <param name="value">The value to lookup.</param>
     /// <returns><see langword="true"/> if the specified value is found in the tree; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
     [Pure]
-    public Boolean Exists([DisallowNull] TValue value!!) =>
-        this.Find(value) is not null;
+    public Boolean Exists([DisallowNull] TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        return this.Find(value) is not null;
+    }
 
     /// <summary>
     /// Finds the <see cref="BinaryNode{TValue}"/> with the highest depth matching the specified value.
     /// </summary>
     /// <param name="value">The value to lookup in the tree.</param>
     /// <returns>The <see cref="BinaryNode{TValue}"/> which contains the specified value or <see langword="null"/> if no node with such value exists in the tree.</returns>
+    /// <exception cref="ArgumentNullException"/>
     [Pure]
     [return: MaybeNull]
-    public BinaryNode<TValue>? Find([DisallowNull] TValue value!!)
+    public BinaryNode<TValue>? Find([DisallowNull] TValue value)
     {
+        ArgumentNullException.ThrowIfNull(value);
+
         BinaryNode<TValue>? node = m_Root;
         Int32 compare = value.CompareTo(node.Value);
         while (node is not null &&
@@ -54,6 +65,189 @@ public sealed partial class BinaryTree<TValue>
             }
         }
         return node;
+    }
+
+    /// <summary>
+    /// Adds an object to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="value">The value to be added to the <see cref="BinaryTree{TValue}"/>.</param>
+    /// <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Boolean Add([DisallowNull] TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        BinaryNode<TValue>? node = m_Root;
+        Int32 compare = value.CompareTo(node.Value);
+        while (node is not null)
+        {
+            if (compare == 0)
+            {
+                if (this.ThrowExceptionOnDuplicate)
+                {
+                    ArgumentException exception = new(message: ALREADY_EXISTS);
+                    exception.Data
+                             .Add(key: "Duplicate Value",
+                                  value: value);
+                    throw exception;
+                }
+                return false;
+            }
+            else if (compare < 0)
+            {
+                if (node.LeftChild is null)
+                {
+                    node.SetLeftChild(new(value: value,
+                                          parent: node));
+                    return true;
+                }
+                node = node.LeftChild;
+            }
+            else if (compare > 0)
+            {
+                if (node.RightChild is null)
+                {
+                    node.SetRightChild(new(value: value,
+                                           parent: node));
+                    return true;
+                }
+                node = node.RightChild;
+            }
+            if (node is not null)
+            {
+                compare = value.CompareTo(node.Value);
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] IEnumerable<TValue> collection)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+
+        foreach (TValue item in collection)
+        {
+            this.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// Removes all elements from the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    public void Clear()
+    {
+        m_Root.SetLeftChild(null);
+        m_Root.SetRightChild(null);
+    }
+
+    /// <summary>
+    /// Removes the first occurrence of the specified item from the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="value">The item to remove.</param>
+    /// <returns><see langword="true"/> if the item was found and removed; otherwise, <see langword="false"/></returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Boolean Remove([DisallowNull] TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        if (value.CompareTo(m_Root.Value) == 0)
+        {
+            throw new ArgumentException(message: CANNOT_REMOVE_ROOT);
+        }
+
+        BinaryNode<TValue>? node = this.Find(value);
+        if (node is null)
+        {
+            return false;
+        }
+
+        if (node.LeftChild is null)
+        {
+            if (node.Parent is null)
+            {
+                throw new NotAllowed(message: NO_PARENT);
+            }
+            if (node.Parent
+                    .LeftChild == node)
+            {
+                node.Parent
+                    .SetLeftChild(node.RightChild);
+            }
+            else if (node.Parent
+                         .RightChild == node)
+            {
+                node.Parent
+                    .SetRightChild(node.RightChild);
+            }
+        }
+        else if (node.RightChild is null)
+        {
+            if (node.Parent is null)
+            {
+                throw new NotAllowed(message: NO_PARENT);
+            }
+            if (node.Parent
+                    .LeftChild == node)
+            {
+                node.Parent
+                    .SetLeftChild(node.LeftChild);
+            }
+            else if (node.Parent
+                         .RightChild == node)
+            {
+                node.Parent
+                    .SetRightChild(node.LeftChild);
+            }
+        }
+        else
+        {
+            BinaryNode<TValue> min = node.SetToMinBranchValue();
+            if (min.Parent is null)
+            {
+                throw new NotAllowed(message: NO_PARENT);
+            }
+            min.Parent
+               .SetLeftChild(null);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Removes all objects from the <see cref="BinaryTree{TValue}"/> that match the specified condition.
+    /// </summary>
+    /// <param name="predicate">The condition that objects need to meet to be deleted.</param>
+    /// <returns>The amount of items removed</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        Collection<TValue> remove = new();
+        foreach (BinaryNode<TValue>? item in this.TraverseInOrder())
+        {
+            if (predicate.Invoke(item.Value))
+            {
+                remove.Add(item.Value);
+            }
+        }
+
+        Int32 skipped = 0;
+        for (Int32 i = 0;
+             i < remove.Count;
+             i++)
+        {
+            if (!this.Remove(remove[i]))
+            {
+                ++skipped;
+            }
+        }
+        return remove.Count - skipped;
     }
 
     /// <summary>
@@ -105,17 +299,26 @@ public sealed partial class BinaryTree<TValue>
     };
 
     /// <summary>
+    /// Gets the root for the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    [NotNull]
+    [Pure]
+    public BinaryNode<TValue> RootNode =>
+        m_Root;
+
+    /// <summary>
     /// Gets or sets if an exception should be thrown when trying to add a duplicate.
     /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
     public Boolean ThrowExceptionOnDuplicate { get; set; } = true;
 }
 
 // Non-Public
 partial class BinaryTree<TValue>
 {
-    internal BinaryTree(IEnumerable<TValue> collection!!)
+    internal BinaryTree(IEnumerable<TValue> collection)
     {
+        ArgumentNullException.ThrowIfNull(collection);
+
         if (!collection.Any())
         {
             throw new ArgumentException(message: CANNOT_CREATE_FROM_EMPTY_COLLECTION);
@@ -136,7 +339,7 @@ partial class BinaryTree<TValue>
         }
     }
 
-    private UInt32 GetDepth(BinaryNode<TValue> node!!)
+    private UInt32 GetDepth(BinaryNode<TValue> node)
     {
         if (node.LeftChild is null &&
             node.RightChild is null)
@@ -165,8 +368,8 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraversePreOrder(IList<BinaryNode<TValue>> nodes!!, 
-                                  BinaryNode<TValue> current!!)
+    private void TraversePreOrder(IList<BinaryNode<TValue>> nodes, 
+                                  BinaryNode<TValue> current)
     {
         nodes.Add(current);
         if (current.LeftChild is not null)
@@ -189,8 +392,8 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraverseInOrder(IList<BinaryNode<TValue>> nodes!!, 
-                                 BinaryNode<TValue> current!!)
+    private void TraverseInOrder(IList<BinaryNode<TValue>> nodes, 
+                                 BinaryNode<TValue> current)
     {
         if (current.LeftChild is not null)
         {
@@ -213,8 +416,8 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraversePostOrder(IList<BinaryNode<TValue>> nodes!!, 
-                                   BinaryNode<TValue> current!!)
+    private void TraversePostOrder(IList<BinaryNode<TValue>> nodes, 
+                                   BinaryNode<TValue> current)
     {
         if (current.LeftChild is not null)
         {
@@ -242,180 +445,6 @@ partial class BinaryTree<TValue>
     private const String CANNOT_REMOVE_ROOT = "The root of a tree cannot be removed.";
 }
 
-// IContentAddable<T>
-partial class BinaryTree<TValue> : IContentAddable<TValue>
-{
-    /// <inheritdoc/>
-    public Boolean Add([DisallowNull] TValue value!!)
-    {
-        BinaryNode<TValue>? node = m_Root;
-        Int32 compare = value.CompareTo(node.Value);
-        while (node is not null)
-        {
-            if (compare == 0)
-            {
-                if (this.ThrowExceptionOnDuplicate)
-                {
-                    ArgumentException exception = new(message: ALREADY_EXISTS);
-                    exception.Data
-                             .Add(key: "Duplicate Value",
-                                  value: value);
-                    throw exception;
-                }
-                return false;
-            }
-            else if (compare < 0)
-            {
-                if (node.LeftChild is null)
-                {
-                    node.Left = new(value: value,
-                                    parent: node);
-                    return true;
-                }
-                node = node.LeftChild;
-            }
-            else if (compare > 0)
-            {
-                if (node.RightChild is null)
-                {
-                    node.Right = new(value: value,
-                                     parent: node);
-                    return true;
-                }
-                node = node.RightChild;
-            }
-            if (node is not null)
-            {
-                compare = value.CompareTo(node.Value);
-            }
-        }
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public void AddRange([DisallowNull] IEnumerable<TValue> collection!!)
-    {
-        foreach (TValue item in collection)
-        {
-            this.Add(item);
-        }
-    }
-}
-
-// IContentClearable
-partial class BinaryTree<TValue> : IContentClearable
-{
-    /// <inheritdoc/>
-    public void Clear()
-    {
-        m_Root.Left = null;
-        m_Root.Right = null;
-    }
-}
-
-// IContentRemovable
-partial class BinaryTree<TValue> : IContentRemovable
-{
-    Boolean IContentRemovable.Remove(Object? item) =>
-        item is TValue value &&
-        this.Remove(value);
-}
-
-// IContentRemovable<T>
-partial class BinaryTree<TValue> : IContentRemovable<TValue>
-{
-    /// <inheritdoc/>
-    public Boolean Remove([DisallowNull] TValue value!!)
-    {
-        if (value.CompareTo(m_Root.Value) == 0)
-        {
-            throw new ArgumentException(message: CANNOT_REMOVE_ROOT);
-        }
-
-        BinaryNode<TValue>? node = this.Find(value);
-        if (node is null)
-        {
-            return false;
-        }
-
-        if (node.LeftChild is null)
-        {
-            if (node.Parent is null)
-            {
-                throw new NotAllowed(message: NO_PARENT);
-            }
-            if (node.Parent
-                    .LeftChild == node)
-            {
-                node.Parent
-                    .Left = node.RightChild;
-            }
-            else if (node.Parent
-                         .RightChild == node)
-            {
-                node.Parent
-                    .Right = node.RightChild;
-            }
-        }
-        else if (node.RightChild is null)
-        {
-            if (node.Parent is null)
-            {
-                throw new NotAllowed(message: NO_PARENT);
-            }
-            if (node.Parent
-                    .LeftChild == node)
-            {
-                node.Parent
-                    .Left = node.LeftChild;
-            }
-            else if (node.Parent
-                         .RightChild == node)
-            {
-                node.Parent
-                    .Right = node.LeftChild;
-            }
-        }
-        else
-        {
-            BinaryNode<TValue> min = node.SetToMinBranchValue();
-            if (min.Parent is null)
-            {
-                throw new NotAllowed(message: NO_PARENT);
-            }
-            min.Parent
-               .Left = null;
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate!!)
-    {
-        Collection<TValue> remove = new();
-        foreach (BinaryNode<TValue>? item in this.TraverseInOrder())
-        {
-            if (predicate.Invoke(item.Value))
-            {
-                remove.Add(item.Value);
-            }
-        }
-
-        Int32 skipped = 0;
-        for (Int32 i = 0; 
-             i < remove.Count; 
-             i++)
-        {
-            if (!this.Remove(remove[i]))
-            {
-                ++skipped;
-            }
-        }
-        return remove.Count - skipped;
-    }
-}
-
 // IEnumerable
 partial class BinaryTree<TValue> : IEnumerable<TValue>
 {
@@ -435,17 +464,4 @@ partial class BinaryTree<TValue> : IEnumerable<TValue>
         }
         yield break;
     }
-}
-
-// ITree<T, U>
-partial class BinaryTree<TValue> : ITree<BinaryNode<TValue>, TValue>
-{
-    /// <summary>
-    /// Gets the root for the <see cref="BinaryTree{TValue}"/>.
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-    [NotNull]
-    [Pure]
-    public BinaryNode<TValue> RootNode => 
-        m_Root;
 }
