@@ -9,11 +9,10 @@
     <RepositoryUrl>https://github.com/Narumikazuchi/Collections</RepositoryUrl>
     <Authors>Narumikazuchi</Authors>
     <Copyright>©2021 Narumikazuchi</Copyright>
-    <Description>Provides new useful collections.
-For more information visit https://github.com/Narumikazuchi/Collections/wiki.</Description>
+    <Description>Provides new useful collections. And a wide array of extension methods for collections. For more information visit the [wiki](https://github.com/Narumikazuchi/Collections/wiki).</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Version>5.0.0</Version>
+    <Version>5.0.1</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Narumikazuchi/Collections/wiki</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
@@ -39,6 +38,14 @@ For more information visit https://github.com/Narumikazuchi/Collections/wiki.</D
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+	<None Include="..\README.md">
+	  <Pack>True</Pack>
+	  <PackagePath></PackagePath>
+	</None>
+	<None Include="..\README nuget.md">
+	  <Pack>True</Pack>
+	  <PackagePath></PackagePath>
+	</None>
   </ItemGroup>
 
   <ItemGroup>
