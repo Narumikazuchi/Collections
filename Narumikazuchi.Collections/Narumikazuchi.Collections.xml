@@ -4,6 +4,326 @@
         <name>Narumikazuchi.Collections</name>
     </assembly>
     <members>
+        <member name="T:Narumikazuchi.Collections.Extensions.CollectionExtensions">
+            <summary>
+            Extends the <see cref="T:System.Collections.Generic.ICollection`1"/> interface.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.AddRange``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="other">The collection to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.AsReadOnly``1(System.Collections.Generic.ICollection{``0})">
+            <summary>
+            Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> wrapper for the current collection.
+            </summary>
+            <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.ConvertAll``2(System.Collections.Generic.ICollection{``0},System.Converter{``0,``1})">
+            <summary>
+            Converts the elements in the current <see cref="T:System.Collections.Generic.ICollection`1"/> to another type, and returns a list containing the converted elements.
+            </summary>
+            <param name="source"></param>
+            <param name="converter">A <see cref="T:System.Converter`2"/> delegate that converts each element from one type to another type.</param>
+            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> of the target type containing the converted elements from the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.Exists``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains elements that match the conditions defined by the specified predicate.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to search for.</param>
+            <returns><see langword="true"/> if the <see cref="T:System.Collections.Generic.ICollection`1"/> contains one or more elements that match the conditions defined by the specified predicate; otherwise, <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.FindAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Retrieves all the elements that match the conditions defined by the specified predicate.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to search for.</param>
+            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.ForEach``1(System.Collections.Generic.ICollection{``0},System.Action{``0})">
+            <summary>
+            Performs the specified action on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="action">The <see cref="T:System.Action`1"/> delegate to perform on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Removes all the elements that match the conditions defined by the specified predicate.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to remove.</param>
+            <returns>The number of elements removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.TrueForAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Determines whether every element in the <see cref="T:System.Collections.Generic.ICollection`1"/> matches the conditions defined by the specified predicate.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions to check against the elements.</param>
+            <returns>
+            <see langword="true"/> if every element in the <see cref="T:System.Collections.Generic.ICollection`1"/> matches the conditions
+            defined by the specified predicate; otherwise, <see langword="false"/>. If the collection has no elements,
+            the return value is <see langword="true"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.Extensions.EnumerableExtensions">
+            <summary>
+            Extends the <see cref="T:System.Collections.Generic.IEnumerable`1"/> interface.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.EnumerableExtensions.ToBinaryTree``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.EnumerableExtensions.ToTrie``1(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Creates a <see cref="T:Narumikazuchi.Collections.Trie`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.EnumerableExtensions.Median``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns the item <typeparamref name="TElement"/> at the center of the collection.
+            </summary>
+            <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
+        </member>
+        <member name="T:Narumikazuchi.Collections.Extensions.ListExtensions">
+            <summary>
+            Extends the <see cref="T:System.Collections.Generic.IList`1"/> interface.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.AsReadOnly``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> wrapper for the current list.
+            </summary>
+            <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.IList`1"/>.</returns>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0)">
+            <summary>
+            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the default comparer and returns the zero-based index of the element.
+            </summary>
+            <param name="source"></param>
+            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
+            <returns>
+            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
+            if item is found; otherwise, a negative number that is the bitwise complement
+            of the index of the next element that is larger than item or, if there is no
+            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException" />
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0,System.Collections.Generic.IComparer{``0})">
+            <summary>
+            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
+            </summary>
+            <param name="source"></param>
+            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
+            <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default"/>.</param>
+            <returns>
+            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
+            if item is found; otherwise, a negative number that is the bitwise complement
+            of the index of the next element that is larger than item or, if there is no
+            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.</returns>
+            <exception cref="T:System.ArgumentException" />
+            <exception cref="T:System.ArgumentNullException" />
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,``0,System.Collections.Generic.IComparer{``0})">
+            <summary>
+            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
+            </summary>
+            <param name="source"></param>
+            <param name="index">The zero-based starting index of the range to search.</param>
+            <param name="count">The length of the range to search.</param>
+            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
+            <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default"/>.</param>
+            <returns>
+            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
+            if item is found; otherwise, a negative number that is the bitwise complement
+            of the index of the next element that is larger than item or, if there is no
+            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.</returns>
+            <exception cref="T:System.ArgumentException" />
+            <exception cref="T:System.ArgumentNullException" />
+            <exception cref="T:System.ArgumentOutOfRangeException" />
+            <exception cref="T:System.InvalidOperationException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindFirstOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the first element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the first element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the first occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the first element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the first occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based starting index of the search.</param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the first element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the first occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based starting index of the search.</param>
+            <param name="count">The number of elements in the section to search.</param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindLastOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the last element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the last element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the last occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the last element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the last occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based starting index of the search.</param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
+            <summary>
+            Searches for the last element that matches the conditions defined by the specified 
+            predicate, and returns the zero-based index of the last occurrence within the
+            entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based starting index of the search.</param>
+            <param name="count">The number of elements in the section to search.</param>
+            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
+            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.GetRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
+            <summary>
+            Creates a shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based <see cref="T:System.Collections.Generic.IList`1"/> index at which the range starts.</param>
+            <param name="count">The number of elements in the range.</param>
+            <returns>A shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.IList`1"/>.</returns>
+            <exception cref="T:System.ArgumentException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.IndexOf``1(System.Collections.Generic.IList{``0},``0)">
+            <summary>
+            Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>. The value can be null for reference types.</param>
+            <returns>The zero-based index of the first occurrence of item within the entire <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.InsertRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Inserts the elements of a collection into the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
+            </summary>
+            <param name="source"></param>
+            <param name="index">The zero-based index at which the new elements should be inserted.</param>
+            <param name="items">The collection whose elements should be inserted into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},``0)">
+            <summary>
+            Searches for the specified object and returns the zero-based index of the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+            <returns>The zero-based index of the last occurrence of item within the entire the <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@)">
+            <summary>
+            Moves the item at the given index one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+            <summary>
+            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@)">
+            <summary>
+            Moves the item one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+            <summary>
+            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.RemoveRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
+            <summary>
+            Removes a range of elements from the <see cref="T:System.Collections.Generic.IList`1"/>.
+            </summary>
+            <param name="source"></param>
+            <param name="startIndex">The zero-based starting index of the range of elements to remove.</param>
+            <param name="count">The number of elements to remove.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
         <member name="T:Narumikazuchi.Collections.BinaryNode`1">
             <summary>
             Represents a node of a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
@@ -80,6 +400,41 @@
             <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(`0[])">
+            <summary>
+            Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="array">The collection of items to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Immutable.ImmutableArray{`0}@)">
+            <summary>
+            Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="array">The collection of items to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Generic.List{`0})">
+            <summary>
+            Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="collection">The collection of items to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Generic.IReadOnlyList{`0})">
+            <summary>
+            Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="collection">The collection of items to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Generic.IList{`0})">
+            <summary>
+            Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
+            </summary>
+            <param name="collection">The collection of items to add.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
         <member name="M:Narumikazuchi.Collections.BinaryTree`1.AddRange(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
@@ -143,442 +498,222 @@
         <member name="M:Narumikazuchi.Collections.BinaryTree`1.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.Linq.CollectionExtensions">
+        <member name="T:Narumikazuchi.Collections.BinaryTree`1.Enumerator">
             <summary>
-            Extends the <see cref="T:System.Collections.Generic.ICollection`1"/> interface.
+            An enumerator that iterates through the <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.AddRange``1(System.Collections.Generic.ICollection{``0},System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Enumerator.#ctor">
             <summary>
-            Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            The default constructor for the <see cref="T:Narumikazuchi.Collections.BinaryTree`1.Enumerator"/> is not allowed.
             </summary>
-            <param name="source"></param>
-            <param name="other">The collection to add.</param>
-            <exception cref="T:System.ArgumentNullException"/>
+            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.AsReadOnly``1(System.Collections.Generic.ICollection{``0})">
-            <summary>
-            Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> wrapper for the current collection.
-            </summary>
-            <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`1.Enumerator.MoveNext">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.ConvertAll``2(System.Collections.Generic.ICollection{``0},System.Converter{``0,``1})">
-            <summary>
-            Converts the elements in the current <see cref="T:System.Collections.Generic.ICollection`1"/> to another type, and returns a list containing the converted elements.
-            </summary>
-            <param name="source"></param>
-            <param name="converter">A <see cref="T:System.Converter`2"/> delegate that converts each element from one type to another type.</param>
-            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> of the target type containing the converted elements from the current <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
+        <member name="P:Narumikazuchi.Collections.BinaryTree`1.Enumerator.Current">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.Exists``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
+        <member name="T:Narumikazuchi.Collections.CommonArrayEnumerator`1">
             <summary>
-            Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains elements that match the conditions defined by the specified predicate.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to search for.</param>
-            <returns><see langword="true"/> if the <see cref="T:System.Collections.Generic.ICollection`1"/> contains one or more elements that match the conditions defined by the specified predicate; otherwise, <see langword="false"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.FindAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Retrieves all the elements that match the conditions defined by the specified predicate.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to search for.</param>
-            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.ForEach``1(System.Collections.Generic.ICollection{``0},System.Action{``0})">
-            <summary>
-            Performs the specified action on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="action">The <see cref="T:System.Action`1"/> delegate to perform on each element of the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.RemoveAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Removes all the elements that match the conditions defined by the specified predicate.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the elements to remove.</param>
-            <returns>The number of elements removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.CollectionExtensions.TrueForAll``1(System.Collections.Generic.ICollection{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Determines whether every element in the <see cref="T:System.Collections.Generic.ICollection`1"/> matches the conditions defined by the specified predicate.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions to check against the elements.</param>
-            <returns>
-            <see langword="true"/> if every element in the <see cref="T:System.Collections.Generic.ICollection`1"/> matches the conditions
-            defined by the specified predicate; otherwise, <see langword="false"/>. If the collection has no elements,
-            the return value is <see langword="true"/>.
-            </returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="T:Narumikazuchi.Collections.Linq.EnumerableExtensions">
-            <summary>
-            Extends the <see cref="T:System.Collections.Generic.IEnumerable`1"/> interface.
+            An enumerator that iterates through an array of type <typeparamref name="TElement"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.ToBinaryTree``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor">
             <summary>
-            Creates a <see cref="T:Narumikazuchi.Collections.BinaryTree`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonArrayEnumerator`1"/> is not allowed.
+            </summary>
+            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
+        </member>
+        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor(`0[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonArrayEnumerator`1"/> struct.
+            </summary>
+            <param name="items">The array containing the items to iterate through.</param>
+        </member>
+        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.CommonArrayEnumerator`1.Current">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.CommonDictionaryEnumerator`2">
+            <summary>
+            An enumerator that iterates through the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.ToTrie``1(System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Narumikazuchi.Collections.CommonDictionaryEnumerator`2.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.CommonDictionaryEnumerator`2.Current">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.CommonListEnumerator`1">
             <summary>
-            Creates a <see cref="T:Narumikazuchi.Collections.Trie`1"/> from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            An enumerator that iterates through a <see cref="T:System.Collections.Generic.List`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.EnumerableExtensions.Median``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor">
             <summary>
-            Returns the item <typeparamref name="TElement"/> at the center of the collection.
+            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonListEnumerator`1"/> is not allowed.
             </summary>
-            <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
+            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
         </member>
-        <member name="T:Narumikazuchi.Collections.Linq.ListExtensions">
+        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
-            Extends the <see cref="T:System.Collections.Generic.IList`1"/> interface.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonListEnumerator`1"/> struct.
+            </summary>
+            <param name="items">The array containing the items to iterate through.</param>
+        </member>
+        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.CommonListEnumerator`1.Current">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.IStrongEnumerable`2">
+            <summary>
+            Allows for the implementing object to optimize the generated IL code by
+            providing a specific type instead of an interface for the <see cref="M:Narumikazuchi.Collections.IStrongEnumerable`2.GetEnumerator"/>
+            method. Using this interface will reduce the delegation cost of virtual IL calls
+            and therefore improve iteration times of <see langword="foreach"/>-loops.
+            </summary>
+            <remarks>
+            The idea for this interface and it's implementation is taken from the official source
+            code of the <see cref="N:System.Collections.Immutable"/> namespace.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.IStrongEnumerable`2.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the collection.
+            </summary>
+            <returns>An enumerator that can be used to iterate through the collection.</returns>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ObservableCollection`1">
+            <summary>
+            Represents a strongly typed collection of objects of type <typeparamref name="TElement"/>, which reports changes.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.AsReadOnly``1(System.Collections.Generic.IList{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.CopyTo(`0[])">
             <summary>
-            Returns a read-only <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> wrapper for the current list.
+            Copies the entire <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> to a compatible one-dimensional array, starting at the beginning of the target array.
             </summary>
-            <returns>An object that acts as a read-only wrapper around the current <see cref="T:System.Collections.Generic.IList`1"/>.</returns>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0)">
-            <summary>
-            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the default comparer and returns the zero-based index of the element.
-            </summary>
-            <param name="source"></param>
-            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
-            <returns>
-            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
-            if item is found; otherwise, a negative number that is the bitwise complement
-            of the index of the next element that is larger than item or, if there is no
-            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.
-            </returns>
-            <exception cref="T:System.ArgumentNullException" />
-            <exception cref="T:System.InvalidOperationException" />
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0,System.Collections.Generic.IComparer{``0})">
-            <summary>
-            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
-            </summary>
-            <param name="source"></param>
-            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
-            <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default"/>.</param>
-            <returns>
-            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
-            if item is found; otherwise, a negative number that is the bitwise complement
-            of the index of the next element that is larger than item or, if there is no
-            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.</returns>
+            <param name="destination">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/>.
+            The <see cref="T:System.Array"/> must have zero-based indexing.</param>
             <exception cref="T:System.ArgumentException" />
             <exception cref="T:System.ArgumentNullException" />
-            <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,``0,System.Collections.Generic.IComparer{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.CopyTo(`0[],System.Int32@)">
             <summary>
-            Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
+            Copies the entire <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> to a compatible one-dimensional array, starting at the specified index of the target array.
             </summary>
-            <param name="source"></param>
-            <param name="index">The zero-based starting index of the range to search.</param>
-            <param name="count">The length of the range to search.</param>
-            <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
-            <param name="comparer">The <see cref="T:System.Collections.Generic.IComparer`1"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="P:System.Collections.Generic.Comparer`1.Default"/>.</param>
-            <returns>
-            The zero-based index of item in the sorted <see cref="T:System.Collections.Generic.IList`1"/>,
-            if item is found; otherwise, a negative number that is the bitwise complement
-            of the index of the next element that is larger than item or, if there is no
-            larger element, the bitwise complement of <see cref="P:System.Collections.Generic.IReadOnlyCollection`1.Count"/>.</returns>
+            <param name="destination">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/>.
+            The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+            <param name="destinationIndex">The zero-based index in array at which copying begins.</param>
             <exception cref="T:System.ArgumentException" />
             <exception cref="T:System.ArgumentNullException" />
             <exception cref="T:System.ArgumentOutOfRangeException" />
-            <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.Create">
             <summary>
-            Searches for the first element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the first element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the first occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the first element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the first occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based starting index of the search.</param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindFirstIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the first element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the first occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based starting index of the search.</param>
-            <param name="count">The number of elements in the section to search.</param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastOrDefault``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the last element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the last element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the last occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the last element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the last occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based starting index of the search.</param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.FindLastIndex``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@,System.Func{``0,System.Boolean})">
-            <summary>
-            Searches for the last element that matches the conditions defined by the specified 
-            predicate, and returns the zero-based index of the last occurrence within the
-            entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based starting index of the search.</param>
-            <param name="count">The number of elements in the section to search.</param>
-            <param name="predicate">The <see cref="T:System.Func`2"/> delegate that defines the conditions of the element to search for.</param>
-            <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.GetRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
-            <summary>
-            Creates a shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based <see cref="T:System.Collections.Generic.IList`1"/> index at which the range starts.</param>
-            <param name="count">The number of elements in the range.</param>
-            <returns>A shallow copy of a range of elements in the source <see cref="T:System.Collections.Generic.IList`1"/>.</returns>
-            <exception cref="T:System.ArgumentException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.IndexOf``1(System.Collections.Generic.IList{``0},``0)">
-            <summary>
-            Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>. The value can be null for reference types.</param>
-            <returns>The zero-based index of the first occurrence of item within the entire <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.InsertRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Inserts the elements of a collection into the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
-            </summary>
-            <param name="source"></param>
-            <param name="index">The zero-based index at which the new elements should be inserted.</param>
-            <param name="items">The collection whose elements should be inserted into the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
-            <exception cref="T:System.ArgumentNullException"/>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},``0)">
-            <summary>
-            Searches for the specified object and returns the zero-based index of the last occurrence within the entire <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
-            <returns>The zero-based index of the last occurrence of item within the entire the <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
-            <exception cref="T:System.ArgumentNullException"/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@)">
-            <summary>
-            Moves the item at the given index one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},System.Int32@,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
             <summary>
-            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> class.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> class.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@)">
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
-            Moves the item one position in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableCollection`1"/> class.
             </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection@,System.Int32)">
-            <summary>
-            Moves the item at the given index the given amount of positions in the specified direction in the <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.Add(`0)">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Linq.ListExtensions.RemoveRange``1(System.Collections.Generic.IList{``0},System.Int32@,System.Int32@)">
-            <summary>
-            Removes a range of elements from the <see cref="T:System.Collections.Generic.IList`1"/>.
-            </summary>
-            <param name="source"></param>
-            <param name="startIndex">The zero-based starting index of the range of elements to remove.</param>
-            <param name="count">The number of elements to remove.</param>
-            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.Clear">
+            <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.ItemMoveDirection">
-            <summary>
-            Specifies in which direction an item inside a list can be moved.
-            </summary>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.Contains(`0)">
+            <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.INotifyCollectionChangedHelper">
-            <summary>
-            Implements a way for extensions methods to raise the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event.
-            </summary>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.CopyTo(`0[],System.Int32)">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.INotifyCollectionChangedHelper.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
-            <summary>
-            Raises the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event with the specified event args.
-            </summary>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.Remove(`0)">
+            <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.INotifyPropertyChangedHelper">
-            <summary>
-            Implements a way for extensions methods to raise the <see cref="E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event.
-            </summary>
+        <member name="P:Narumikazuchi.Collections.ObservableCollection`1.IsReadOnly">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.INotifyPropertyChangedHelper.OnPropertyChanged(System.String)">
-            <summary>
-            Raises the <see cref="E:System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/> event for the specified property.
-            </summary>
-            <param name="propertyName">The name of the property that changed.</param>
+        <member name="E:Narumikazuchi.Collections.ObservableCollection`1.CollectionChanged">
+            <inheritdoc/>
         </member>
-        <member name="T:Narumikazuchi.Collections.INotifyPropertyChangingHelper">
-            <summary>
-            Implements a way for extensions methods to raise the <see cref="E:System.ComponentModel.INotifyPropertyChanging.PropertyChanging"/> event.
-            </summary>
+        <member name="E:Narumikazuchi.Collections.ObservableCollection`1.PropertyChanging">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.INotifyPropertyChangingHelper.OnPropertyChanging(System.String)">
-            <summary>
-            Raises the <see cref="E:System.ComponentModel.INotifyPropertyChanging.PropertyChanging"/> event for the specified property.
-            </summary>
-            <param name="propertyName">The name of the property that is changing.</param>
+        <member name="E:Narumikazuchi.Collections.ObservableCollection`1.PropertyChanged">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableCollection`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ObservableCollection`1.Count">
+            <inheritdoc/>
         </member>
         <member name="T:Narumikazuchi.Collections.ObservableList`1">
             <summary>
-            Represents a strongly typed list of objects, which reports changes, can be accessed by index and searched. 
+            Represents a strongly typed list of objects of type <typeparamref name="TElement"/>, which reports changes and can be accessed by index. 
             </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
         </member>
         <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor">
             <summary>
-            Initializes a new empty instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
-            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class having the specified collection of items and the specified capacity.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
             </summary>
-            <param name="collection">The initial collection of items in this list.</param>
+            <param name="items">The items that the resulting collection shall hold.</param>
             <exception cref="T:System.ArgumentNullException" />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(`0[])">
-            <summary>
-            Copies the entire <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> to a compatible one-dimensional array, starting at the beginning of the target array.
-            </summary>
-            <param name="destination">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:Narumikazuchi.Collections.ObservableList`1"/>.
-            The <see cref="T:System.Array"/> must have zero-based indexing.</param>
-            <exception cref="T:System.ArgumentException" />
-            <exception cref="T:System.ArgumentNullException" />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(`0[],System.Int32@)">
-            <summary>
-            Copies the entire <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> to a compatible one-dimensional array, starting at the specified index of the target array.
-            </summary>
-            <param name="destination">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:Narumikazuchi.Collections.ObservableList`1"/>.
-            The <see cref="T:System.Array"/> must have zero-based indexing.</param>
-            <param name="destinationIndex">The zero-based index in array at which copying begins.</param>
-            <exception cref="T:System.ArgumentException" />
-            <exception cref="T:System.ArgumentNullException" />
-            <exception cref="T:System.ArgumentOutOfRangeException" />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(System.Int32@,`0[],System.Int32@,System.Int32@)">
-            <summary>
-            Copies the entire <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> to a compatible one-dimensional array, starting at the specified index of the target array.
-            </summary>
-            <param name="startIndex">The zero-based index in the source <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> at which copying begins.</param>
-            <param name="destination">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:Narumikazuchi.Collections.ObservableList`1"/>.
-            The <see cref="T:System.Array"/> must have zero-based indexing.</param>
-            <param name="destinationIndex">The zero-based index in array at which copying begins.</param>
-            <param name="count">The number of elements to copy.</param>
-            <exception cref="T:System.ArgumentException" />
-            <exception cref="T:System.ArgumentNullException" />
-            <exception cref="T:System.ArgumentOutOfRangeException" />
-        </member>
-        <member name="P:Narumikazuchi.Collections.ObservableList`1.IsSynchronized">
-            <inheritdoc />
-        </member>
-        <member name="P:Narumikazuchi.Collections.ObservableList`1.SyncRoot">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(System.Array,System.Int32)">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Add(`0)">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Clear">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Contains(`0)">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(`0[],System.Int32)">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Remove(`0)">
-            <inheritdoc />
-        </member>
-        <member name="P:Narumikazuchi.Collections.ObservableList`1.IsReadOnly">
-            <inheritdoc />
-        </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.GetEnumerator">
-            <inheritdoc />
         </member>
         <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf(`0)">
             <inheritdoc />
@@ -589,105 +724,488 @@
         <member name="M:Narumikazuchi.Collections.ObservableList`1.RemoveAt(System.Int32)">
             <inheritdoc />
         </member>
-        <member name="P:Narumikazuchi.Collections.ObservableList`1.Count">
-            <inheritdoc />
-        </member>
         <member name="P:Narumikazuchi.Collections.ObservableList`1.Item(System.Int32)">
             <inheritdoc />
         </member>
-        <member name="E:Narumikazuchi.Collections.ObservableList`1.CollectionChanged">
-            <inheritdoc />
-        </member>
-        <member name="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanging">
-            <inheritdoc />
-        </member>
-        <member name="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanged">
-            <inheritdoc />
-        </member>
-        <member name="T:Narumikazuchi.Collections.Trie`1">
+        <member name="T:Narumikazuchi.Collections.ReadOnlyCollection`1">
             <summary>
-            Represents a very fast but memory costly word lookup data structure. Includes the attaching of objects of type <typeparamref name="TContent"/> to any individual <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
+            Represents a strongly-typed collection of elements with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or any other derivative interface in your code then the 
+            efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyCollection`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyCollection`1"/> struct.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyCollection`1.Create">
             <summary>
-            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyCollection`1"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor(System.Collections.Generic.IEnumerable{System.Char})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
             <summary>
-            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyCollection`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyCollection`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ReadOnlyDictionary`2">
+            <summary>
+            Represents a strongly-typed collection of key-value pairs with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or any other derivative interface in your code then the 
+            efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> struct.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.CreateFrom(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.CreateFrom(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}},System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{System.Collections.Generic.KeyValuePair{`0,`1},``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{System.Collections.Generic.KeyValuePair{`0,`1},``0},System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`2.Keys">
+            <summary>
+            Gets a read-only list of keys present in the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`2.Values">
+            <summary>
+            Gets a read-only list of values present in the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`2.Count">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.ContainsKey(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.TryGetValue(`0,`1@)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`2.Item(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`2.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ReadOnlyList`1">
+            <summary>
+            Represents a strongly-typed collection of elements with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops. The elements of this collection
+            can be accessed by index.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or any other derivative interface in your code then the 
+            efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyList`1"/> struct.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyList`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyList`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyList`1.Item(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1">
+            <summary>
+            Represents a strongly-typed collection of elements with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> interface in your 
+            code then the efficiency of the enumerator will be lost due to call virtualization in the 
+            compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> struct.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedCollection`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedCollection`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedCollection`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2">
+            <summary>
+            Represents a strongly-typed collection of key-value pairs with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops. The key-value pairs are sorted by using
+            the provided <see cref="T:System.Collections.Generic.IComparer`1"/>.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or any other derivative interface in your code then the 
+            efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}},System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}},System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{System.Collections.Generic.KeyValuePair{`0,`1},``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{System.Collections.Generic.KeyValuePair{`0,`1},``0},System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{System.Collections.Generic.KeyValuePair{`0,`1},``0},System.Collections.Generic.IEqualityComparer{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.Keys">
+            <summary>
+            Gets a read-only list of keys present in the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.Values">
+            <summary>
+            Gets a read-only list of values present in the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.Count">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.ContainsKey(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.TryGetValue(`0,`1@)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.Item(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`2.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ReadOnlySortedList`1">
+            <summary>
+            Represents a strongly-typed collection of elements with a significantly faster enumerator to
+            improve iteration times for <see langword="foreach"/>-loops. The elements of this collection
+            can be accessed by index and are sorted upon instatiation using either the default comparer
+            or the provided one.
+            </summary>
+            <remarks>
+            The faster enumeration only works if the collection is used as-is or by using the
+            <see cref="T:Narumikazuchi.Collections.IStrongEnumerable`2"/> interface. If you you plan on using 
+            the <see cref="T:System.Collections.Generic.IEnumerable`1"/> or <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> interface in your 
+            code then the efficiency of the enumerator will be lost due to call virtualization in the 
+            compiler generated IL.
+            </remarks>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> struct.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> class.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.CreateFrom(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`1"/> struct.
+            </summary>
+            <param name="items">The items that the resulting collection shall hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException" />
+        </member>
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedList`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedList`1.Item(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.SortedCollection`1">
+            <summary>
+            Represents a strongly typed collection of sorted objects of type <typeparamref name="TElement"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Create">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
             </summary>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Exists(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Find(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.FindAll(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.FindExcept(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.FindLast(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String@,`0)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.IEnumerable{`0})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Clear">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Remove(System.String)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.RemoveAll(System.Func{System.String,System.Boolean})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Traverse">
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Create(System.Int32@)">
             <summary>
-            Traverses through the <see cref="T:Narumikazuchi.Collections.Trie`1"/> and returns the inserted words in alphabetic order.
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
             </summary>
-            <returns>An <see cref="T:System.Collections.IEnumerable"/> which iterates through all inserted words of this <see cref="T:Narumikazuchi.Collections.Trie`1"/></returns>
+            <param name="capacity">The initial capacity of the collection.</param>
+            <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="P:Narumikazuchi.Collections.Trie`1.RootNode">
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Create(System.Int32@,System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="capacity">The initial capacity of the collection.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="collection">The collection of items that this collection will initially hold.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.CreateFrom(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="collection">The collection of items that this collection will initially hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="collection">The collection of items that this collection will initially hold.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.CreateFrom``1(Narumikazuchi.Collections.IStrongEnumerable{`0,``0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="collection">The collection of items that this collection will initially hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.#ctor(System.Int32@,System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="capacity">The initial capacity of the collection.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedCollection`1"/> class.
+            </summary>
+            <param name="collection">The collection of items that this collection will initially hold.</param>
+            <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Add(`0)">
             <inheritdoc/>
         </member>
-        <member name="P:Narumikazuchi.Collections.Trie`1.ParentsKnowChildItems">
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Clear">
             <inheritdoc/>
         </member>
-        <member name="E:Narumikazuchi.Collections.Trie`1.CollectionChanged">
-            <inheritdoc />
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Contains(`0)">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
-            <summary>
-            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.CollectionChanged"/> event with the specified event args.
-            </summary>
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.CopyTo(`0[],System.Int32)">
+            <inheritdoc/>
         </member>
-        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanging">
-            <inheritdoc />
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.Remove(`0)">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanging(System.String)">
-            <summary>
-            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanging"/> event with the specified event args.
-            </summary>
+        <member name="P:Narumikazuchi.Collections.SortedCollection`1.IsReadOnly">
+            <inheritdoc/>
         </member>
-        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanged">
-            <inheritdoc />
+        <member name="P:Narumikazuchi.Collections.SortedCollection`1.Count">
+            <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanged(System.String)">
-            <summary>
-            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanged"/> event with the specified event args.
-            </summary>
-        </member>
-        <member name="P:Narumikazuchi.Collections.Trie`1.Count">
-            <inheritdoc />
+        <member name="M:Narumikazuchi.Collections.SortedCollection`1.GetEnumerator">
+            <inheritdoc/>
         </member>
         <member name="T:Narumikazuchi.Collections.TrieNode`1">
             <summary>
@@ -776,6 +1294,159 @@
             <summary>
             Gets the items associated with this <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.Trie`1">
+            <summary>
+            Represents a very fast but memory costly word lookup data structure. Includes the attaching of objects of type <typeparamref name="TContent"/> to any individual <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor">
+            <summary>
+            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor(System.Char[])">
+            <summary>
+            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor(System.Collections.Generic.List{System.Char})">
+            <summary>
+            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.#ctor(System.Collections.Generic.IEnumerable{System.Char})">
+            <summary>
+            Instantiates an empty <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Exists(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Find(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindAll(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindExcept(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.FindLast(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String@,`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,`0[])">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Immutable.ImmutableArray{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.List{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.IReadOnlyList{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.IList{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange(System.String@,System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Remove(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.RemoveAll(System.Func{System.String,System.Boolean})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Traverse">
+            <summary>
+            Traverses through the <see cref="T:Narumikazuchi.Collections.Trie`1"/> and returns the inserted words in alphabetic order.
+            </summary>
+            <returns>An <see cref="T:System.Collections.IEnumerable"/> which iterates through all inserted words of this <see cref="T:Narumikazuchi.Collections.Trie`1"/></returns>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.RootNode">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.ParentsKnowChildItems">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.CollectionChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.CollectionChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanging">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanging(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanging"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanged">
+            <inheritdoc />
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.OnPropertyChanged(System.String)">
+            <summary>
+            Raises the <see cref="E:Narumikazuchi.Collections.Trie`1.PropertyChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.Count">
+            <inheritdoc />
+        </member>
+        <member name="T:Narumikazuchi.Collections.Trie`1.Enumerator">
+            <summary>
+            An enumerator that iterates through the <see cref="T:Narumikazuchi.Collections.Trie`1"/>.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Trie`1.Enumerator.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Trie`1.Enumerator.Current">
+            <inheritdoc/>
+        </member>
+        <member name="T:Narumikazuchi.Collections.INotifyCollectionChangedHelper">
+            <summary>
+            Implements a way for extensions methods to raise the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.INotifyCollectionChangedHelper.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event with the specified event args.
+            </summary>
+        </member>
+        <member name="T:Narumikazuchi.Collections.ItemMoveDirection">
+            <summary>
+            Specifies in which direction an item inside a list can be moved.
+            </summary>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Linq.WhereIterator`2.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.Linq.WhereIterator`2.Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.Linq.WhereIterator`2.GetEnumerator">
+            <inheritdoc/>
         </member>
     </members>
 </doc>

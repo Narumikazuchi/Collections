@@ -9,5 +9,5 @@ public interface INotifyCollectionChangedHelper :
     /// <summary>
     /// Raises the <see cref="INotifyCollectionChanged.CollectionChanged"/> event with the specified event args.
     /// </summary>
-    internal protected void OnCollectionChanged([DisallowNull] NotifyCollectionChangedEventArgs eventArgs);
+    public void OnCollectionChanged([DisallowNull] NotifyCollectionChangedEventArgs eventArgs);
 }

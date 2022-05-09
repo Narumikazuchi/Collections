@@ -1,6 +1,4 @@
-﻿using Narumikazuchi.Collections.Linq;
-
-namespace Narumikazuchi.Collections;
+﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a fast binary lookup data structure.
@@ -123,6 +121,86 @@ public sealed partial class BinaryTree<TValue>
         return false;
     }
 
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="array">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] TValue[] array)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        for (Int32 i = 0;
+             i < array.Length;
+             i++)
+        {
+            this.Add(array[i]);
+        }
+    }
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="array">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] in ImmutableArray<TValue> array)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        for (Int32 i = 0;
+             i < array.Length;
+             i++)
+        {
+            this.Add(array[i]);
+        }
+    }
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] List<TValue> collection)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+
+        for (Int32 i = 0;
+             i < collection.Count;
+             i++)
+        {
+            this.Add(collection[i]);
+        }
+    }
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] IReadOnlyList<TValue> collection)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+
+        for (Int32 i = 0;
+             i < collection.Count;
+             i++)
+        {
+            this.Add(collection[i]);
+        }
+    }
+    /// <summary>
+    /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    /// <param name="collection">The collection of items to add.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public void AddRange([DisallowNull] IList<TValue> collection)
+    {
+        ArgumentNullException.ThrowIfNull(collection);
+
+        for (Int32 i = 0;
+             i < collection.Count;
+             i++)
+        {
+            this.Add(collection[i]);
+        }
+    }
     /// <summary>
     /// Adds the elements of the specified collection to the <see cref="BinaryTree{TValue}"/>.
     /// </summary>
@@ -312,13 +390,9 @@ public sealed partial class BinaryTree<TValue>
     /// </summary>
     /// <param name="method">The method to use when traversing.</param>
     [Pure]
-    public IEnumerable<BinaryNode<TValue>> Traverse(in BinaryTraversalMethod method) => method switch
-    {
-        BinaryTraversalMethod.PreOrder => this.TraversePreOrder(),
-        BinaryTraversalMethod.InOrder => this.TraverseInOrder(),
-        BinaryTraversalMethod.PostOrder => this.TraversePostOrder(),
-        _ => Array.Empty<BinaryNode<TValue>>(),
-    };
+    public Enumerator Traverse(in BinaryTraversalMethod method) =>
+        new(tree: this,
+            method: method);
 
     /// <summary>
     /// Gets the root for the <see cref="BinaryTree{TValue}"/>.
@@ -331,7 +405,11 @@ public sealed partial class BinaryTree<TValue>
     /// <summary>
     /// Gets or sets if an exception should be thrown when trying to add a duplicate.
     /// </summary>
-    public Boolean ThrowExceptionOnDuplicate { get; set; } = true;
+    public Boolean ThrowExceptionOnDuplicate
+    {
+        get;
+        set;
+    } = true;
 }
 
 // Non-Public
@@ -351,14 +429,7 @@ partial class BinaryTree<TValue>
         TValue median = distinct.Median()!;
         m_Root = new(value: median, 
                      parent: null);
-        foreach (TValue item in distinct)
-        {
-            if (item.CompareTo(median) == 0)
-            {
-                continue;
-            }
-            this.Add(item);
-        }
+        this.AddRange(distinct.Where(x => x.CompareTo(median) != 0));
     }
 
     private UInt32 GetDepth(BinaryNode<TValue> node)
@@ -382,7 +453,7 @@ partial class BinaryTree<TValue>
                         val2: this.GetDepth(node: node.RightChild!));
     }
 
-    private IEnumerable<BinaryNode<TValue>> TraversePreOrder()
+    private List<BinaryNode<TValue>> TraversePreOrder()
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraversePreOrder(nodes: nodes, 
@@ -390,7 +461,7 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraversePreOrder(IList<BinaryNode<TValue>> nodes, 
+    private void TraversePreOrder(List<BinaryNode<TValue>> nodes, 
                                   BinaryNode<TValue> current)
     {
         nodes.Add(current);
@@ -406,7 +477,7 @@ partial class BinaryTree<TValue>
         }
     }
 
-    private IEnumerable<BinaryNode<TValue>> TraverseInOrder()
+    private List<BinaryNode<TValue>> TraverseInOrder()
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraverseInOrder(nodes: nodes, 
@@ -414,7 +485,7 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraverseInOrder(IList<BinaryNode<TValue>> nodes, 
+    private void TraverseInOrder(List<BinaryNode<TValue>> nodes, 
                                  BinaryNode<TValue> current)
     {
         if (current.LeftChild is not null)
@@ -430,7 +501,7 @@ partial class BinaryTree<TValue>
         }
     }
 
-    private IEnumerable<BinaryNode<TValue>> TraversePostOrder()
+    private List<BinaryNode<TValue>> TraversePostOrder()
     {
         List<BinaryNode<TValue>> nodes = new();
         this.TraversePostOrder(nodes: nodes, 
@@ -438,7 +509,7 @@ partial class BinaryTree<TValue>
         return nodes;
     }
 
-    private void TraversePostOrder(IList<BinaryNode<TValue>> nodes, 
+    private void TraversePostOrder(List<BinaryNode<TValue>> nodes, 
                                    BinaryNode<TValue> current)
     {
         if (current.LeftChild is not null)
@@ -467,23 +538,64 @@ partial class BinaryTree<TValue>
     private const String CANNOT_REMOVE_ROOT = "The root of a tree cannot be removed.";
 }
 
-// IEnumerable
-partial class BinaryTree<TValue> : IEnumerable<TValue>
-{
-    IEnumerator IEnumerable.GetEnumerator() => 
-        this.GetEnumerator();
-}
-
-// IEnumerable<T>
-partial class BinaryTree<TValue> : IEnumerable<TValue>
+// IStrongEnumerable<T, U>
+partial class BinaryTree<TValue> : IStrongEnumerable<TValue, BinaryTree<TValue>.Enumerator>
 {
     /// <inheritdoc/>
-    public IEnumerator<TValue> GetEnumerator()
+    public Enumerator GetEnumerator() =>
+        new(tree: this,
+            method: BinaryTraversalMethod.InOrder);
+}
+
+// Enumerator
+partial class BinaryTree<TValue>
+{
+    /// <summary>
+    /// An enumerator that iterates through the <see cref="BinaryTree{TValue}"/>.
+    /// </summary>
+    public struct Enumerator :
+        IEnumerator<TValue>,
+        IEnumerator
     {
-        foreach (BinaryNode<TValue> node in this.TraverseInOrder())
+        /// <summary>
+        /// The default constructor for the <see cref="Enumerator"/> is not allowed.
+        /// </summary>
+        /// <exception cref="NotAllowed"></exception>
+        public Enumerator()
         {
-            yield return node.Value;
+            throw new NotAllowed();
         }
-        yield break;
+
+        internal Enumerator(BinaryTree<TValue> tree,
+                            in BinaryTraversalMethod method)
+        {
+            m_Elements = method switch
+            {
+                BinaryTraversalMethod.PreOrder => tree.TraversePreOrder(),
+                BinaryTraversalMethod.PostOrder => tree.TraversePostOrder(),
+                _ => tree.TraverseInOrder(),
+            };
+            m_Index = -1;
+        }
+
+        /// <inheritdoc/>
+        public Boolean MoveNext() => 
+            ++m_Index < m_Elements.Count;
+
+        void IDisposable.Dispose()
+        { }
+
+        void IEnumerator.Reset()
+        { }
+
+        /// <inheritdoc/>
+        public TValue Current =>
+            m_Elements[m_Index].Value;
+
+        Object IEnumerator.Current =>
+            m_Elements[m_Index].Value;
+
+        private readonly List<BinaryNode<TValue>> m_Elements;
+        private Int32 m_Index;
     }
 }

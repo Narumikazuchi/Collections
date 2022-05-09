@@ -266,16 +266,10 @@ partial class TrieNode<TContent>
     private readonly Trie<TContent> m_Trie;
 }
 
-// IEnumerable
-partial class TrieNode<TContent> : IEnumerable
+// IStrongEnumerable<T, U>
+partial class TrieNode<TContent> : IStrongEnumerable<TContent?, HashSet<TContent>.Enumerator>
 {
-    IEnumerator IEnumerable.GetEnumerator() =>
-        m_Items.GetEnumerator();
-}
-
-// IEnumerable<T>
-partial class TrieNode<TContent> : IEnumerable<TContent?>
-{
-    IEnumerator<TContent?> IEnumerable<TContent?>.GetEnumerator() =>
+    /// <inheritdoc/>
+    public HashSet<TContent>.Enumerator GetEnumerator() =>
         m_Items.GetEnumerator();
 }
