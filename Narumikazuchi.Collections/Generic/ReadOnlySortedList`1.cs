@@ -75,7 +75,7 @@ public readonly partial struct ReadOnlySortedList<TElement>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlySortedList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
-        where TEnumerator : IEnumerator<TElement> =>
+        where TEnumerator : struct, IStrongEnumerator<TElement> =>
             CreateFrom(items: items,
                        comparer: Comparer<TElement>.Default);
     /// <summary>
@@ -86,7 +86,7 @@ public readonly partial struct ReadOnlySortedList<TElement>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlySortedList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items,
                                                                        [DisallowNull] IComparer<TElement> comparer)
-        where TEnumerator : IEnumerator<TElement>
+        where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);

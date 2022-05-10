@@ -3,38 +3,38 @@
 /// <summary>
 /// An enumerator that iterates through a <see cref="List{T}"/>.
 /// </summary>
-public struct CommonListEnumerator<TElement> :
+public struct CommonHashSetEnumerator<TElement> :
     IStrongEnumerator<TElement>
 {
     /// <summary>
-    /// The default constructor for the <see cref="CommonListEnumerator{TElement}"/> is not allowed.
+    /// The default constructor for the <see cref="CommonHashSetEnumerator{TElement}"/> is not allowed.
     /// </summary>
     /// <exception cref="NotAllowed"></exception>
-    public CommonListEnumerator()
+    public CommonHashSetEnumerator()
     {
         throw new NotAllowed();
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CommonListEnumerator{TElement}"/> struct.
+    /// Initializes a new instance of the <see cref="CommonHashSetEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The array containing the items to iterate through.</param>
-    public CommonListEnumerator([DisallowNull] List<TElement> items)
+    public CommonHashSetEnumerator([DisallowNull] HashSet<TElement> items)
     {
         ArgumentNullException.ThrowIfNull(items);
 
         m_Elements = items;
-        m_Index = -1;
+        m_Enumerator = items.GetEnumerator();
     }
 
     /// <inheritdoc/>
     public Boolean MoveNext() =>
-        ++m_Index < m_Elements.Count;
+        m_Enumerator.MoveNext();
 
     /// <inheritdoc/>
     public TElement Current =>
-        m_Elements[m_Index];
+        m_Enumerator.Current;
 
-    internal readonly List<TElement> m_Elements;
-    private Int32 m_Index;
+    internal readonly HashSet<TElement> m_Elements;
+    internal readonly HashSet<TElement>.Enumerator m_Enumerator;
 }

@@ -4,9 +4,7 @@
 /// An enumerator that iterates through the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/>.
 /// </summary>
 public struct CommonDictionaryEnumerator<TKey, TValue> :
-    IDisposable,
-    IEnumerator<KeyValuePair<TKey, TValue>>,
-    IEnumerator
+    IStrongEnumerator<KeyValuePair<TKey, TValue>>
         where TKey : notnull
 {
     public CommonDictionaryEnumerator([DisallowNull] Dictionary<TKey, TValue> elements)
@@ -47,20 +45,10 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
     public Boolean MoveNext() =>
         ++m_Index < m_Elements.Length;
 
-    void IDisposable.Dispose()
-    { }
-
-    void IEnumerator.Reset()
-    { }
-
     /// <inheritdoc/>
     public KeyValuePair<TKey, TValue> Current =>
         new(key: m_Elements[m_Index].Key,
             value: m_Elements[m_Index].Value);
-
-    Object? IEnumerator.Current =>
-        new KeyValuePair<TKey, TValue>(key: m_Elements[m_Index].Key,
-                                       value: m_Elements[m_Index].Value);
 
     private readonly __DictionaryEntry<TKey, TValue>[] m_Elements;
     private Int32 m_Index;

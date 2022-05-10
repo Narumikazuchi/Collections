@@ -55,7 +55,7 @@ public partial class SortedCollection<TElement>
     /// <param name="collection">The collection of items that this collection will initially hold.</param>
     /// <exception cref="ArgumentNullException"/>
     public static SortedCollection<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> collection)
-        where TEnumerator : IEnumerator<TElement> =>
+        where TEnumerator : struct, IStrongEnumerator<TElement> =>
             CreateFrom(collection: collection,
                        comparer: Comparer<TElement>.Default);
     /// <summary>
@@ -66,7 +66,7 @@ public partial class SortedCollection<TElement>
     /// <exception cref="ArgumentNullException"/>
     public static SortedCollection<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> collection,
                                                                      [DisallowNull] IComparer<TElement> comparer)
-        where TEnumerator : IEnumerator<TElement>
+        where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(collection);
         ArgumentNullException.ThrowIfNull(comparer);
@@ -224,9 +224,9 @@ partial class SortedCollection<TElement> : IReadOnlyCollection<TElement>
 }
 
 // IStrongEnumerable<T, U>
-partial class SortedCollection<TElement> : IStrongEnumerable<TElement, List<TElement>.Enumerator>
+partial class SortedCollection<TElement> : IStrongEnumerable<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public List<TElement>.Enumerator GetEnumerator() =>
-        m_Elements.GetEnumerator();
+    public CommonListEnumerator<TElement> GetEnumerator() =>
+        new(m_Elements);
 }

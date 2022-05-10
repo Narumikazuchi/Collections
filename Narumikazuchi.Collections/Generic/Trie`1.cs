@@ -734,12 +734,11 @@ partial class Trie<TContent>
 }
 
 // IStrongEnumerable<T, U>
-partial class Trie<TContent> : IStrongEnumerable<String, List<String>.Enumerator>
+partial class Trie<TContent> : IStrongEnumerable<String, CommonListEnumerator<String>>
 {
     /// <inheritdoc/>
-    public List<String>.Enumerator GetEnumerator() =>
-        this.TraverseInternal(m_Root)
-            .GetEnumerator();
+    public CommonListEnumerator<String> GetEnumerator() =>
+        new(this.TraverseInternal(m_Root));
 }
 
 // INotifyCollectionChanged

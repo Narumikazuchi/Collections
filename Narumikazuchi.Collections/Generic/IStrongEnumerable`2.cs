@@ -13,7 +13,7 @@
 public interface IStrongEnumerable<out TElement, TEnumerator> :
     IEnumerable<TElement>,
     IEnumerable
-        where TEnumerator : IEnumerator<TElement>
+        where TEnumerator : struct, IStrongEnumerator<TElement>
 {
     /// <summary>
     /// Returns an enumerator that iterates through the collection.

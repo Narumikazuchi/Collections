@@ -4,9 +4,7 @@
 /// An enumerator that iterates through an array of type <typeparamref name="TElement"/>.
 /// </summary>
 public struct CommonArrayEnumerator<TElement> :
-    IDisposable,
-    IEnumerator<TElement>,
-    IEnumerator
+    IStrongEnumerator<TElement>
 {
     /// <summary>
     /// The default constructor for the <see cref="CommonArrayEnumerator{TElement}"/> is not allowed.
@@ -33,17 +31,8 @@ public struct CommonArrayEnumerator<TElement> :
     public Boolean MoveNext() =>
         ++m_Index < m_Elements.Length;
 
-    void IDisposable.Dispose()
-    { }
-
-    void IEnumerator.Reset()
-    { }
-
     /// <inheritdoc/>
     public TElement Current =>
-        m_Elements[m_Index];
-
-    Object? IEnumerator.Current =>
         m_Elements[m_Index];
 
     internal readonly TElement[] m_Elements;

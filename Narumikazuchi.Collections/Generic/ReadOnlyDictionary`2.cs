@@ -117,7 +117,7 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlyDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items)
-        where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> =>
+        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>> =>
             CreateFrom(items: items,
                        equalityComparer: EqualityComparer<TKey>.Default);
     /// <summary>
@@ -128,7 +128,7 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlyDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items,
                                                                            [DisallowNull] IEqualityComparer<TKey> equalityComparer)
-        where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);

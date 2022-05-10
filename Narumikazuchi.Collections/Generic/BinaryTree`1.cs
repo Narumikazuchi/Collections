@@ -1,4 +1,6 @@
-﻿namespace Narumikazuchi.Collections;
+﻿using Narumikazuchi.Collections.Extensions;
+
+namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a fast binary lookup data structure.
@@ -554,8 +556,7 @@ partial class BinaryTree<TValue>
     /// An enumerator that iterates through the <see cref="BinaryTree{TValue}"/>.
     /// </summary>
     public struct Enumerator :
-        IEnumerator<TValue>,
-        IEnumerator
+        IStrongEnumerator<TValue>
     {
         /// <summary>
         /// The default constructor for the <see cref="Enumerator"/> is not allowed.
@@ -582,17 +583,8 @@ partial class BinaryTree<TValue>
         public Boolean MoveNext() => 
             ++m_Index < m_Elements.Count;
 
-        void IDisposable.Dispose()
-        { }
-
-        void IEnumerator.Reset()
-        { }
-
         /// <inheritdoc/>
         public TValue Current =>
-            m_Elements[m_Index].Value;
-
-        Object IEnumerator.Current =>
             m_Elements[m_Index].Value;
 
         private readonly List<BinaryNode<TValue>> m_Elements;

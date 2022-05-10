@@ -267,9 +267,9 @@ partial class TrieNode<TContent>
 }
 
 // IStrongEnumerable<T, U>
-partial class TrieNode<TContent> : IStrongEnumerable<TContent?, HashSet<TContent>.Enumerator>
+partial class TrieNode<TContent> : IStrongEnumerable<TContent?, CommonHashSetEnumerator<TContent>>
 {
     /// <inheritdoc/>
-    public HashSet<TContent>.Enumerator GetEnumerator() =>
-        m_Items.GetEnumerator();
+    public CommonHashSetEnumerator<TContent> GetEnumerator() =>
+        new(m_Items);
 }

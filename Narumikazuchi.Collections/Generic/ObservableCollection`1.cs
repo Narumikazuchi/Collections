@@ -57,7 +57,7 @@ public partial class ObservableCollection<TElement>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
     public static ObservableCollection<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
-        where TEnumerator : IEnumerator<TElement>
+        where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         ObservableCollection<TElement> result = new();
@@ -225,11 +225,11 @@ partial class ObservableCollection<TElement> : INotifyPropertyChangedHelper
 }
 
 // IStrongEnumerable<T, U>
-partial class ObservableCollection<TElement> : IStrongEnumerable<TElement, List<TElement>.Enumerator>
+partial class ObservableCollection<TElement> : IStrongEnumerable<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public List<TElement>.Enumerator GetEnumerator() =>
-        m_Items.GetEnumerator();
+    public CommonListEnumerator<TElement> GetEnumerator() =>
+        new(m_Items);
 }
 
 // IReadOnlyCollection<T>

@@ -26,7 +26,7 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
     public static new ObservableList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
-        where TEnumerator : IEnumerator<TElement>
+        where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         ObservableList<TElement> result = new();

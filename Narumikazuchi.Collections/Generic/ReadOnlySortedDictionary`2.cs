@@ -97,7 +97,7 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items)
-        where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> =>
+        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>> =>
             CreateFrom(items: items,
                        equalityComparer: EqualityComparer<TKey>.Default,
                        comparer: Comparer<TKey>.Default);
@@ -109,7 +109,7 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
     /// <exception cref="ArgumentNullException" />
     public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items,
                                                                                  [DisallowNull] IEqualityComparer<TKey> equalityComparer)
-        where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>> =>
+        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>> =>
             CreateFrom(items: items,
                        equalityComparer: equalityComparer,
                        comparer: Comparer<TKey>.Default);
@@ -123,7 +123,7 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
     public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items,
                                                                                  [DisallowNull] IEqualityComparer<TKey> equalityComparer,
                                                                                  [DisallowNull] IComparer<TKey> comparer)
-        where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
+        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
