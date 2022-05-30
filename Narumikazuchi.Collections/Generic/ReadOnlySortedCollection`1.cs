@@ -48,16 +48,16 @@ public readonly partial struct ReadOnlySortedCollection<TElement>
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
 
-        if (items is IReadOnlyCollection<TElement> roc)
+        if (items is IReadOnlyCollection<TElement> iReadOnlyCollection)
         {
-            return new(items: roc.OrderBy(x => x, comparer),
-                       count: roc.Count,
+            return new(items: iReadOnlyCollection.OrderBy(x => x, comparer),
+                       count: iReadOnlyCollection.Count,
                        comparer: comparer);
         }
-        else if (items is ICollection<TElement> c)
+        else if (items is ICollection<TElement> iCollection)
         {
-            return new(items: c.OrderBy(x => x, comparer),
-                       count: c.Count,
+            return new(items: iCollection.OrderBy(x => x, comparer),
+                       count: iCollection.Count,
                        comparer: comparer);
         }
         else
@@ -89,40 +89,43 @@ public readonly partial struct ReadOnlySortedCollection<TElement>
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
 
-        if (items is ReadOnlySortedCollection<TElement> readOnlySortedCollection)
+        if (items is ISortedCollection<TElement, TEnumerator> iSortedCollection)
         {
-            if (readOnlySortedCollection.m_Comparer == comparer)
+            if (iSortedCollection.Comparer == comparer)
             {
-                TElement[] elements = new TElement[readOnlySortedCollection.Count];
-                Array.Copy(sourceArray: readOnlySortedCollection.m_Items,
-                           destinationArray: elements,
-                           length: elements.Length);
-                return new(items: elements,
-                           comparer: readOnlySortedCollection.m_Comparer);
-            }
-            else
-            {
-                return new(items: items.OrderBy(x => x, comparer),
-                           count: items.Count(),
-                           comparer: comparer);
+                if (iSortedCollection is __IReadOnlyCollection<TElement> iReadOnlyCollectionT &&
+                    iReadOnlyCollectionT.TryGetReadOnlyArray(out TElement[]? array))
+                {
+                    return new(items: array,
+                               comparer: comparer);
+                }
+                else
+                {
+                    TElement[] elements = new TElement[iSortedCollection.Count];
+                    iSortedCollection.CopyTo(elements, 0);
+                    return new(items: elements.OrderBy(x => x, comparer)
+                                              .ToArray(),
+                               comparer: comparer);
+                }
             }
         }
-        else if (items is IReadOnlyCollection<TElement> roc)
+        if (items is IReadOnlyCollection<TElement, TEnumerator> iReadOnlyCollection)
         {
-            return new(items: roc.OrderBy(x => x, comparer),
-                       count: roc.Count,
-                       comparer: comparer);
-        }
-        else if (items is ICollection<TElement> c)
-        {
-            return new(items: c.OrderBy(x => x, comparer),
-                       count: c.Count,
+            TElement[] elements = new TElement[iReadOnlyCollection.Count];
+            iReadOnlyCollection.CopyTo(elements, 0);
+            return new(items: elements.OrderBy(x => x, comparer)
+                                      .ToArray(),
                        comparer: comparer);
         }
         else
         {
-            return new(items: items.OrderBy(x => x, comparer),
-                       count: items.Count(),
+            List<TElement> result = new();
+            foreach (TElement element in items)
+            {
+                result.Add(element);
+            }
+            result.Sort(comparer);
+            return new(items: result.ToArray(),
                        comparer: comparer);
         }
     }
@@ -166,6 +169,68 @@ partial struct ReadOnlySortedCollection<TElement>
     internal readonly IComparer<TElement> m_Comparer;
 }
 
+// IReadOnlyCollection<T>
+partial struct ReadOnlySortedCollection<TElement> : ICollectionWithCount<TElement, CommonArrayEnumerator<TElement>>
+{
+    /// <inheritdoc/>
+    public Int32 Count =>
+        m_Items.Length;
+}
+
+// IEnumerable
+partial struct ReadOnlySortedCollection<TElement> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial struct ReadOnlySortedCollection<TElement> : IEnumerable<TElement>
+{
+    IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IReadOnlyCollection<T>
+partial struct ReadOnlySortedCollection<TElement> : IReadOnlyCollection<TElement, CommonArrayEnumerator<TElement>>
+{
+    /// <inheritdoc/>
+    public Boolean Contains(TElement element) =>
+        Array.IndexOf(array: m_Items,
+                      value: element) > -1;
+
+    /// <inheritdoc/>
+    public void CopyTo([DisallowNull] TElement[] array)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+
+        Array.Copy(sourceArray: m_Items,
+                   destinationArray: array,
+                   length: m_Items.Length);
+    }
+    /// <inheritdoc/>
+    public void CopyTo([DisallowNull] TElement[] array,
+                       Int32 destinationIndex)
+    {
+        ArgumentNullException.ThrowIfNull(array);
+        destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
+
+        Array.Copy(sourceArray: m_Items,
+                   sourceIndex: 0,
+                   destinationArray: array,
+                   destinationIndex: destinationIndex,
+                   length: m_Items.Length);
+    }
+}
+
+// ISortedCollection<T, U>
+partial struct ReadOnlySortedCollection<TElement> : ISortedCollection<TElement, CommonArrayEnumerator<TElement>>
+{
+    /// <inheritdoc/>
+    public IComparer<TElement> Comparer =>
+        m_Comparer;
+}
+
 // IStrongEnumerable<T, U>
 partial struct ReadOnlySortedCollection<TElement> : IStrongEnumerable<TElement, CommonArrayEnumerator<TElement>>
 {
@@ -174,10 +239,18 @@ partial struct ReadOnlySortedCollection<TElement> : IStrongEnumerable<TElement, 
         new(m_Items);
 }
 
-// IReadOnlyCollection<T>
-partial struct ReadOnlySortedCollection<TElement> : IReadOnlyCollection<TElement>
+// __IReadOnlyCollection<T>
+partial struct ReadOnlySortedCollection<TElement> : __IReadOnlyCollection<TElement>
 {
-    /// <inheritdoc/>
-    public Int32 Count =>
-        m_Items.Length;
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
+    {
+        array = m_Items;
+        return true;
+    }
+
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyList([NotNullWhen(true)] out List<TElement>? list)
+    {
+        list = default;
+        return false;
+    }
 }

@@ -7,22 +7,24 @@
 /// Using this interface will reduce the delegation cost of virtual IL calls
 /// and therefore improve iteration times of <see langword="foreach"/>-loops.
 /// This interface also removes the requirement of the implementation of the
-/// <see cref="IDisposable.Dispose"/> method.
+/// <see cref="IDisposable.Dispose"/> method, making the resulting type 
+/// even more memory efficient.
 /// </summary>
 /// <remarks>
 /// The idea for this interface and it's implementation is taken from the official source
 /// code of the <see cref="System.Collections.Immutable"/> namespace.
 /// </remarks>
-public interface IStrongEnumerator<out TElement> :
-    IEnumerator<TElement>,
-    IEnumerator
+public interface IStrongEnumerator<out TElement>
 {
-    void IEnumerator.Reset()
-    { }
+    /// <summary>
+    /// Advances the enumerator to the next element in the collection.
+    /// </summary>
+    /// <returns><see langword="true"/> if the enumerator has advanced to the next element; otherwise, <see langword="false"/></returns>
+    /// <exception cref="InvalidOperationException"/>
+    public Boolean MoveNext();
 
-    void IDisposable.Dispose()
-    { }
-
-    Object? IEnumerator.Current =>
-        this.Current;
+    /// <summary>
+    /// Gets the element in the collection that is at the current position of the enumerator.
+    /// </summary>
+    public TElement Current { get; }
 }

@@ -1,4 +1,4 @@
-﻿namespace Narumikazuchi.Collections.Linq;
+﻿namespace Narumikazuchi.Collections.Extensions;
 
 /// <summary>
 /// Extends the <see cref="ICollection{T}"/> interface.
@@ -37,40 +37,25 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// Returns a read-only <see cref="IReadOnlyCollection{T}"/> wrapper for the current collection.
-    /// </summary>
-    /// <returns>An object that acts as a read-only wrapper around the current <see cref="ICollection{T}"/>.</returns>
-    public static IReadOnlyCollection<TElement> AsReadOnly<TElement>(this ICollection<TElement> source)
-        where TElement : notnull
-    {
-        if (source is List<TElement> list)
-        {
-            return list.AsReadOnly();
-        }
-
-        return new List<TElement>(source.Where(x => x is not null)).AsReadOnly();
-    }
-
-    /// <summary>
     /// Converts the elements in the current <see cref="ICollection{T}"/> to another type, and returns a list containing the converted elements.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="converter">A <see cref="Converter{TInput, TOutput}"/> delegate that converts each element from one type to another type.</param>
     /// <returns>A <see cref="IReadOnlyCollection{T}"/> of the target type containing the converted elements from the current <see cref="ICollection{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static IReadOnlyCollection<TOther> ConvertAll<TElement, TOther>(this ICollection<TElement> source,
-                                                                           [DisallowNull] Converter<TElement, TOther> converter)
-        where TElement : notnull
+    public static ReadOnlyCollection<TOther> ConvertAll<TElement, TOther>(this ICollection<TElement> source,
+                                                                          [DisallowNull] Converter<TElement, TOther> converter)
     {
         ArgumentNullException.ThrowIfNull(converter);
 
-        List<TOther> list = new();
-        foreach (TElement element in source.Where(x => x is not null))
+        TOther[] result = new TOther[source.Count];
+        Int32 index = 0;
+        foreach (TElement element in source)
         {
-            list.Add(converter.Invoke(element));
+            result[index++] = converter.Invoke(element);
         }
 
-        return list.AsReadOnly();
+        return ReadOnlyCollection<TOther>.CreateFrom(result);
     }
 
     /// <summary>
@@ -82,11 +67,10 @@ public static class CollectionExtensions
     /// <exception cref="ArgumentNullException"/>
     public static Boolean Exists<TElement>(this ICollection<TElement> source,
                                            [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        foreach (TElement element in source.Where(x => x is not null))
+        foreach (TElement element in source)
         {
             if (predicate.Invoke(element))
             {
@@ -103,14 +87,13 @@ public static class CollectionExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the elements to search for.</param>
     /// <returns>A <see cref="IReadOnlyCollection{T}"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="IReadOnlyCollection{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static IReadOnlyCollection<TElement> FindAll<TElement>(this ICollection<TElement> source,
-                                                                  [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
+    public static ReadOnlyCollection<TElement> FindAll<TElement>(this ICollection<TElement> source,
+                                                                 [DisallowNull] Func<TElement, Boolean> predicate)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
         List<TElement> list = new();
-        foreach (TElement element in source.Where(x => x is not null))
+        foreach (TElement element in source)
         {
             if (predicate.Invoke(element))
             {
@@ -118,7 +101,7 @@ public static class CollectionExtensions
             }
         }
 
-        return list.AsReadOnly();
+        return ReadOnlyCollection<TElement>.CreateFrom(list);
     }
 
     /// <summary>
@@ -129,11 +112,10 @@ public static class CollectionExtensions
     /// <exception cref="ArgumentNullException"/>
     public static void ForEach<TElement>(this ICollection<TElement> source,
                                          [DisallowNull] Action<TElement> action)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        foreach (TElement element in source.Where(x => x is not null))
+        foreach (TElement element in source)
         {
             action.Invoke(element);
         }
@@ -148,12 +130,11 @@ public static class CollectionExtensions
     /// <exception cref="ArgumentNullException"/>
     public static Int32 RemoveAll<TElement>(this ICollection<TElement> source,
                                             [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
         List<TElement> remove = new();
-        foreach (TElement element in source.Where(x => x is not null))
+        foreach (TElement element in source)
         {
             if (predicate.Invoke(element))
             {
@@ -195,11 +176,10 @@ public static class CollectionExtensions
     /// <exception cref="ArgumentNullException"/>
     public static Boolean TrueForAll<TElement>(this ICollection<TElement> source,
                                                [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
-        foreach (TElement element in source.Where(x => x is not null))
+        foreach (TElement element in source)
         {
             if (!predicate.Invoke(element))
             {

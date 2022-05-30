@@ -10,7 +10,6 @@
 /// the <see cref="IEnumerable{T}"/> or any other derivative interface in your code then the 
 /// efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
 /// </remarks>
-#pragma warning disable CS0282
 public readonly partial struct ReadOnlyDictionary<TKey, TValue>
     where TKey : notnull
 {
@@ -53,14 +52,14 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue>
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
 
-        if (items is KeyValuePair<TKey, TValue>[] a)
+        if (items is KeyValuePair<TKey, TValue>[] array)
         {
-            return new(items: a,
+            return new(items: array,
                        equalityComparer: equalityComparer);
         }
-        else if (items is ImmutableArray<KeyValuePair<TKey, TValue>> ia)
+        else if (items is ImmutableArray<KeyValuePair<TKey, TValue>> immutableArray)
         {
-            return new(items: ia,
+            return new(items: immutableArray,
                        equalityComparer: equalityComparer);
         }
         else if (items is List<KeyValuePair<TKey, TValue>> list)
@@ -73,34 +72,20 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue>
             return new(items: dictionary,
                        equalityComparer: equalityComparer);
         }
-        else if (items is IReadOnlyDictionary<TKey, TValue> rod)
+        else if (items is ICollection<KeyValuePair<TKey, TValue>> iCollection)
         {
-            return new(items: rod,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is IDictionary<TKey, TValue> d)
-        {
-            return new(items: d,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is IReadOnlyList<KeyValuePair<TKey, TValue>> rol)
-        {
-            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[rol.Count];
-            Int32 index = 0;
-            while (index < rol.Count)
-            {
-                elements[index] = rol[index++];
-            }
+            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iCollection.Count];
+            iCollection.CopyTo(elements, 0);
             return new(items: elements,
                        equalityComparer: equalityComparer);
         }
-        else if (items is IList<KeyValuePair<TKey, TValue>> l)
+        else if (items is IReadOnlyList<KeyValuePair<TKey, TValue>> iReadOnlyList)
         {
-            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[l.Count];
+            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iReadOnlyList.Count];
             Int32 index = 0;
-            while (index < l.Count)
+            while (index < iReadOnlyList.Count)
             {
-                elements[index] = l[index++];
+                elements[index] = iReadOnlyList[index++];
             }
             return new(items: elements,
                        equalityComparer: equalityComparer);
@@ -135,86 +120,41 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue>
 
         if (items is ReadOnlyDictionary<TKey, TValue> readOnlyDictionary)
         {
-            return new(buckets: readOnlyDictionary.m_Buckets,
-                       entries: readOnlyDictionary.m_Entries,
-                       equalityComparer: readOnlyDictionary.m_EqualityComparer,
-                       keys: readOnlyDictionary.Keys,
-                       values: readOnlyDictionary.Values);
+            return ReadOnlyDictionary<TKey, TValue>.Clone(readOnlyDictionary);
         }
         else if (items is ReadOnlySortedDictionary<TKey, TValue> readOnlySortedDictionary)
         {
-            return new(buckets: readOnlySortedDictionary.m_Buckets,
-                       entries: readOnlySortedDictionary.m_Entries,
-                       equalityComparer: readOnlySortedDictionary.m_EqualityComparer,
-                       keys: readOnlySortedDictionary.Keys,
-                       values: readOnlySortedDictionary.Values);
+            return ReadOnlyDictionary<TKey, TValue>.Clone(readOnlySortedDictionary);
         }
-        else if (items is ReadOnlyCollection<KeyValuePair<TKey, TValue>> readOnlyCollection)
+        else if (items is IReadOnlyLookup<TKey, TValue, TEnumerator> iReadOnlyLookup)
         {
-            return new(items: readOnlyCollection.m_Items,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is ReadOnlySortedCollection<KeyValuePair<TKey, TValue>> readOnlySortedCollection)
-        {
-            return new(items: readOnlySortedCollection.m_Items,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is ReadOnlyList<KeyValuePair<TKey, TValue>> readOnlyList)
-        {
-            return new(items: readOnlyList.m_Items,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is ReadOnlySortedList<KeyValuePair<TKey, TValue>> readOnlySortedList)
-        {
-            return new(items: readOnlySortedList.m_Items,
-                       equalityComparer: equalityComparer);
-        }
-        else if (items is IReadOnlyCollection<KeyValuePair<TKey, TValue>> roc)
-        {
-            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[roc.Count];
-            TEnumerator enumerator = items.GetEnumerator();
+            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iReadOnlyLookup.Count];
             Int32 index = 0;
-            while (enumerator.MoveNext())
+            foreach (KeyValuePair<TKey, TValue> kv in iReadOnlyLookup)
             {
-                elements[index++] = enumerator.Current;
+                elements[index++] = kv;
             }
             return new(items: elements,
                        equalityComparer: equalityComparer);
         }
-        else if (items is ICollection<KeyValuePair<TKey, TValue>> c)
+        else if (items is IReadOnlyCollection<KeyValuePair<TKey, TValue>, TEnumerator> iReadOnlyCollection)
         {
-            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[c.Count];
-            TEnumerator enumerator = items.GetEnumerator();
-            Int32 index = 0;
-            while (enumerator.MoveNext())
-            {
-                elements[index++] = enumerator.Current;
-            }
+            KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iReadOnlyCollection.Count];
+            iReadOnlyCollection.CopyTo(elements);
             return new(items: elements,
                        equalityComparer: equalityComparer);
         }
         else
         {
             List<KeyValuePair<TKey, TValue>> list = new();
-            TEnumerator enumerator = items.GetEnumerator();
-            while (enumerator.MoveNext())
+            foreach (KeyValuePair<TKey, TValue> kv in items)
             {
-                list.Add(enumerator.Current);
+                list.Add(kv);
             }
             return new(items: list.ToArray(),
                        equalityComparer: equalityComparer);
         }
     }
-    
-    /// <summary>
-    /// Gets a read-only list of keys present in the <see cref="ReadOnlyDictionary{TKey, TValue}"/>.
-    /// </summary>
-    public ReadOnlyList<TKey> Keys { get; }
-
-    /// <summary>
-    /// Gets a read-only list of values present in the <see cref="ReadOnlyDictionary{TKey, TValue}"/>.
-    /// </summary>
-    public ReadOnlyList<TValue> Values { get; }
 }
 
 // Non-Public
@@ -223,8 +163,8 @@ partial struct ReadOnlyDictionary<TKey, TValue>
     internal ReadOnlyDictionary(Int32[] buckets,
                                 __DictionaryEntry<TKey, TValue>[] entries,
                                 IEqualityComparer<TKey> equalityComparer,
-                                in ReadOnlyList<TKey> keys,
-                                in ReadOnlyList<TValue> values)
+                                ReadOnlyCollection<TKey> keys,
+                                ReadOnlyCollection<TValue> values)
     {
         m_Buckets = buckets;
         m_Entries = entries;
@@ -289,8 +229,8 @@ partial struct ReadOnlyDictionary<TKey, TValue>
         }
 
         this.Count = index;
-        this.Keys = ReadOnlyList<TKey>.CreateFrom(keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom(values);
+        this.Keys = ReadOnlyCollection<TKey>.CreateFrom(keys);
+        this.Values = ReadOnlyCollection<TValue>.CreateFrom(values);
     }
     internal ReadOnlyDictionary(ImmutableArray<KeyValuePair<TKey, TValue>> items,
                                 IEqualityComparer<TKey> equalityComparer)
@@ -348,8 +288,8 @@ partial struct ReadOnlyDictionary<TKey, TValue>
         }
 
         this.Count = index;
-        this.Keys = ReadOnlyList<TKey>.CreateFrom(keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom(values);
+        this.Keys = ReadOnlyCollection<TKey>.CreateFrom(keys);
+        this.Values = ReadOnlyCollection<TValue>.CreateFrom(values);
     }
     internal ReadOnlyDictionary(Dictionary<TKey, TValue> items,
                                 IEqualityComparer<TKey> equalityComparer)
@@ -383,78 +323,8 @@ partial struct ReadOnlyDictionary<TKey, TValue>
         }
 
         this.Count = index;
-        this.Keys = ReadOnlyList<TKey>.CreateFrom(items.Keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom(items.Values);
-    }
-    internal ReadOnlyDictionary(IDictionary<TKey, TValue> items,
-                                IEqualityComparer<TKey> equalityComparer)
-    {
-        // Initialize
-        Int32 size = Primes.GetNext(items.Count);
-        m_Buckets = new Int32[size];
-        Int32 index;
-        for (index = 0;
-             index < size;
-             index++)
-        {
-            m_Buckets[index] = -1;
-        }
-        m_Entries = new __DictionaryEntry<TKey, TValue>[size];
-        m_EqualityComparer = equalityComparer;
-
-        // Adding
-        index = 0;
-        foreach (KeyValuePair<TKey, TValue> item in items)
-        {
-            Int32 hashcode = m_EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
-            Int32 bucket = hashcode % m_Buckets.Length;
-
-            m_Entries[index].HashCode = hashcode;
-            m_Entries[index].Next = m_Buckets[bucket];
-            m_Entries[index].Key = item.Key;
-            m_Entries[index].Value = item.Value;
-            m_Buckets[bucket] = index;
-            index++;
-        }
-
-        this.Count = index;
-        this.Keys = ReadOnlyList<TKey>.CreateFrom(items.Keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom(items.Values);
-    }
-    internal ReadOnlyDictionary(IReadOnlyDictionary<TKey, TValue> items,
-                                IEqualityComparer<TKey> equalityComparer)
-    {
-        // Initialize
-        Int32 size = Primes.GetNext(items.Count);
-        m_Buckets = new Int32[size];
-        Int32 index;
-        for (index = 0;
-             index < size;
-             index++)
-        {
-            m_Buckets[index] = -1;
-        }
-        m_Entries = new __DictionaryEntry<TKey, TValue>[size];
-        m_EqualityComparer = equalityComparer;
-
-        // Adding
-        index = 0;
-        foreach (KeyValuePair<TKey, TValue> item in items)
-        {
-            Int32 hashcode = m_EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
-            Int32 bucket = hashcode % m_Buckets.Length;
-
-            m_Entries[index].HashCode = hashcode;
-            m_Entries[index].Next = m_Buckets[bucket];
-            m_Entries[index].Key = item.Key;
-            m_Entries[index].Value = item.Value;
-            m_Buckets[bucket] = index;
-            index++;
-        }
-
-        this.Count = index;
-        this.Keys = ReadOnlyList<TKey>.CreateFrom(items.Keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom(items.Values);
+        this.Keys = ReadOnlyCollection<TKey>.CreateFrom(items.Keys);
+        this.Values = ReadOnlyCollection<TValue>.CreateFrom(items.Values);
     }
 
     private Int32 FindEntry(TKey key)
@@ -479,33 +349,59 @@ partial struct ReadOnlyDictionary<TKey, TValue>
         return -1;
     }
 
+    private static ReadOnlyDictionary<TKey, TValue> Clone<TEnumerable>(TEnumerable lookup)
+        where TEnumerable : __IReadOnlyDictionary<TKey, TValue> => 
+            new(buckets: lookup.Buckets,
+                entries: lookup.Entries,
+                equalityComparer: lookup.EqualityComparer,
+                keys: lookup.Keys,
+                values: lookup.Values);
+
     internal readonly Int32[] m_Buckets;
     internal readonly __DictionaryEntry<TKey, TValue>[] m_Entries;
     internal readonly IEqualityComparer<TKey> m_EqualityComparer;
 }
 
+// IEnumerable
+partial struct ReadOnlyDictionary<TKey, TValue> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial struct ReadOnlyDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+{
+    IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
 // IReadOnlyCollection<T>
-partial struct ReadOnlyDictionary<TKey, TValue> : IReadOnlyCollection<KeyValuePair<TKey, TValue>>
+partial struct ReadOnlyDictionary<TKey, TValue> : ICollectionWithCount<KeyValuePair<TKey, TValue>, CommonDictionaryEnumerator<TKey, TValue>>
 {
     /// <inheritdoc/>
     public Int32 Count { get; }
 }
 
 // IReadOnlyDictionary<T, U>
-partial struct ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
+partial struct ReadOnlyDictionary<TKey, TValue> : IReadOnlyLookup<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>>
 {
     /// <inheritdoc/>
-    public Boolean ContainsKey(TKey key) =>
+    public Boolean ContainsKey([DisallowNull] TKey key) =>
         this.FindEntry(key) > -1;
 
     /// <inheritdoc/>
-    public Boolean TryGetValue(TKey key,
-                               [MaybeNullWhen(false)] out TValue value)
+    public Boolean ContainsValue(TValue value) =>
+        this.Values.Contains(value);
+
+    /// <inheritdoc/>
+    public Boolean TryGetValue([DisallowNull] TKey key,
+                               [NotNullWhen(true)] out TValue? value)
     {
         Int32 index = this.FindEntry(key);
         if (index > -1)
         {
-            value = m_Entries[index].Value;
+            value = m_Entries[index].Value!;
             return true;
         }
         value = default;
@@ -526,11 +422,11 @@ partial struct ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TVal
         }
     }
 
-    IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys =>
-        this.Keys;
+    /// <inheritdoc/>
+    public ReadOnlyCollection<TKey> Keys { get; }
 
-    IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values =>
-        this.Values;
+    /// <inheritdoc/>
+    public ReadOnlyCollection<TValue> Values { get; }
 }
 
 // IStrongEnumerable<T, U>
@@ -539,4 +435,26 @@ partial struct ReadOnlyDictionary<TKey, TValue> : IStrongEnumerable<KeyValuePair
     /// <inheritdoc/>
     public CommonDictionaryEnumerator<TKey, TValue> GetEnumerator() =>
         new(m_Entries);
+}
+
+// __IReadOnlyDictionary<T, U>
+partial struct ReadOnlyDictionary<TKey, TValue> : __IReadOnlyDictionary<TKey, TValue>
+{
+    Int32 __IReadOnlyDictionary<TKey, TValue>.Size =>
+        m_Entries.Length;
+
+    Int32[] __IReadOnlyDictionary<TKey, TValue>.Buckets =>
+        m_Buckets;
+
+    __DictionaryEntry<TKey, TValue>[] __IReadOnlyDictionary<TKey, TValue>.Entries =>
+        m_Entries;
+
+    IEqualityComparer<TKey> __IReadOnlyDictionary<TKey, TValue>.EqualityComparer =>
+        m_EqualityComparer;
+
+    ReadOnlyCollection<TKey> __IReadOnlyDictionary<TKey, TValue>.Keys =>
+        this.Keys;
+
+    ReadOnlyCollection<TValue> __IReadOnlyDictionary<TKey, TValue>.Values =>
+        this.Values;
 }

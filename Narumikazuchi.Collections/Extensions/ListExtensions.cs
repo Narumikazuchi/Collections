@@ -1,4 +1,4 @@
-﻿namespace Narumikazuchi.Collections.Linq;
+﻿namespace Narumikazuchi.Collections.Extensions;
 
 /// <summary>
 /// Extends the <see cref="IList{T}"/> interface.
@@ -6,27 +6,12 @@
 public static class ListExtensions
 {
     /// <summary>
-    /// Returns a read-only <see cref="IReadOnlyList{T}"/> wrapper for the current list.
-    /// </summary>
-    /// <returns>An object that acts as a read-only wrapper around the current <see cref="IList{T}"/>.</returns>
-    public static IReadOnlyList<TElement> AsReadOnly<TElement>(this IList<TElement> source)
-        where TElement : notnull
-    {
-        if (source is List<TElement> list)
-        {
-            return list.AsReadOnly();
-        }
-
-        return new List<TElement>(source.Where(x => x is not null)).AsReadOnly();
-    }
-
-    /// <summary>
     /// Searches the entire sorted <see cref="IList{T}"/> for an element using the default comparer and returns the zero-based index of the element.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
     /// <returns>
-    /// The zero-based index of item in the sorted <see cref="IList{T}"/>,
+    /// The zero-based index of item the sorted <see cref="IList{T}"/>,
     /// if item is found; otherwise, a negative number that is the bitwise complement
     /// of the index of the next element that is larger than item or, if there is no
     /// larger element, the bitwise complement of <see cref="IReadOnlyCollection{T}.Count"/>.
@@ -35,7 +20,6 @@ public static class ListExtensions
     /// <exception cref="InvalidOperationException" />
     public static Int32 BinarySearch<TElement>(this IList<TElement> source,
                                                [DisallowNull] TElement item)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(item);
 
@@ -49,8 +33,7 @@ public static class ListExtensions
                                       value: item);
         }
 
-        TElement[] elements = source.Where(x => x is not null)
-                                    .ToArray();
+        TElement[] elements = source.ToArray();
         return Array.BinarySearch(array: elements,
                                   value: item);
     }
@@ -61,17 +44,17 @@ public static class ListExtensions
     /// <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
     /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="Comparer{T}.Default"/>.</param>
     /// <returns>
-    /// The zero-based index of item in the sorted <see cref="IList{T}"/>,
+    /// The zero-based index of item the sorted <see cref="IList{T}"/>,
     /// if item is found; otherwise, a negative number that is the bitwise complement
     /// of the index of the next element that is larger than item or, if there is no
     /// larger element, the bitwise complement of <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="InvalidOperationException" />
-    public static Int32 BinarySearch<TElement>(this IList<TElement> source,
-                                               [DisallowNull] TElement item,
-                                               [AllowNull] IComparer<TElement>? comparer)
-        where TElement : notnull
+    public static Int32 BinarySearch<TElement, TComparer>(this IList<TElement> source,
+                                                          [DisallowNull] TElement item,
+                                                          [AllowNull] TComparer? comparer)
+        where TComparer : IComparer<TElement>
     {
         ArgumentNullException.ThrowIfNull(item);
 
@@ -84,14 +67,13 @@ public static class ListExtensions
         {
             return Array.BinarySearch(array: array,
                                       value: item,
-                                      comparer: comparer ?? Comparer<TElement>.Default);
+                                      comparer: comparer);
         }
 
-        TElement[] elements = source.Where(x => x is not null)
-                                    .ToArray();
+        TElement[] elements = source.ToArray();
         return Array.BinarySearch(array: elements,
                                   value: item,
-                                  comparer: comparer ?? Comparer<TElement>.Default);
+                                  comparer: comparer);
     }
     /// <summary>
     /// Searches the entire sorted <see cref="IList{T}"/> for an element using the specified comparer and returns the zero-based index of the element.
@@ -102,7 +84,7 @@ public static class ListExtensions
     /// <param name="item">The object to locate. The value can be <see langword="null"/> for reference types.</param>
     /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing elements. -or- <see langword="null"/> to use the default comparer <see cref="Comparer{T}.Default"/>.</param>
     /// <returns>
-    /// The zero-based index of item in the sorted <see cref="IList{T}"/>,
+    /// The zero-based index of item the sorted <see cref="IList{T}"/>,
     /// if item is found; otherwise, a negative number that is the bitwise complement
     /// of the index of the next element that is larger than item or, if there is no
     /// larger element, the bitwise complement of <see cref="IReadOnlyCollection{T}.Count"/>.</returns>
@@ -110,12 +92,12 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="ArgumentOutOfRangeException" />
     /// <exception cref="InvalidOperationException" />
-    public static Int32 BinarySearch<TElement>(this IList<TElement> source,
-                                               in Int32 index,
-                                               in Int32 count,
-                                               [DisallowNull] TElement item,
-                                               [AllowNull] IComparer<TElement>? comparer)
-        where TElement : notnull
+    public static Int32 BinarySearch<TElement, TComparer>(this IList<TElement> source,
+                                                          Int32 index,
+                                                          Int32 count,
+                                                          [DisallowNull] TElement item,
+                                                          [AllowNull] TComparer? comparer)
+        where TComparer : IComparer<TElement>
     {
         ArgumentNullException.ThrowIfNull(item);
 
@@ -132,20 +114,19 @@ public static class ListExtensions
                                       index: index,
                                       length: count,
                                       value: item,
-                                      comparer: comparer ?? Comparer<TElement>.Default);
+                                      comparer: comparer);
         }
 
-        TElement[] elements = source.Where(x => x is not null)
-                                    .ToArray();
+        TElement[] elements = source.ToArray();
         return Array.BinarySearch(array: elements,
                                   value: item,
                                   index: index,
                                   length: count,
-                                  comparer: comparer ?? Comparer<TElement>.Default);
+                                  comparer: comparer);
     }
 
     /// <summary>
-    /// Searches for the first element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire <see cref="IList{T}"/>.
+    /// Searches for the first element that matches the conditions defined by the specified predicate, and returns the first occurrence withthe entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
@@ -153,7 +134,6 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     public static TElement? FindFirstOrDefault<TElement>(this IList<TElement> source,
                                                          [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -172,7 +152,7 @@ public static class ListExtensions
 
     /// <summary>
     /// Searches for the first element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the first occurrence within the
+    /// predicate, and returns the zero-based index of the first occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
@@ -181,7 +161,6 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
                                                  [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -199,7 +178,7 @@ public static class ListExtensions
     }
     /// <summary>
     /// Searches for the first element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the first occurrence within the
+    /// predicate, and returns the zero-based index of the first occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
@@ -209,9 +188,8 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
-                                                 in Int32 startIndex,
+                                                 Int32 startIndex,
                                                  [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
@@ -230,21 +208,20 @@ public static class ListExtensions
     }
     /// <summary>
     /// Searches for the first element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the first occurrence within the
+    /// predicate, and returns the zero-based index of the first occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="startIndex">The zero-based starting index of the search.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
+    /// <param name="count">The number of elements the section to search.</param>
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
-                                                 in Int32 startIndex,
-                                                 in Int32 count,
+                                                 Int32 startIndex,
+                                                 Int32 count,
                                                  [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
@@ -264,7 +241,7 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Searches for the last element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire <see cref="IList{T}"/>.
+    /// Searches for the last element that matches the conditions defined by the specified predicate, and returns the last occurrence withthe entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
@@ -272,7 +249,6 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     public static TElement? FindLastOrDefault<TElement>(this IList<TElement> source,
                                                         [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -291,7 +267,7 @@ public static class ListExtensions
 
     /// <summary>
     /// Searches for the last element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the last occurrence within the
+    /// predicate, and returns the zero-based index of the last occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
@@ -300,7 +276,6 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
                                                 [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -318,7 +293,7 @@ public static class ListExtensions
     }
     /// <summary>
     /// Searches for the last element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the last occurrence within the
+    /// predicate, and returns the zero-based index of the last occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
@@ -328,9 +303,8 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
-                                                in Int32 startIndex,
+                                                Int32 startIndex,
                                                 [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
@@ -349,21 +323,20 @@ public static class ListExtensions
     }
     /// <summary>
     /// Searches for the last element that matches the conditions defined by the specified 
-    /// predicate, and returns the zero-based index of the last occurrence within the
+    /// predicate, and returns the zero-based index of the last occurrence withthe
     /// entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="startIndex">The zero-based starting index of the search.</param>
-    /// <param name="count">The number of elements in the section to search.</param>
+    /// <param name="count">The number of elements the section to search.</param>
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
-                                                in Int32 startIndex,
-                                                in Int32 count,
+                                                Int32 startIndex,
+                                                Int32 count,
                                                 [DisallowNull] Func<TElement, Boolean> predicate)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(predicate);
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
@@ -383,52 +356,53 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Creates a shallow copy of a range of elements in the source <see cref="IList{T}"/>.
+    /// Creates a shallow copy of a range of elements the source <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="startIndex">The zero-based <see cref="IList{T}"/> index at which the range starts.</param>
-    /// <param name="count">The number of elements in the range.</param>
-    /// <returns>A shallow copy of a range of elements in the source <see cref="IList{T}"/>.</returns>
+    /// <param name="count">The number of elements the range.</param>
+    /// <returns>A shallow copy of a range of elements the source <see cref="IList{T}"/>.</returns>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static IReadOnlyList<TElement> GetRange<TElement>(this IList<TElement> source,
-                                                             in Int32 startIndex,
-                                                             in Int32 count)
-        where TElement : notnull
+    public static ReadOnlyList<TElement> GetRange<TElement>(this IList<TElement> source,
+                                                            Int32 startIndex,
+                                                            Int32 count)
     {
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
         count.ThrowIfOutOfRange(1, source.Count - startIndex);
 
         if (source is List<TElement> list)
         {
-            return list.GetRange(index: startIndex,
-                                 count: count);
+            return ReadOnlyList<TElement>.CreateFrom(list.GetRange(index: startIndex,
+                                                                   count: count));
         }
 
-        return new List<TElement>(source.Skip(startIndex)
-                                        .Take(count));
+        return ReadOnlyList<TElement>.CreateFrom(source.Skip(startIndex)
+                                                       .Take(count));
     }
 
     /// <summary>
-    /// Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="IList{T}"/>.
+    /// Searches for the specified object and returns the zero-based index of the first occurrence withthe entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="item">The object to locate in the <see cref="IList{T}"/>. The value can be null for reference types.</param>
-    /// <returns>The zero-based index of the first occurrence of item within the entire <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
+    /// <param name="item">The object to locate the <see cref="IList{T}"/>. The value can be null for reference types.</param>
+    /// <param name="equalityComparer">The equality comparer that will be used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <returns>The zero-based index of the first occurrence of item withthe entire <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 IndexOf<TElement>(this IList<TElement> source,
-                                          [DisallowNull] TElement item)
-        where TElement : notnull
+    public static Int32 IndexOf<TElement, TComparer>(this IList<TElement> source,
+                                                     [DisallowNull] TElement item,
+                                                     [DisallowNull] TComparer equalityComparer)
+        where TComparer : IEqualityComparer<TElement>
     {
         ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(equalityComparer);
 
         for (Int32 i = 0;
              i < source.Count;
              i++)
         {
-            if (EqualityComparer<TElement>.Default
-                                          .Equals(x: item,
-                                                  y: source[i]))
+            if (equalityComparer.Equals(x: item,
+                                        y: source[i]))
             {
                 return i;
             }
@@ -446,9 +420,8 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static void InsertRange<TElement>(this IList<TElement> source,
-                                             in Int32 index,
+                                             Int32 index,
                                              [DisallowNull] IEnumerable<TElement> items)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(items);
         index.ThrowIfOutOfRange(0, source.Count - 1);
@@ -475,25 +448,39 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Searches for the specified object and returns the zero-based index of the last occurrence within the entire <see cref="IList{T}"/>.
+    /// Searches for the specified object and returns the zero-based index of the last occurrence withthe entire <see cref="IList{T}"/>.
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="item">The object to locate in the <see cref="IList{T}"/>.</param>
-    /// <returns>The zero-based index of the last occurrence of item within the entire the <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
+    /// <param name="item">The object to locate the <see cref="IList{T}"/>.</param>
+    /// <returns>The zero-based index of the last occurrence of item withthe entire the <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     public static Int32 LastIndexOf<TElement>(this IList<TElement> source,
-                                              [DisallowNull] TElement item)
-        where TElement : notnull
+                                              [DisallowNull] TElement item) =>
+        LastIndexOf(source: source,
+                    item: item,
+                    equalityComparer: EqualityComparer<TElement>.Default);
+    /// <summary>
+    /// Searches for the specified object and returns the zero-based index of the last occurrence withthe entire <see cref="IList{T}"/>.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="item">The object to locate the <see cref="IList{T}"/>.</param>
+    /// <param name="equalityComparer">The equality comparer that will be used to compare two instances of <typeparamref name="TElement"/>.</param>
+    /// <returns>The zero-based index of the last occurrence of item withthe entire the <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    public static Int32 LastIndexOf<TElement, TComparer>(this IList<TElement> source,
+                                                         [DisallowNull] TElement item,
+                                                         [DisallowNull] TComparer equalityComparer)
+        where TComparer : IEqualityComparer<TElement>
     {
         ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(equalityComparer);
 
         for (Int32 i = source.Count - 1;
              i > 0;
              i--)
         {
-            if (EqualityComparer<TElement>.Default
-                                          .Equals(x: item,
-                                                  y: source[i]))
+            if (equalityComparer.Equals(x: item,
+                                        y: source[i]))
             {
                 return i;
             }
@@ -503,12 +490,11 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Moves the item at the given index one position in the specified direction in the <see cref="IList{T}"/>.
+    /// Moves the item at the given index one position the specified direction the <see cref="IList{T}"/>.
     /// </summary>
     public static void MoveItem<TElement>(this IList<TElement> source,
-                                          in Int32 index,
-                                          in ItemMoveDirection direction)
-        where TElement : notnull
+                                          Int32 index,
+                                          ItemMoveDirection direction)
     {
         TElement tmp;
         if (direction == ItemMoveDirection.ToLowerIndex)
@@ -532,13 +518,12 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="IList{T}"/>.
+    /// Moves the item at the given index the given amount of positions the specified direction the <see cref="IList{T}"/>.
     /// </summary>
     public static void MoveItem<TElement>(this IList<TElement> source,
-                                          in Int32 index,
-                                          in ItemMoveDirection direction,
+                                          Int32 index,
+                                          ItemMoveDirection direction,
                                           Int32 positions)
-        where TElement : notnull
     {
         if (positions == 0)
         {
@@ -558,12 +543,11 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Moves the item one position in the specified direction in the <see cref="IList{T}"/>.
+    /// Moves the item one position the specified direction the <see cref="IList{T}"/>.
     /// </summary>
     public static void MoveItem<TElement>(this IList<TElement> source,
                                           [DisallowNull] TElement item,
-                                          in ItemMoveDirection direction)
-        where TElement : notnull
+                                          ItemMoveDirection direction)
     {
         ArgumentNullException.ThrowIfNull(item);
 
@@ -591,13 +575,12 @@ public static class ListExtensions
     }
 
     /// <summary>
-    /// Moves the item at the given index the given amount of positions in the specified direction in the <see cref="IList{T}"/>.
+    /// Moves the item at the given index the given amount of positions the specified direction the <see cref="IList{T}"/>.
     /// </summary>
     public static void MoveItem<TElement>(this IList<TElement> source,
                                           [DisallowNull] TElement item,
-                                          in ItemMoveDirection direction,
+                                          ItemMoveDirection direction,
                                           Int32 positions)
-        where TElement : notnull
     {
         ArgumentNullException.ThrowIfNull(item);
 
@@ -631,9 +614,8 @@ public static class ListExtensions
     /// <param name="count">The number of elements to remove.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public static void RemoveRange<TElement>(this IList<TElement> source,
-                                             in Int32 startIndex,
-                                             in Int32 count)
-        where TElement : notnull
+                                             Int32 startIndex,
+                                             Int32 count)
     {
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
         count.ThrowIfOutOfRange(1, source.Count - startIndex);

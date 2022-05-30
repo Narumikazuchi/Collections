@@ -206,15 +206,16 @@ public sealed partial class Trie<TContent>
         ArgumentNullException.ThrowIfNull(item);
 
         this.InsertRange(index: index,
-                         collection: new TContent[] { item });
+                         enumerable: new TContent[] { item });
     }
 
     /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] TContent[] collection)
+    public void InsertRange<TEnumerable>([DisallowNull] in String index,
+                                         [DisallowNull] TEnumerable enumerable)
+        where TEnumerable : IEnumerable<TContent>
     {
         ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
+        ArgumentNullException.ThrowIfNull(enumerable);
 
         String[] words = index.ToLower()
                               .Split(separator: m_Separators,
@@ -241,14 +242,11 @@ public sealed partial class Trie<TContent>
                     TrieNode<TContent> newNode = new(trie: this,
                                                      value: word[i],
                                                      parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
+                    current.m_Children.Add(newNode);
                     current = newNode;
                 }
                 current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
+                foreach (TContent item in enumerable)
                 {
                     if (item is null)
                     {
@@ -263,11 +261,12 @@ public sealed partial class Trie<TContent>
         }
     }
     /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] ImmutableArray<TContent> collection)
+    public void InsertRange<TEnumerator>([DisallowNull] in String index,
+                                         [DisallowNull] IStrongEnumerable<TContent, TEnumerator> enumerable)
+        where TEnumerator : struct, IStrongEnumerator<TContent>
     {
         ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
+        ArgumentNullException.ThrowIfNull(enumerable);
 
         String[] words = index.ToLower()
                               .Split(separator: m_Separators,
@@ -294,226 +293,11 @@ public sealed partial class Trie<TContent>
                     TrieNode<TContent> newNode = new(trie: this,
                                                      value: word[i],
                                                      parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
+                    current.m_Children.Add(newNode);
                     current = newNode;
                 }
                 current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
-                {
-                    if (item is null)
-                    {
-                        continue;
-                    }
-                    current.Add(item);
-                }
-            }
-            this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                         changedItem: word));
-        }
-    }
-    /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] List<TContent> collection)
-    {
-        ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
-
-        String[] words = index.ToLower()
-                              .Split(separator: m_Separators,
-                                     options: StringSplitOptions.RemoveEmptyEntries);
-        foreach (String word in words)
-        {
-            TrieNode<TContent>? current = this.Find(prefix => prefix == word);
-            if (current is null)
-            {
-                continue;
-            }
-
-            this.OnPropertyChanging(nameof(this.Count));
-            lock (m_SyncRoot)
-            {
-                if (current.Depth < word.Length)
-                {
-                    m_Words++;
-                }
-                for (Int32 i = (Int32)current.Depth;
-                     i < word.Length;
-                     i++)
-                {
-                    TrieNode<TContent> newNode = new(trie: this,
-                                                     value: word[i],
-                                                     parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
-                    current = newNode;
-                }
-                current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
-                {
-                    if (item is null)
-                    {
-                        continue;
-                    }
-                    current.Add(item);
-                }
-            }
-            this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                         changedItem: word));
-        }
-    }
-    /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] IReadOnlyList<TContent> collection)
-    {
-        ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
-
-        String[] words = index.ToLower()
-                              .Split(separator: m_Separators,
-                                     options: StringSplitOptions.RemoveEmptyEntries);
-        foreach (String word in words)
-        {
-            TrieNode<TContent>? current = this.Find(prefix => prefix == word);
-            if (current is null)
-            {
-                continue;
-            }
-
-            this.OnPropertyChanging(nameof(this.Count));
-            lock (m_SyncRoot)
-            {
-                if (current.Depth < word.Length)
-                {
-                    m_Words++;
-                }
-                for (Int32 i = (Int32)current.Depth;
-                     i < word.Length;
-                     i++)
-                {
-                    TrieNode<TContent> newNode = new(trie: this,
-                                                     value: word[i],
-                                                     parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
-                    current = newNode;
-                }
-                current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
-                {
-                    if (item is null)
-                    {
-                        continue;
-                    }
-                    current.Add(item);
-                }
-            }
-            this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                         changedItem: word));
-        }
-    }
-    /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] IList<TContent> collection)
-    {
-        ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
-
-        String[] words = index.ToLower()
-                              .Split(separator: m_Separators,
-                                     options: StringSplitOptions.RemoveEmptyEntries);
-        foreach (String word in words)
-        {
-            TrieNode<TContent>? current = this.Find(prefix => prefix == word);
-            if (current is null)
-            {
-                continue;
-            }
-
-            this.OnPropertyChanging(nameof(this.Count));
-            lock (m_SyncRoot)
-            {
-                if (current.Depth < word.Length)
-                {
-                    m_Words++;
-                }
-                for (Int32 i = (Int32)current.Depth;
-                     i < word.Length;
-                     i++)
-                {
-                    TrieNode<TContent> newNode = new(trie: this,
-                                                     value: word[i],
-                                                     parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
-                    current = newNode;
-                }
-                current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
-                {
-                    if (item is null)
-                    {
-                        continue;
-                    }
-                    current.Add(item);
-                }
-            }
-            this.OnPropertyChanged(nameof(this.Count));
-            this.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                         changedItem: word));
-        }
-    }
-    /// <inheritdoc/>
-    public void InsertRange([DisallowNull] in String index,
-                            [DisallowNull] IEnumerable<TContent> collection)
-    {
-        ArgumentNullException.ThrowIfNull(index);
-        ArgumentNullException.ThrowIfNull(collection);
-
-        String[] words = index.ToLower()
-                              .Split(separator: m_Separators,
-                                     options: StringSplitOptions.RemoveEmptyEntries);
-        foreach (String word in words)
-        {
-            TrieNode<TContent>? current = this.Find(prefix => prefix == word);
-            if (current is null)
-            {
-                continue;
-            }
-
-            this.OnPropertyChanging(nameof(this.Count));
-            lock (m_SyncRoot)
-            {
-                if (current.Depth < word.Length)
-                {
-                    m_Words++;
-                }
-                for (Int32 i = (Int32)current.Depth;
-                     i < word.Length;
-                     i++)
-                {
-                    TrieNode<TContent> newNode = new(trie: this,
-                                                     value: word[i],
-                                                     parent: current);
-                    current.m_Children
-                           .Add(key: word[i],
-                                value: newNode);
-                    current = newNode;
-                }
-                current.IsWord = true;
-                current.AddRange(collection);
-                foreach (TContent item in collection)
+                foreach (TContent item in enumerable)
                 {
                     if (item is null)
                     {
@@ -533,8 +317,7 @@ public sealed partial class Trie<TContent>
     {
         lock (m_SyncRoot)
         {
-            m_Root.m_Children
-                  .Clear();
+            m_Root.m_Children.Clear();
             m_Words = 0;
         }
     }
@@ -571,8 +354,7 @@ public sealed partial class Trie<TContent>
                         {
                             break;
                         }
-                        parent.m_Children
-                              .Remove(node.Value);
+                        parent.m_Children.Remove(node);
                         node = parent;
                     }
                 }
@@ -613,9 +395,8 @@ public sealed partial class Trie<TContent>
     /// Traverses through the <see cref="Trie{TContent}"/> and returns the inserted words in alphabetic order.
     /// </summary>
     /// <returns>An <see cref="IEnumerable"/> which iterates through all inserted words of this <see cref="Trie{TContent}"/></returns>
-    public List<String>.Enumerator Traverse() => 
-        this.TraverseInternal(m_Root)
-            .GetEnumerator();
+    public ReadOnlyList<String> Traverse() => 
+        this.TraverseInternal(m_Root);
 
     /// <inheritdoc/>
     [NotNull]
@@ -646,7 +427,7 @@ partial class Trie<TContent>
     internal Trie(HashSet<String> collection) :
         this()
     {
-        if (!collection.Any())
+        if (collection.Count <= 0)
         {
             throw new ArgumentException(CANNOT_CREATE_FROM_EMPTY_COLLECTION);
         }
@@ -654,13 +435,13 @@ partial class Trie<TContent>
         foreach (String word in collection)
         {
             this.InsertRange(index: word,
-                             collection: Array.Empty<TContent>());
+                             enumerable: Array.Empty<TContent>());
         }
     }
     internal Trie(ImmutableHashSet<String> collection) :
         this()
     {
-        if (!collection.Any())
+        if (collection.Count <= 0)
         {
             throw new ArgumentException(CANNOT_CREATE_FROM_EMPTY_COLLECTION);
         }
@@ -668,7 +449,7 @@ partial class Trie<TContent>
         foreach (String word in collection)
         {
             this.InsertRange(index: word,
-                             collection: Array.Empty<TContent>());
+                             enumerable: Array.Empty<TContent>());
         }
     }
     internal Trie(IEnumerable<String> collection) :
@@ -682,19 +463,18 @@ partial class Trie<TContent>
         foreach (String word in collection.Distinct())
         {
             this.InsertRange(index: word,
-                             collection: Array.Empty<TContent>());
+                             enumerable: Array.Empty<TContent>());
         }
     }
 
-    private List<String> TraverseInternal(TrieNode<TContent> parent) => 
+    private ReadOnlyList<String> TraverseInternal(TrieNode<TContent> parent) => 
         this.TraverseInternal(parent: parent,
                               wordStart: String.Empty);
-    private List<String> TraverseInternal(TrieNode<TContent> parent,
-                                          String wordStart)
+    private ReadOnlyList<String> TraverseInternal(TrieNode<TContent> parent,
+                                                  String wordStart)
     {
         List<String> words = new();
-        String start = wordStart + parent.Value
-                                         .ToString();
+        String start = wordStart + parent.Value.ToString();
 
         if (parent.IsLeaf ||
             parent.IsWord)
@@ -712,10 +492,10 @@ partial class Trie<TContent>
             foreach (String word in this.TraverseInternal(parent: child,
                                                           wordStart: start))
             {
-                words.Add(start);
+                words.Add(word);
             }
         }
-        return words;
+        return ReadOnlyList<String>.CreateFrom(words);
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -733,12 +513,27 @@ partial class Trie<TContent>
     private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create Trie from empty IEnumerable.";
 }
 
+// IEnumerable
+partial class Trie<TContent> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial class Trie<TContent> : IEnumerable<String>
+{
+    IEnumerator<String> IEnumerable<String>.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
 // IStrongEnumerable<T, U>
-partial class Trie<TContent> : IStrongEnumerable<String, CommonListEnumerator<String>>
+partial class Trie<TContent> : IStrongEnumerable<String, CommonArrayEnumerator<String>>
 {
     /// <inheritdoc/>
-    public CommonListEnumerator<String> GetEnumerator() =>
-        new(this.TraverseInternal(m_Root));
+    public CommonArrayEnumerator<String> GetEnumerator() =>
+        this.TraverseInternal(m_Root)
+            .GetEnumerator();
 }
 
 // INotifyCollectionChanged
@@ -751,9 +546,8 @@ partial class Trie<TContent> : INotifyCollectionChanged
     /// Raises the <see cref="CollectionChanged"/> event with the specified event args.
     /// </summary>
     private void OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs) =>
-        this.CollectionChanged?
-            .Invoke(sender: this,
-                    e: eventArgs);
+        this.CollectionChanged?.Invoke(sender: this,
+                                       e: eventArgs);
 }
 
 // INotifyPropertyChanging
@@ -766,9 +560,8 @@ partial class Trie<TContent> : INotifyPropertyChanging
     /// Raises the <see cref="PropertyChanging"/> event with the specified event args.
     /// </summary>
     private void OnPropertyChanging(String propertyName) =>
-        this.PropertyChanging?
-            .Invoke(sender: this,
-                    e: new(propertyName));
+        this.PropertyChanging?.Invoke(sender: this,
+                                      e: new(propertyName));
 }
 
 // INotifyPropertyChanged
@@ -781,53 +574,14 @@ partial class Trie<TContent> : INotifyPropertyChanged
     /// Raises the <see cref="PropertyChanged"/> event with the specified event args.
     /// </summary>
     private void OnPropertyChanged(String propertyName) =>
-        this.PropertyChanged?
-            .Invoke(sender: this,
-                    e: new(propertyName));
+        this.PropertyChanged?.Invoke(sender: this,
+                                     e: new(propertyName));
 }
 
 // IReadOnlyCollection<T>
-partial class Trie<TContent> : IReadOnlyCollection<String>
+partial class Trie<TContent>// : IReadOnlyCollection<String>
 {
     /// <inheritdoc />
     public Int32 Count =>
         m_Words;
-}
-
-// Enumerator
-partial class Trie<TContent>
-{
-    /// <summary>
-    /// An enumerator that iterates through the <see cref="Trie{TContent}"/>.
-    /// </summary>
-    public struct Enumerator :
-        IEnumerator<String>,
-        IEnumerator
-    {
-        internal Enumerator(Trie<TContent> trie)
-        {
-            m_Elements = trie.TraverseInternal(trie.RootNode);
-            m_Index = -1;
-        }
-
-        /// <inheritdoc/>
-        public Boolean MoveNext() =>
-            ++m_Index < m_Elements.Count;
-
-        void IDisposable.Dispose()
-        { }
-
-        void IEnumerator.Reset()
-        { }
-
-        /// <inheritdoc/>
-        public String Current =>
-            m_Elements[m_Index];
-
-        Object IEnumerator.Current =>
-            m_Elements[m_Index];
-
-        private readonly List<String> m_Elements;
-        private Int32 m_Index;
-    }
 }

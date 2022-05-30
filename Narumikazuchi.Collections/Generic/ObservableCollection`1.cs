@@ -6,37 +6,6 @@
 public partial class ObservableCollection<TElement>
 {
     /// <summary>
-    /// Copies the entire <see cref="ObservableCollection{TElement}"/> to a compatible one-dimensional array, starting at the beginning of the target array.
-    /// </summary>
-    /// <param name="destination">The one-dimensional <see cref="Array"/> that is the destination of the elements copied from <see cref="ObservableCollection{TElement}"/>.
-    /// The <see cref="Array"/> must have zero-based indexing.</param>
-    /// <exception cref="ArgumentException" />
-    /// <exception cref="ArgumentNullException" />
-    public void CopyTo([DisallowNull] TElement[] destination)
-    {
-        ArgumentNullException.ThrowIfNull(destination);
-
-        m_Items.CopyTo(destination);
-    }
-    /// <summary>
-    /// Copies the entire <see cref="ObservableCollection{TElement}"/> to a compatible one-dimensional array, starting at the specified index of the target array.
-    /// </summary>
-    /// <param name="destination">The one-dimensional <see cref="Array"/> that is the destination of the elements copied from <see cref="ObservableCollection{TElement}"/>.
-    /// The <see cref="Array"/> must have zero-based indexing.</param>
-    /// <param name="destinationIndex">The zero-based index in array at which copying begins.</param>
-    /// <exception cref="ArgumentException" />
-    /// <exception cref="ArgumentNullException" />
-    /// <exception cref="ArgumentOutOfRangeException" />
-    public void CopyTo([DisallowNull] TElement[] destination,
-                       in Int32 destinationIndex)
-    {
-        ArgumentNullException.ThrowIfNull(destination);
-
-        m_Items.CopyTo(array: destination,
-                       arrayIndex: destinationIndex);
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ObservableCollection{TElement}"/> class.
     /// </summary>
     public static ObservableCollection<TElement> Create() => 
@@ -60,11 +29,11 @@ public partial class ObservableCollection<TElement>
         where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
+
         ObservableCollection<TElement> result = new();
-        TEnumerator enumerator = items.GetEnumerator();
-        while (enumerator.MoveNext())
+        foreach (TElement item in items)
         {
-            result.Add(enumerator.Current);
+            result.Add(item);
         }
         return result;
     }
@@ -95,26 +64,33 @@ partial class ObservableCollection<TElement>
     internal readonly List<TElement> m_Items;
 }
 
-// ICollection
-partial class ObservableCollection<TElement> : ICollection
-{
-    Boolean ICollection.IsSynchronized =>
-        ((ICollection)m_Items).IsSynchronized;
-
-    Object ICollection.SyncRoot =>
-        ((ICollection)m_Items).SyncRoot;
-
-    void ICollection.CopyTo(Array array,
-                            Int32 index) =>
-        ((ICollection)m_Items).CopyTo(array: array,
-                                      index: index);
-}
-
-// ICollection
-partial class ObservableCollection<TElement> : ICollection<TElement>
+// ICollectionWithCount<T, U>
+partial class ObservableCollection<TElement> : ICollectionWithCount<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public void Add(TElement item)
+    public Int32 Count => 
+        m_Items.Count;
+}
+
+// IEnumerable
+partial class ObservableCollection<TElement> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial class ObservableCollection<TElement> : IEnumerable<TElement>
+{
+    IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IModifyableCollection<T, U>
+partial class ObservableCollection<TElement> : IModifyableCollection<TElement, CommonListEnumerator<TElement>>
+{
+    /// <inheritdoc/>
+    public Boolean Add(TElement item)
     {
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         m_Items.Add(item);
@@ -122,6 +98,41 @@ partial class ObservableCollection<TElement> : ICollection<TElement>
                                                          changedItem: item);
         ((INotifyCollectionChangedHelper)this).OnCollectionChanged(eventArgs);
         ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public void AddRange<TEnumerator>(IStrongEnumerable<TElement, TEnumerator> collection)
+        where TEnumerator : struct, IStrongEnumerator<TElement>
+    {
+        ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
+        if (collection is ICollectionWithCount<TElement, TEnumerator> counted)
+        {
+            TElement[] changed = new TElement[counted.Count];
+            Int32 index = 0;
+            foreach (TElement item in collection)
+            {
+                changed[index++] = item;
+                m_Items.Add(item);
+            }
+            NotifyCollectionChangedEventArgs eventArgs = new(action: NotifyCollectionChangedAction.Add,
+                                                             changedItems: changed);
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(eventArgs);
+            ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
+        }
+        else
+        {
+            List<TElement> changed = new();
+            foreach (TElement item in collection)
+            {
+                changed.Add(item);
+                m_Items.Add(item);
+            }
+            NotifyCollectionChangedEventArgs eventArgs = new(action: NotifyCollectionChangedAction.Add,
+                                                             changedItems: changed);
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(eventArgs);
+            ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
+        }
     }
 
     /// <inheritdoc/>
@@ -133,16 +144,6 @@ partial class ObservableCollection<TElement> : ICollection<TElement>
         ((INotifyCollectionChangedHelper)this).OnCollectionChanged(eventArgs);
         ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
     }
-
-    /// <inheritdoc/>
-    public Boolean Contains(TElement item) =>
-        m_Items.Contains(item);
-
-    /// <inheritdoc/>
-    public void CopyTo(TElement[] array,
-                       Int32 arrayIndex) =>
-        m_Items.CopyTo(array: array,
-                       arrayIndex: arrayIndex);
 
     /// <inheritdoc/>
     public Boolean Remove(TElement item)
@@ -159,9 +160,6 @@ partial class ObservableCollection<TElement> : ICollection<TElement>
         ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
         return true;
     }
-
-    /// <inheritdoc/>
-    public Boolean IsReadOnly { get; } = false;
 }
 
 // INotifyCollectionChanged
@@ -178,9 +176,8 @@ partial class ObservableCollection<TElement> : INotifyCollectionChangedHelper
     {
         ArgumentNullException.ThrowIfNull(eventArgs);
 
-        this.CollectionChanged?
-            .Invoke(sender: this,
-                    e: eventArgs);
+        this.CollectionChanged?.Invoke(sender: this,
+                                       e: eventArgs);
     }
 }
 
@@ -198,9 +195,8 @@ partial class ObservableCollection<TElement> : INotifyPropertyChangingHelper
     {
         ArgumentNullException.ThrowIfNull(propertyName);
 
-        this.PropertyChanging?
-            .Invoke(sender: this,
-                    e: new(propertyName));
+        this.PropertyChanging?.Invoke(sender: this,
+                                      e: new(propertyName));
     }
 }
 
@@ -218,9 +214,8 @@ partial class ObservableCollection<TElement> : INotifyPropertyChangedHelper
     {
         ArgumentNullException.ThrowIfNull(propertyName);
 
-        this.PropertyChanged?
-            .Invoke(sender: this,
-                    e: new(propertyName));
+        this.PropertyChanged?.Invoke(sender: this,
+                                     e: new(propertyName));
     }
 }
 
@@ -232,10 +227,20 @@ partial class ObservableCollection<TElement> : IStrongEnumerable<TElement, Commo
         new(m_Items);
 }
 
-// IReadOnlyCollection<T>
-partial class ObservableCollection<TElement> : IReadOnlyCollection<TElement>
+// IReadOnlyCollection<T, U>
+partial class ObservableCollection<TElement> : IReadOnlyCollection<TElement, CommonListEnumerator<TElement>>
 {
+
     /// <inheritdoc/>
-    public Int32 Count =>
-        m_Items.Count;
+    public Boolean Contains(TElement item) =>
+        m_Items.Contains(item);
+
+    /// <inheritdoc/>
+    public void CopyTo(TElement[] array) =>
+        m_Items.CopyTo(array: array);
+    /// <inheritdoc/>
+    public void CopyTo(TElement[] array,
+                       Int32 destinationIndex) =>
+        m_Items.CopyTo(array: array,
+                       arrayIndex: destinationIndex);
 }

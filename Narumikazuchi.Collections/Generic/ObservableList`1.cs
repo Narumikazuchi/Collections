@@ -9,7 +9,7 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// Initializes a new instance of the <see cref="ObservableList{TElement}"/> class.
     /// </summary>
     public static new ObservableList<TElement> Create() =>
-        new(new List<TElement>());
+        new();
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservableList{TElement}"/> class.
     /// </summary>
@@ -29,11 +29,11 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
         where TEnumerator : struct, IStrongEnumerator<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
+
         ObservableList<TElement> result = new();
-        TEnumerator enumerator = items.GetEnumerator();
-        while (enumerator.MoveNext())
+        foreach (TElement item in items)
         {
-            result.Add(enumerator.Current);
+            result.Add(item);
         }
         return result;
     }
@@ -58,74 +58,48 @@ partial class ObservableList<TElement>
     { }
 }
 
-// IList
-partial class ObservableList<TElement> : IList
+// ICollectionWithReadWriteIndexer<T, U>
+partial class ObservableList<TElement> : ICollectionWithReadWriteIndexer<TElement, CommonListEnumerator<TElement>>
 {
-    Int32 IList.Add(Object? value)
+    /// <inheritdoc />
+    public TElement this[Int32 index]
     {
-        if (value is TElement element)
-        {
-            Int32 index = this.Count;
-            this.Add(element);
-            return index;
-        }
-        return -1;
-    }
-
-    void IList.Clear() =>
-        this.Clear();
-
-    Boolean IList.Contains(Object? value) =>
-        value is TElement element &&
-        this.Contains(element);
-
-    Int32 IList.IndexOf(Object? value)
-    {
-        if (value is TElement element)
-        {
-            return this.IndexOf(element);
-        }
-        return -1;
-    }
-
-    void IList.Insert(Int32 index,
-                      Object? value)
-    {
-        if (value is TElement element)
-        {
-            this.Insert(index: index,
-                        item: element);
-        }
-    }
-
-    void IList.Remove(Object? value)
-    {
-        if (value is TElement element)
-        {
-            this.Remove(element);
-        }
-    }
-
-    void IList.RemoveAt(Int32 index) =>
-        this.RemoveAt(index);
-
-    Object? IList.this[Int32 index]
-    {
-        get => this[index];
+        get => m_Items[index]!;
         set
         {
-            if (value is TElement element)
+            if ((UInt32)index >= (UInt32)this.Count)
             {
-                this[index] = element;
+                throw new IndexOutOfRangeException();
             }
+
+            this.Insert(index: index,
+                        item: value);
         }
     }
-
-    Boolean IList.IsFixedSize { get; } = false;
+    /// <inheritdoc />
+    public TElement this[Index index]
+    {
+        get => m_Items[index];
+        set => m_Items[index] = value;
+    }
 }
 
-// IList<T>
-partial class ObservableList<TElement> : IList<TElement>
+// IEnumerable
+partial class ObservableList<TElement> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IEnumerable<T>
+partial class ObservableList<TElement> : IEnumerable<TElement>
+{
+    IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
+        this.GetEnumerator();
+}
+
+// IModifyableCollectionWithIndex<T, U>
+partial class ObservableList<TElement> : IModifyableCollectionWithIndex<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc />
     public Int32 IndexOf(TElement item) =>
@@ -144,33 +118,71 @@ partial class ObservableList<TElement> : IList<TElement>
     }
 
     /// <inheritdoc />
-    public void RemoveAt(Int32 index)
+    public void InsertRange<TEnumerator>(Int32 index,
+                                         [DisallowNull] IStrongEnumerable<TElement, TEnumerator> enumerable)
+        where TEnumerator : struct, IStrongEnumerator<TElement>
     {
+        ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
+        if (enumerable is ICollectionWithCount<TElement, TEnumerator> collection)
+        {
+            TElement[] changed = new TElement[collection.Count];
+            if (enumerable is ICollectionWithReadIndexer<TElement, TEnumerator> readIndex)
+            {
+                for (Int32 i = 0;
+                     i < collection.Count;
+                     i++)
+                {
+                    m_Items.Insert(index: index + i,
+                                   item: readIndex[i]);
+                    changed[i] = readIndex[i];
+                }
+            }
+            else
+            {
+                Int32 i = 0;
+                foreach (TElement item in enumerable)
+                {
+                    m_Items.Insert(index: index + i,
+                                   item: item);
+                    changed[i++] = item;
+                }
+            }
+            ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                                                           changedItems: changed));
+        }
+        else
+        {
+            List<TElement> changed = new();
+            Int32 i = 0;
+            foreach (TElement item in enumerable)
+            {
+                m_Items.Insert(index: index + i,
+                               item: item);
+                changed.Add(item);
+                i++;
+            }
+            ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                                                           changedItems: changed));
+        }
+    }
+
+    /// <inheritdoc />
+    public Boolean RemoveAt(Int32 index)
+    {
+        if (index < 0 ||
+            index >= this.Count)
+        {
+            return false;
+        }
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         TElement item = this[index];
         m_Items.RemoveAt(index);
         ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
         ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new(action: NotifyCollectionChangedAction.Remove,
                                                                        changedItem: item));
-    }
-}
-
-// IReadOnlyList<T>
-partial class ObservableList<TElement> : IReadOnlyList<TElement>
-{
-    /// <inheritdoc />
-    public TElement this[Int32 index]
-    {
-        get => m_Items[index]!;
-        set
-        {
-            if ((UInt32)index >= (UInt32)this.Count)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            this.Insert(index: index,
-                        item: value);
-        }
+        return true;
     }
 }

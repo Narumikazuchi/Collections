@@ -3,9 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
+		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<EnablePreviewFeatures>True</EnablePreviewFeatures>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<WarningsNotAsErrors>1591,0282</WarningsNotAsErrors>
 		<NoWarn>1701;1702,0282</NoWarn>
@@ -14,7 +13,7 @@
 		<RepositoryUrl>https://github.com/Narumikazuchi/Collections</RepositoryUrl>
 		<Authors>Narumikazuchi</Authors>
 		<Copyright>©2021 Narumikazuchi</Copyright>
-		<Description>Provides new useful collections. And a wide array of extension methods for collections. For more information visit the [wiki](https://github.com/Narumikazuchi/Collections/wiki).</Description>
+		<Description>Provides some extensions methods for collections as well as introducing new collections designed for big datasets by using optimized enumeration therefor improving speed of foreach-loops significantly. For more information visit the [wiki](https://github.com/Narumikazuchi/Collections/wiki).</Description>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Version>6.0.0</Version>
@@ -22,7 +21,7 @@
 		<PackageProjectUrl>https://github.com/Narumikazuchi/Collections/wiki</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README nuget.md</PackageReadmeFile>
-		<PackageTags>Collections; Register; Observable; Trie; Binary Tree</PackageTags>
+		<PackageTags>Collections; Observable; Trie; Binary Tree; Big Datasets; Enumeration</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -45,7 +44,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Narumikazuchi" Version="2.3.1" />
+		<PackageReference Include="Narumikazuchi" Version="2.4.0" />
 	</ItemGroup>
 
 </Project>

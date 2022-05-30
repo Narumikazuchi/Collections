@@ -4,7 +4,8 @@
 /// An enumerator that iterates through a <see cref="List{T}"/>.
 /// </summary>
 public struct CommonHashSetEnumerator<TElement> :
-    IStrongEnumerator<TElement>
+    IStrongEnumerator<TElement>,
+    IEnumerator<TElement>
 {
     /// <summary>
     /// The default constructor for the <see cref="CommonHashSetEnumerator{TElement}"/> is not allowed.
@@ -14,11 +15,11 @@ public struct CommonHashSetEnumerator<TElement> :
     {
         throw new NotAllowed();
     }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonHashSetEnumerator{TElement}"/> struct.
     /// </summary>
-    /// <param name="items">The array containing the items to iterate through.</param>
+    /// <param name="items">The <see cref="HashSet{T}"/> containing the items to iterate through.</param>
+    /// <exception cref="ArgumentNullException"/>
     public CommonHashSetEnumerator([DisallowNull] HashSet<TElement> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -31,9 +32,18 @@ public struct CommonHashSetEnumerator<TElement> :
     public Boolean MoveNext() =>
         m_Enumerator.MoveNext();
 
+    void IEnumerator.Reset()
+    { }
+
+    void IDisposable.Dispose()
+    { }
+
     /// <inheritdoc/>
     public TElement Current =>
         m_Enumerator.Current;
+
+    Object? IEnumerator.Current =>
+        this.Current;
 
     internal readonly HashSet<TElement> m_Elements;
     internal readonly HashSet<TElement>.Enumerator m_Enumerator;

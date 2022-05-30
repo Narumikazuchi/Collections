@@ -5,7 +5,7 @@
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed partial class BinaryNode<TValue>
-    where TValue : IComparable<TValue>
+    where TValue : notnull
 {
 #pragma warning disable CS1591
     public static implicit operator TValue(BinaryNode<TValue> node)
@@ -18,16 +18,18 @@ public sealed partial class BinaryNode<TValue>
     /// Gets the <typeparamref name="TValue"/> value of this <see cref="BinaryNode{TValue}"/>.
     /// </summary>
     [Pure]
+    [NotNull]
     public TValue Value =>
         m_Value;
 
     /// <summary>
-    /// Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
+    /// Gets the parent of the current <see cref="BinaryNode{TValue}"/>. Should return <see langword="null"/> for root nodes.
     /// </summary>
     [Pure]
     [MaybeNull]
     public BinaryNode<TValue>? Parent =>
         m_Parent;
+
     /// <summary>
     /// Gets the left child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no left sided child node.
     /// </summary>
@@ -45,7 +47,7 @@ public sealed partial class BinaryNode<TValue>
         m_Right;
 
     /// <summary>
-    /// Gets the depth of this node in it's corresponding tree. Should be 0 for root nodes.
+    /// Gets the depth of this node in it's corresponding <see cref="BinaryTree{TValue}"/>. Should be 0 for root nodes.
     /// </summary>
     [Pure]
     public UInt32 Depth { get; }
@@ -82,8 +84,7 @@ partial class BinaryNode<TValue>
         while (node is not null &&
                node.LeftChild is not null)
         {
-            min = node.LeftChild
-                      .Value;
+            min = node.LeftChild.Value;
             node = node.LeftChild;
         }
         m_Value = min;
@@ -93,13 +94,13 @@ partial class BinaryNode<TValue>
     internal void SetParent(BinaryNode<TValue>? parent) => 
         m_Parent = parent;
 
-    internal void SetLeftChild(BinaryNode<TValue>? node)
+    internal void SetLeftChild(BinaryNode<TValue>? node,
+                               IComparer<TValue> comparer)
     {
         if (m_Right is not null &&
             node is not null &&
             m_Right.Value is not null &&
-            m_Right.Value
-                   .CompareTo(node.Value) == 0)
+            comparer.Compare(m_Right.Value, node.Value) == 0)
         {
             return;
         }
@@ -107,13 +108,13 @@ partial class BinaryNode<TValue>
         m_Left = node;
     }
 
-    internal void SetRightChild(BinaryNode<TValue>? node)
+    internal void SetRightChild(BinaryNode<TValue>? node,
+                                IComparer<TValue> comparer)
     {
         if (m_Left is not null &&
             node is not null &&
             m_Left.Value is not null &&
-            m_Left.Value
-                  .CompareTo(node.Value) == 0)
+            comparer.Compare(m_Left.Value, node.Value) == 0)
         {
             return;
         }

@@ -23,6 +23,14 @@ public partial class SortedCollection<TElement>
     /// <summary>
     /// Initializes a new instance of the <see cref="SortedCollection{TElement}"/> class.
     /// </summary>
+    /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public static SortedCollection<TElement> Create([DisallowNull] IComparer<TElement> comparer) =>
+        new(capacity: 4,
+            comparer: comparer);
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SortedCollection{TElement}"/> class.
+    /// </summary>
     /// <param name="capacity">The initial capacity of the collection.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
@@ -71,36 +79,13 @@ public partial class SortedCollection<TElement>
         ArgumentNullException.ThrowIfNull(collection);
         ArgumentNullException.ThrowIfNull(comparer);
 
-        if (collection is IReadOnlyCollection<TElement> roc)
+        if (collection is ICollectionWithCount<TElement, TEnumerator> counted)
         {
-            SortedCollection<TElement> result = new(capacity: roc.Count,
+            SortedCollection<TElement> result = new(capacity: counted.Count,
                                                     comparer: comparer);
-            TEnumerator enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
+            foreach (TElement element in collection)
             {
-                result.Add(enumerator.Current);
-            }
-            return result;
-        }
-        else if (collection is ICollection<TElement> ct)
-        {
-            SortedCollection<TElement> result = new(capacity: ct.Count,
-                                                    comparer: comparer);
-            TEnumerator enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                result.Add(enumerator.Current);
-            }
-            return result;
-        }
-        else if (collection is ICollection c)
-        {
-            SortedCollection<TElement> result = new(capacity: c.Count,
-                                                    comparer: comparer);
-            TEnumerator enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
-            {
-                result.Add(enumerator.Current);
+                result.Add(element);
             }
             return result;
         }
@@ -108,10 +93,9 @@ public partial class SortedCollection<TElement>
         {
             SortedCollection<TElement> result = new(capacity: 4,
                                                     comparer: comparer);
-            TEnumerator enumerator = collection.GetEnumerator();
-            while (enumerator.MoveNext())
+            foreach (TElement element in collection)
             {
-                result.Add(enumerator.Current);
+                result.Add(element);
             }
             return result;
         }
@@ -156,27 +140,33 @@ partial class SortedCollection<TElement>
     internal readonly IComparer<TElement> m_Comparer;
 }
 
-// ICollection
-partial class SortedCollection<TElement> : ICollection
+// IReadOnlyCollection<T>
+partial class SortedCollection<TElement> : ICollectionWithCount<TElement, CommonListEnumerator<TElement>>
 {
-    Boolean ICollection.IsSynchronized =>
-        ((ICollection)m_Elements).IsSynchronized;
+    /// <inheritdoc/>
+    public Int32 Count =>
+        m_Elements.Count;
+}
 
-    Object ICollection.SyncRoot =>
-        ((ICollection)m_Elements).SyncRoot;
+// IEnumerable
+partial class SortedCollection<TElement> : IEnumerable
+{
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+}
 
-    void ICollection.CopyTo(Array array,
-                            Int32 index) =>
-        ((ICollection)m_Elements).CopyTo(array: array,
-                                         index: index);
+// IEnumerable<T>
+partial class SortedCollection<TElement> : IEnumerable<TElement>
+{
+    IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
+        this.GetEnumerator();
 }
 
 // ICollection<T>
-partial class SortedCollection<TElement> : ICollection<TElement>
+partial class SortedCollection<TElement> : IModifyableCollection<TElement, CommonListEnumerator<TElement>>
 {
-
     /// <inheritdoc/>
-    public void Add(TElement item)
+    public Boolean Add(TElement item)
     {
         for (Int32 i = 0;
              i < m_Elements.Count;
@@ -187,10 +177,23 @@ partial class SortedCollection<TElement> : ICollection<TElement>
             {
                 m_Elements.Insert(index: i,
                                   item: item);
-                return;
+                return true;
             }
         }
         m_Elements.Add(item);
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public void AddRange<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> enumerable)
+        where TEnumerator : struct, IStrongEnumerator<TElement>
+    {
+        ArgumentNullException.ThrowIfNull(enumerable);
+
+        foreach (TElement item in enumerable)
+        {
+            this.Add(item);
+        }
     }
 
     /// <inheritdoc/>
@@ -198,29 +201,25 @@ partial class SortedCollection<TElement> : ICollection<TElement>
         m_Elements.Clear();
 
     /// <inheritdoc/>
+    public Boolean Remove(TElement item) =>
+        m_Elements.Remove(item);
+}
+
+// IReadOnlyCollection<T>
+partial class SortedCollection<TElement> : IReadOnlyCollection<TElement, CommonListEnumerator<TElement>>
+{
+    /// <inheritdoc/>
     public Boolean Contains(TElement item) =>
         m_Elements.Contains(item);
 
+    /// <inheritdoc/>
+    public void CopyTo(TElement[] array) =>
+        m_Elements.CopyTo(array: array);
     /// <inheritdoc/>
     public void CopyTo(TElement[] array,
                        Int32 arrayIndex) =>
         m_Elements.CopyTo(array: array,
                           arrayIndex: arrayIndex);
-
-    /// <inheritdoc/>
-    public Boolean Remove(TElement item) =>
-        m_Elements.Remove(item);
-
-    /// <inheritdoc/>
-    public Boolean IsReadOnly { get; } = false;
-}
-
-// IReadOnlyCollection<T>
-partial class SortedCollection<TElement> : IReadOnlyCollection<TElement>
-{
-    /// <inheritdoc/>
-    public Int32 Count =>
-        m_Elements.Count;
 }
 
 // IStrongEnumerable<T, U>

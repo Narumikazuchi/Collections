@@ -1,4 +1,4 @@
-﻿namespace Narumikazuchi.Collections.Linq;
+﻿namespace Narumikazuchi.Collections.Extensions;
 
 /// <summary>
 /// Extends the <see cref="IEnumerable{T}"/> interface.
@@ -6,17 +6,68 @@
 public static class EnumerableExtensions
 {
     /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyCollection{T}"/> wrapper for the current collection.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyCollection<TElement> AsReadOnlyCollection<TElement>(this IEnumerable<TElement> source) =>
+        ReadOnlyCollection<TElement>.CreateFrom(source);
+
+    /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyDictionary<TKey, TValue> AsReadOnlyDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)
+        where TKey : notnull =>
+            ReadOnlyDictionary<TKey, TValue>.CreateFrom(source);
+    /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyDictionary<TKey, TElement> AsReadOnlyDictionary<TElement, TKey>(this IEnumerable<TElement> source,
+                                                                                          [DisallowNull] Func<TElement, TKey> keySelector)
+        where TKey : notnull
+    {
+        ArgumentNullException.ThrowIfNull(keySelector);
+
+        return ReadOnlyDictionary<TKey, TElement>.CreateFrom(source.Select(x => new KeyValuePair<TKey, TElement>(key: keySelector.Invoke(x),
+                                                                                                                 value: x)));
+    }
+    /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyDictionary<TKey, TValue> AsReadOnlyDictionary<TElement, TKey, TValue>(this IEnumerable<TElement> source,
+                                                                                                [DisallowNull] Func<TElement, TKey> keySelector,
+                                                                                                [DisallowNull] Func<TElement, TValue> valueSelector)
+        where TKey : notnull
+    {
+        ArgumentNullException.ThrowIfNull(keySelector);
+        ArgumentNullException.ThrowIfNull(valueSelector);
+
+        return ReadOnlyDictionary<TKey, TValue>.CreateFrom(source.Select(x => new KeyValuePair<TKey, TValue>(key: keySelector.Invoke(x),
+                                                                                                             value: valueSelector.Invoke(x))));
+    }
+
+    /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current list.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyList<TElement> AsReadOnlyList<TElement>(this IEnumerable<TElement> source) =>
+        ReadOnlyList<TElement>.CreateFrom(source);
+
+    /// <summary>
     /// Creates a <see cref="BinaryTree{TElement}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
     [return: NotNull]
     public static BinaryTree<TElement> ToBinaryTree<TElement>(this IEnumerable<TElement> source) 
-        where TElement : IComparable<TElement>
+        where TElement : notnull
     {
         if (source is BinaryTree<TElement> original)
         {
             return original;
         }
-        return new(collection: source);
+        return new(collection: source,
+                   comparer: Comparer<TElement>.Default);
     }
 
     /// <summary>
