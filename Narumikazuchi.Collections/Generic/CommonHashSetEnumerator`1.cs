@@ -24,7 +24,6 @@ public struct CommonHashSetEnumerator<TElement> :
     {
         ArgumentNullException.ThrowIfNull(items);
 
-        m_Elements = items;
         m_Enumerator = items.GetEnumerator();
     }
 
@@ -45,6 +44,5 @@ public struct CommonHashSetEnumerator<TElement> :
     Object? IEnumerator.Current =>
         this.Current;
 
-    internal readonly HashSet<TElement> m_Elements;
-    internal readonly HashSet<TElement>.Enumerator m_Enumerator;
+    internal HashSet<TElement>.Enumerator m_Enumerator;
 }
