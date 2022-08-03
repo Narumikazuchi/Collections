@@ -261,9 +261,10 @@ public sealed partial class Trie<TContent>
         }
     }
     /// <inheritdoc/>
-    public void InsertRange<TEnumerator>([DisallowNull] in String index,
-                                         [DisallowNull] IStrongEnumerable<TContent, TEnumerator> enumerable)
+    public void InsertRange<TEnumerable, TEnumerator>([DisallowNull] in String index,
+                                                      [DisallowNull] TEnumerable enumerable)
         where TEnumerator : struct, IStrongEnumerator<TContent>
+        where TEnumerable : IStrongEnumerable<TContent, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(index);
         ArgumentNullException.ThrowIfNull(enumerable);

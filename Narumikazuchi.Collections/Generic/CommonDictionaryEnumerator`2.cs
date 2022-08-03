@@ -1,7 +1,7 @@
 ﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
-/// An enumerator that iterates through the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/>.
+/// An enumerator that iterates through the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/>.
 /// </summary>
 public struct CommonDictionaryEnumerator<TKey, TValue> :
     IStrongEnumerator<KeyValuePair<TKey, TValue>>,
@@ -26,6 +26,7 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         ArgumentNullException.ThrowIfNull(items);
 
         m_Elements = new __DictionaryEntry<TKey, TValue>[items.Count];
+        m_Count = items.Count;
         Int32 index = 0;
         foreach (KeyValuePair<TKey, TValue> element in items)
         {
@@ -47,6 +48,7 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         ArgumentNullException.ThrowIfNull(items);
 
         m_Elements = new __DictionaryEntry<TKey, TValue>[items.Count];
+        m_Count = items.Count;
         Int32 index = 0;
         foreach (KeyValuePair<TKey, TValue> element in items)
         {
@@ -58,15 +60,17 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         }
         m_Index = -1;
     }
-    internal CommonDictionaryEnumerator(in __DictionaryEntry<TKey, TValue>[] elements)
+    internal CommonDictionaryEnumerator(__DictionaryEntry<TKey, TValue>[] elements,
+                                        Int32 count)
     {
         m_Elements = elements;
+        m_Count = count;
         m_Index = -1;
     }
 
     /// <inheritdoc/>
     public Boolean MoveNext() =>
-        ++m_Index < m_Elements.Length;
+        ++m_Index < m_Count;
 
     void IEnumerator.Reset()
     { }
@@ -83,5 +87,6 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         this.Current;
 
     private readonly __DictionaryEntry<TKey, TValue>[] m_Elements;
+    private readonly Int32 m_Count;
     private Int32 m_Index;
 }

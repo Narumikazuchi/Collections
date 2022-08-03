@@ -32,7 +32,8 @@ public readonly partial struct ReadOnlyCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyCollection<TElement> CreateFrom([DisallowNull] IEnumerable<TElement> items)
+    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
 
@@ -90,8 +91,9 @@ public readonly partial struct ReadOnlyCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
+    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(items);
 

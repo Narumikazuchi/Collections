@@ -157,7 +157,8 @@ partial class TrieNode<TContent>
                       TrieNode<TContent>? parent)
     {
         m_Trie = trie;
-        m_Children = SortedCollection<TrieNode<TContent>>.Create(comparer: TrieNodeComparer<TContent>.Instance);
+        m_Children = SortedCollection<TrieNode<TContent>, TrieNodeComparer<TContent>>.Create(capacity: 4,
+                                                                                             comparer: TrieNodeComparer<TContent>.Instance);
         m_Items = new();
         this.Value = Char.ToLower(c: value);
         this.Parent = parent;
@@ -175,7 +176,7 @@ partial class TrieNode<TContent>
     internal readonly HashSet<TContent> m_Items;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    internal readonly SortedCollection<TrieNode<TContent>> m_Children;
+    internal readonly SortedCollection<TrieNode<TContent>, TrieNodeComparer<TContent>> m_Children;
 
     private readonly Trie<TContent> m_Trie;
 }
@@ -223,8 +224,9 @@ partial class TrieNode<TContent> : IModifyableCollection<TContent, CommonHashSet
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerator>([DisallowNull] IStrongEnumerable<TContent, TEnumerator> enumerable)
+    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable enumerable)
         where TEnumerator : struct, IStrongEnumerator<TContent>
+        where TEnumerable : IStrongEnumerable<TContent, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(enumerable);
 

@@ -13,39 +13,33 @@
 /// code then the efficiency of the enumerator will be lost due to call virtualization in the 
 /// compiler generated IL.
 /// </remarks>
-public readonly partial struct ReadOnlySortedList<TElement>
+public readonly partial struct ReadOnlySortedList<TElement, TComparer>
+    where TComparer : IComparer<TElement>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement, TComparer}"/> struct.
     /// </summary>
     public ReadOnlySortedList()
     {
         m_Items = Array.Empty<TElement>();
-        m_Comparer = Comparer<TElement>.Default;
+        this.Comparer = default!;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> class.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement, TComparer}"/> class.
     /// </summary>
-    public static ReadOnlySortedList<TElement> Create() =>
+    public static ReadOnlySortedList<TElement, TComparer> Create() =>
         new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement> CreateFrom([DisallowNull] IEnumerable<TElement> items) =>
-        CreateFrom(items: items,
-                   comparer: Comparer<TElement>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement, TComparer}"/> struct.
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement> CreateFrom([DisallowNull] IEnumerable<TElement> items,
-                                                          [DisallowNull] IComparer<TElement> comparer)
+    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
+                                                                                  [DisallowNull] TComparer comparer)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
@@ -70,30 +64,22 @@ public readonly partial struct ReadOnlySortedList<TElement>
         }
     }
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
-        where TEnumerator : struct, IStrongEnumerator<TElement> =>
-            CreateFrom(items: items,
-                       comparer: Comparer<TElement>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedList{TElement, TComparer}"/> struct.
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items,
-                                                                       [DisallowNull] IComparer<TElement> comparer)
+    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items,
+                                                                                               [DisallowNull] TComparer comparer)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
 
-        if (items is ISortedCollection<TElement, TEnumerator> iSortedCollection)
+        if (items is ISortedCollection<TElement, TEnumerator, TComparer> iSortedCollection)
         {
-            if (iSortedCollection.Comparer == comparer)
+            if (Equals(iSortedCollection.Comparer, comparer))
             {
                 if (iSortedCollection is __IReadOnlyCollection<TElement> iReadOnlyCollectionT &&
                     iReadOnlyCollectionT.TryGetReadOnlyArray(out TElement[]? array))
@@ -133,7 +119,7 @@ public readonly partial struct ReadOnlySortedList<TElement>
     }
 
 #pragma warning disable CS1591
-    public static implicit operator ReadOnlyList<TElement>(in ReadOnlySortedList<TElement> source)
+    public static implicit operator ReadOnlyList<TElement>(in ReadOnlySortedList<TElement, TComparer> source)
     {
         TElement[] items = new TElement[source.Count];
         Array.Copy(sourceArray: source.m_Items,
@@ -145,20 +131,20 @@ public readonly partial struct ReadOnlySortedList<TElement>
 }
 
 // Non-Public
-partial struct ReadOnlySortedList<TElement>
+partial struct ReadOnlySortedList<TElement, TComparer>
 {
     internal ReadOnlySortedList(TElement[] items,
-                                IComparer<TElement> comparer)
+                                TComparer comparer)
     {
         m_Items = items;
-        m_Comparer = comparer;
+        this.Comparer = comparer;
     }
     internal ReadOnlySortedList(IOrderedEnumerable<TElement> items,
-                                IComparer<TElement> comparer,
+                                TComparer comparer,
                                 in Int32 count)
     {
         m_Items = new TElement[count];
-        m_Comparer = comparer;
+        this.Comparer = comparer;
 
         Int32 index = 0;
         foreach (TElement item in items)
@@ -168,11 +154,10 @@ partial struct ReadOnlySortedList<TElement>
     }
 
     internal readonly TElement[] m_Items;
-    internal readonly IComparer<TElement> m_Comparer;
 }
 
 // IReadOnlyCollection<T>
-partial struct ReadOnlySortedList<TElement> : ICollectionWithCount<TElement, CommonArrayEnumerator<TElement>>
+partial struct ReadOnlySortedList<TElement, TComparer> : ICollectionWithCount<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
     public Int32 Count =>
@@ -180,21 +165,21 @@ partial struct ReadOnlySortedList<TElement> : ICollectionWithCount<TElement, Com
 }
 
 // IEnumerable
-partial struct ReadOnlySortedList<TElement> : IEnumerable
+partial struct ReadOnlySortedList<TElement, TComparer> : IEnumerable
 {
     IEnumerator IEnumerable.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IEnumerable<T>
-partial struct ReadOnlySortedList<TElement> : IEnumerable<TElement>
+partial struct ReadOnlySortedList<TElement, TComparer> : IEnumerable<TElement>
 {
     IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IReadOnlyList<T>
-partial struct ReadOnlySortedList<TElement> : ICollectionWithReadIndexer<TElement, CommonArrayEnumerator<TElement>>
+partial struct ReadOnlySortedList<TElement, TComparer> : ICollectionWithReadIndexer<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
     public Int32 IndexOf(TElement element) =>
@@ -210,7 +195,7 @@ partial struct ReadOnlySortedList<TElement> : ICollectionWithReadIndexer<TElemen
 }
 
 // IReadOnlyCollection<T>
-partial struct ReadOnlySortedList<TElement> : IReadOnlyCollection<TElement, CommonArrayEnumerator<TElement>>
+partial struct ReadOnlySortedList<TElement, TComparer> : IReadOnlyCollection<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
     public Boolean Contains(TElement element) =>
@@ -242,15 +227,14 @@ partial struct ReadOnlySortedList<TElement> : IReadOnlyCollection<TElement, Comm
 }
 
 // ISortedCollection<T, U>
-partial struct ReadOnlySortedList<TElement> : ISortedCollection<TElement, CommonArrayEnumerator<TElement>>
+partial struct ReadOnlySortedList<TElement, TComparer> : ISortedCollection<TElement, CommonArrayEnumerator<TElement>, TComparer>
 {
     /// <inheritdoc/>
-    public IComparer<TElement> Comparer =>
-        m_Comparer;
+    public TComparer Comparer { get; }
 }
 
 // IStrongEnumerable<T, U>
-partial struct ReadOnlySortedList<TElement> : IStrongEnumerable<TElement, CommonArrayEnumerator<TElement>>
+partial struct ReadOnlySortedList<TElement, TComparer> : IStrongEnumerable<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
     public CommonArrayEnumerator<TElement> GetEnumerator() =>
@@ -258,7 +242,7 @@ partial struct ReadOnlySortedList<TElement> : IStrongEnumerable<TElement, Common
 }
 
 // __IReadOnlyCollection<T>
-partial struct ReadOnlySortedList<TElement> : __IReadOnlyCollection<TElement>
+partial struct ReadOnlySortedList<TElement, TComparer> : __IReadOnlyCollection<TElement>
 {
     Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
     {

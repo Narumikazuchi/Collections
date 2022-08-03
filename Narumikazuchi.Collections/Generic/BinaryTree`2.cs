@@ -6,37 +6,12 @@ namespace Narumikazuchi.Collections;
 /// Represents a fast binary lookup data structure.
 /// </summary>
 [DebuggerDisplay("Depth = {GetDepth()}")]
-public sealed partial class BinaryTree<TValue>
+public sealed partial class BinaryTree<TValue, TComparer>
     where TValue : notnull
+    where TComparer : IComparer<TValue>
 {
     /// <summary>
-    /// Instantiates a new <see cref="BinaryTree{TValue}"/> with the <paramref name="rootValue"/> as root node.
-    /// </summary>
-    /// <param name="rootValue">The value of the root node.</param>
-    /// <exception cref="ArgumentNullException"/>
-    public BinaryTree([DisallowNull] TValue rootValue) :
-        this(rootValue: rootValue,
-             comparer: Comparer<TValue>.Default)
-    { }
-    /// <summary>
-    /// Instantiates a new <see cref="BinaryTree{TValue}"/> with the <paramref name="rootValue"/> as root node.
-    /// </summary>
-    /// <param name="rootValue">The value of the root node.</param>
-    /// <param name="comparer">The comparer that will be used to compare two <typeparamref name="TValue"/> instances.</param>
-    /// <exception cref="ArgumentNullException"/>
-    public BinaryTree([DisallowNull] TValue rootValue,
-                      [DisallowNull] IComparer<TValue> comparer)
-    {
-        ArgumentNullException.ThrowIfNull(rootValue);
-        ArgumentNullException.ThrowIfNull(comparer);
-
-        m_Root = new BinaryNode<TValue>(value: rootValue,
-                                        parent: null);
-        this.Comparer = comparer;
-    }
-
-    /// <summary>
-    /// Adds the elements of the specified <typeparamref name="TEnumerable"/> to the <see cref="BinaryTree{TValue}"/>.
+    /// Adds the elements of the specified <typeparamref name="TEnumerable"/> to the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
@@ -85,7 +60,7 @@ public sealed partial class BinaryTree<TValue>
     }
 
     /// <summary>
-    /// Removes all <see cref="BinaryNode{TValue}"/> objects from the <see cref="BinaryTree{TValue}"/>, only when their <typeparamref name="TValue"/> matches the specified condition.
+    /// Removes all <see cref="BinaryNode{TValue}"/> objects from the <see cref="BinaryTree{TValue, TComparer}"/>, only when their <typeparamref name="TValue"/> matches the specified condition.
     /// </summary>
     /// <param name="predicate">The condition that the <typeparamref name="TValue"/> needs to meet to be deleted.</param>
     /// <returns>The number of <see cref="BinaryNode{TValue}"/> objects that have been removed.</returns>
@@ -117,7 +92,7 @@ public sealed partial class BinaryTree<TValue>
     }
 
     /// <summary>
-    /// Gets the depth of the <see cref="BinaryTree{TValue}"/>.
+    /// Gets the depth of the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     /// <returns>The depth of the deepest <see cref="BinaryNode{TValue}"/> in the tree.</returns>
     [Pure]
@@ -125,9 +100,9 @@ public sealed partial class BinaryTree<TValue>
         this.GetDepth(node: m_Root);
 
     /// <summary>
-    /// Determines the lowest value in the <see cref="BinaryTree{TValue}"/>.
+    /// Determines the lowest value in the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-    /// <returns>The <typeparamref name="TValue"/> of the lowest element in the <see cref="BinaryTree{TValue}"/>.</returns>
+    /// <returns>The <typeparamref name="TValue"/> of the lowest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
     [Pure]
     [return: NotNull]
     public TValue LowBound()
@@ -141,9 +116,9 @@ public sealed partial class BinaryTree<TValue>
     }
 
     /// <summary>
-    /// Determines the highest value in the <see cref="BinaryTree{TValue}"/>.
+    /// Determines the highest value in the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-    /// <returns>The <typeparamref name="TValue"/> of the highest element in the <see cref="BinaryTree{TValue}"/>.</returns>
+    /// <returns>The <typeparamref name="TValue"/> of the highest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
     [Pure]
     [return: NotNull]
     public TValue HighBound()
@@ -160,15 +135,31 @@ public sealed partial class BinaryTree<TValue>
     /// Returns an <see cref="IStrongEnumerable{TElement, TEnumerator}"/> containing the <typeparamref name="TValue"/> in the traversed order.
     /// </summary>
     /// <param name="traverseMethod">The method to use when traversing.</param>
-    /// <returns>An <see cref="IStrongEnumerable{TElement, TEnumerator}"/> containing all <typeparamref name="TValue"/> in this <see cref="BinaryTree{TValue}"/> in the order specified by the <paramref name="traverseMethod"/>.</returns>
+    /// <returns>An <see cref="IStrongEnumerable{TElement, TEnumerator}"/> containing all <typeparamref name="TValue"/> in this <see cref="BinaryTree{TValue, TComparer}"/> in the order specified by the <paramref name="traverseMethod"/>.</returns>
     [Pure]
     [return: NotNull]
-    public IStrongEnumerable<TValue, Enumerator> Traverse(in BinaryTraversalMethod traverseMethod) =>
-        new Enumerator(tree: this,
-                       method: traverseMethod);
+    public Enumerator Traverse(in BinaryTraversalMethod traverseMethod) =>
+        new(tree: this,
+            method: traverseMethod);
 
     /// <summary>
-    /// Gets the root for the <see cref="BinaryTree{TValue}"/>.
+    /// Instantiates a new <see cref="BinaryTree{TValue, TComparer}"/> with the <paramref name="root"/> as root node.
+    /// </summary>
+    /// <param name="root">The value of the root node.</param>
+    /// <param name="comparer">The comparer that will be used to compare two <typeparamref name="TValue"/> instances.</param>
+    /// <exception cref="ArgumentNullException"/>
+    public static BinaryTree<TValue, TComparer> Create([DisallowNull] TValue root,
+                                                       [DisallowNull] TComparer comparer)
+    {
+        ArgumentNullException.ThrowIfNull(root);
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        return new(root: root,
+                   comparer: comparer);
+    }
+
+    /// <summary>
+    /// Gets the root for the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     [NotNull]
     [Pure]
@@ -186,27 +177,14 @@ public sealed partial class BinaryTree<TValue>
 }
 
 // Non-Public
-partial class BinaryTree<TValue>
+partial class BinaryTree<TValue, TComparer>
 {
-    internal BinaryTree(IEnumerable<TValue> collection,
-                        IComparer<TValue> comparer)
+    internal BinaryTree(TValue root,
+                        TComparer comparer)
     {
-        ArgumentNullException.ThrowIfNull(collection);
-        ArgumentNullException.ThrowIfNull(comparer);
-
-        if (!collection.Any())
-        {
-            throw new ArgumentException(message: CANNOT_CREATE_FROM_EMPTY_COLLECTION);
-        }
-
-        this.Comparer = comparer;
-
-        IOrderedEnumerable<TValue> distinct = collection.Distinct()
-                                                        .OrderBy(i => i);
-        TValue median = distinct.Median()!;
-        m_Root = new(value: median, 
+        m_Root = new(value: root,
                      parent: null);
-        this.AddRange(distinct.Where(x => comparer.Compare(x, median) != 0));
+        this.Comparer = comparer;
     }
 
     private UInt32 GetDepth(BinaryNode<TValue> node)
@@ -318,7 +296,7 @@ partial class BinaryTree<TValue>
 }
 
 // ICollectionWithCount<T, U>
-partial class BinaryTree<TValue> : ICollectionWithCount<TValue, BinaryTree<TValue>.Enumerator>
+partial class BinaryTree<TValue, TComparer> : ICollectionWithCount<TValue, BinaryTree<TValue, TComparer>.Enumerator>
 {
     /// <inheritdoc/>
     public Int32 Count =>
@@ -326,27 +304,27 @@ partial class BinaryTree<TValue> : ICollectionWithCount<TValue, BinaryTree<TValu
 }
 
 // IEnumerable
-partial class BinaryTree<TValue> : IEnumerable
+partial class BinaryTree<TValue, TComparer> : IEnumerable
 {
     IEnumerator IEnumerable.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IEnumerable<T>
-partial class BinaryTree<TValue> : IEnumerable<TValue>
+partial class BinaryTree<TValue, TComparer> : IEnumerable<TValue>
 {
     IEnumerator<TValue> IEnumerable<TValue>.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IModifyableCollection<T, U>
-partial class BinaryTree<TValue> : IModifyableCollection<TValue, BinaryTree<TValue>.Enumerator>
+partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValue, BinaryTree<TValue, TComparer>.Enumerator>
 {
     /// <summary>
-    /// Adds an element to the <see cref="BinaryTree{TValue}"/>.
+    /// Adds an element to the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-    /// <param name="element">The element to add to the <see cref="BinaryTree{TValue}"/>.</param>
-    /// <returns><see langword="true"/> if the element was added to the <see cref="BinaryTree{TValue}"/>; otherwise, <see langword="false"/>.</returns>
+    /// <param name="element">The element to add to the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
+    /// <returns><see langword="true"/> if the element was added to the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
     public Boolean Add([DisallowNull] TValue element)
     {
@@ -400,12 +378,13 @@ partial class BinaryTree<TValue> : IModifyableCollection<TValue, BinaryTree<TVal
     }
 
     /// <summary>
-    /// Adds all elements of an enumerable to the <see cref="BinaryTree{TValue}"/>.
+    /// Adds all elements of an enumerable to the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-    /// <param name="enumerable">The elements to add to the <see cref="BinaryTree{TValue}"/>.</param>
+    /// <param name="enumerable">The elements to add to the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public void AddRange<TEnumerator>([DisallowNull] IStrongEnumerable<TValue, TEnumerator> enumerable)
+    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable enumerable)
         where TEnumerator : struct, IStrongEnumerator<TValue>
+        where TEnumerable : IStrongEnumerable<TValue, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(enumerable);
 
@@ -416,7 +395,7 @@ partial class BinaryTree<TValue> : IModifyableCollection<TValue, BinaryTree<TVal
     }
 
     /// <summary>
-    /// Removes all elements from the <see cref="BinaryTree{TValue}"/>.
+    /// Removes all elements from the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     public void Clear()
     {
@@ -428,10 +407,10 @@ partial class BinaryTree<TValue> : IModifyableCollection<TValue, BinaryTree<TVal
     }
 
     /// <summary>
-    /// Removes the first occurrence of an element from the <see cref="BinaryTree{TValue}"/>.
+    /// Removes the first occurrence of an element from the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-    /// <param name="element">Tehe element to remove from the <see cref="BinaryTree{TValue}"/>.</param>
-    /// <returns><see langword="true"/> if the element was removed from the <see cref="BinaryTree{TValue}"/>; otherwise, <see langword="false"/>.</returns>
+    /// <param name="element">Tehe element to remove from the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
+    /// <returns><see langword="true"/> if the element was removed from the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
     public Boolean Remove([DisallowNull] TValue element)
     {
@@ -515,7 +494,7 @@ partial class BinaryTree<TValue> : IModifyableCollection<TValue, BinaryTree<TVal
 }
 
 // IReadOnlyCollection<T, U>
-partial class BinaryTree<TValue> : IReadOnlyCollection<TValue, BinaryTree<TValue>.Enumerator>
+partial class BinaryTree<TValue, TComparer> : IReadOnlyCollection<TValue, BinaryTree<TValue, TComparer>.Enumerator>
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
@@ -552,16 +531,16 @@ partial class BinaryTree<TValue> : IReadOnlyCollection<TValue, BinaryTree<TValue
 }
 
 // ISortedCollection<T, U>
-partial class BinaryTree<TValue> : ISortedCollection<TValue, BinaryTree<TValue>.Enumerator>
+partial class BinaryTree<TValue, TComparer> : ISortedCollection<TValue, BinaryTree<TValue, TComparer>.Enumerator, TComparer>
 {
     /// <inheritdoc/>
     [Pure]
     [NotNull]
-    public IComparer<TValue> Comparer { get; }
+    public TComparer Comparer { get; }
 }
 
 // IStrongEnumerable<T, U>
-partial class BinaryTree<TValue> : IStrongEnumerable<TValue, BinaryTree<TValue>.Enumerator>
+partial class BinaryTree<TValue, TComparer> : IStrongEnumerable<TValue, BinaryTree<TValue, TComparer>.Enumerator>
 {
     /// <inheritdoc/>
     public Enumerator GetEnumerator() =>
@@ -570,13 +549,13 @@ partial class BinaryTree<TValue> : IStrongEnumerable<TValue, BinaryTree<TValue>.
 }
 
 // Enumerator
-partial class BinaryTree<TValue>
+partial class BinaryTree<TValue, TComparer>
 {
     /// <summary>
-    /// An enumerator that iterates through the <see cref="BinaryTree{TValue}"/>.
+    /// An enumerator that iterates through the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     public struct Enumerator :
-        IStrongEnumerable<TValue, BinaryTree<TValue>.Enumerator>,
+        IStrongEnumerable<TValue, BinaryTree<TValue, TComparer>.Enumerator>,
         IStrongEnumerator<TValue>,
         IEnumerator<TValue>
     {
@@ -588,7 +567,7 @@ partial class BinaryTree<TValue>
         {
             throw new NotAllowed();
         }
-        internal Enumerator(BinaryTree<TValue> tree,
+        internal Enumerator(BinaryTree<TValue, TComparer> tree,
                             in BinaryTraversalMethod method)
         {
             m_Elements = method switch

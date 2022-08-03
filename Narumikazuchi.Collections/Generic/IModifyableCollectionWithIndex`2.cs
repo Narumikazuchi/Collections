@@ -24,9 +24,10 @@ public interface IModifyableCollectionWithIndex<TElement, TEnumerator> :
     /// <param name="index">The zero-based index of the location where to start inserting the elements.</param>
     /// <param name="enumerable">The elements to insert.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public void InsertRange<TOtherEnumerator>(Int32 index,
-                                              IStrongEnumerable<TElement, TOtherEnumerator> enumerable)
-        where TOtherEnumerator : struct, IStrongEnumerator<TElement>;
+    public void InsertRange<TEnumerable, TOtherEnumerator>(Int32 index,
+                                                           [DisallowNull] TEnumerable enumerable)
+        where TOtherEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TOtherEnumerator>;
 
     /// <summary>
     /// Removes the element at the specified index.

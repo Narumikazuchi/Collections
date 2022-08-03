@@ -14,17 +14,15 @@
 /// The idea for this interface and it's implementation is taken from the official source
 /// code of the <see cref="System.Collections.Immutable"/> namespace.
 /// </remarks>
-public interface IStrongEnumerator<out TElement>
+public interface IStrongEnumerator<out TElement> :
+    IEnumerator<TElement>
 {
-    /// <summary>
-    /// Advances the enumerator to the next element in the collection.
-    /// </summary>
-    /// <returns><see langword="true"/> if the enumerator has advanced to the next element; otherwise, <see langword="false"/></returns>
-    /// <exception cref="InvalidOperationException"/>
-    public Boolean MoveNext();
+    void IDisposable.Dispose()
+    { }
 
-    /// <summary>
-    /// Gets the element in the collection that is at the current position of the enumerator.
-    /// </summary>
-    public TElement Current { get; }
+    void IEnumerator.Reset()
+    { }
+
+    Object? IEnumerator.Current =>
+        this.Current;
 }

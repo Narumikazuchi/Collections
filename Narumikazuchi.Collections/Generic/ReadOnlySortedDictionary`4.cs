@@ -11,58 +11,41 @@
 /// the <see cref="IEnumerable{T}"/> or any other derivative interface in your code then the 
 /// efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
 /// </remarks>
-public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
+public readonly partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer>
     where TKey : notnull
+    where TComparer : IComparer<TKey>
+    where TEqualityComparer : IEqualityComparer<TKey>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/> struct.
     /// </summary>
     public ReadOnlySortedDictionary()
     {
         m_Buckets = Array.Empty<Int32>();
         m_Entries = Array.Empty<__DictionaryEntry<TKey, TValue>>();
-        m_EqualityComparer = EqualityComparer<TKey>.Default;
-        m_Comparer = Comparer<TKey>.Default;
+        this.EqualityComparer = default!;
+        this.Comparer = default!;
         this.Count = 0;
         this.Keys = new();
         this.Values = new();
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> class.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/> class.
     /// </summary>
-    public static ReadOnlySortedDictionary<TKey, TValue> Create() =>
+    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> Create() =>
         new();
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom([DisallowNull] IEnumerable<KeyValuePair<TKey, TValue>> items) =>
-        CreateFrom(items: items,
-                   equalityComparer: EqualityComparer<TKey>.Default,
-                   comparer: Comparer<TKey>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom([DisallowNull] IEnumerable<KeyValuePair<TKey, TValue>> items,
-                                                                    [DisallowNull] IEqualityComparer<TKey> equalityComparer) =>
-        CreateFrom(items: items,
-                   equalityComparer: equalityComparer,
-                   comparer: Comparer<TKey>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/> struct.
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom([DisallowNull] IEnumerable<KeyValuePair<TKey, TValue>> items,
-                                                                    [DisallowNull] IEqualityComparer<TKey> equalityComparer,
-                                                                    [DisallowNull] IComparer<TKey> comparer)
+    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
+                                                                                                               [DisallowNull] TEqualityComparer equalityComparer,
+                                                                                                               [DisallowNull] TComparer comparer)
+        where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
@@ -91,48 +74,27 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
         }
     }
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items)
-        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>> =>
-            CreateFrom(items: items,
-                       equalityComparer: EqualityComparer<TKey>.Default,
-                       comparer: Comparer<TKey>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
-    /// </summary>
-    /// <param name="items">The items that the resulting collection shall hold.</param>
-    /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
-    /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items,
-                                                                                 [DisallowNull] IEqualityComparer<TKey> equalityComparer)
-        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>> =>
-            CreateFrom(items: items,
-                       equalityComparer: equalityComparer,
-                       comparer: Comparer<TKey>.Default);
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue}"/> struct.
+    /// Initializes a new instance of the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/> struct.
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator> items,
-                                                                                 [DisallowNull] IEqualityComparer<TKey> equalityComparer,
-                                                                                 [DisallowNull] IComparer<TKey> comparer)
+    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items,
+                                                                                                                            [DisallowNull] TEqualityComparer equalityComparer,
+                                                                                                                            [DisallowNull] TComparer comparer)
         where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
+        where TEnumerable : IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
         ArgumentNullException.ThrowIfNull(comparer);
 
-        if (items is ReadOnlySortedDictionary<TKey, TValue> readOnlySortedDictionary)
+        if (items is ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> readOnlySortedDictionary)
         {
-            if (readOnlySortedDictionary.m_Comparer == comparer)
+            if (Equals(readOnlySortedDictionary.Comparer, comparer))
             {
-                return ReadOnlySortedDictionary<TKey, TValue>.Clone(readOnlySortedDictionary);
+                return ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer>.Clone(readOnlySortedDictionary);
             }
             else
             {
@@ -163,27 +125,27 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue>
 }
 
 // Non-Public
-partial struct ReadOnlySortedDictionary<TKey, TValue>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer>
 {
     private ReadOnlySortedDictionary(Int32[] buckets,
                                      __DictionaryEntry<TKey, TValue>[] entries,
-                                     IEqualityComparer<TKey> equalityComparer,
-                                     IComparer<TKey> comparer,
+                                     TEqualityComparer equalityComparer,
+                                     TComparer comparer,
                                      ReadOnlyCollection<TKey> keys,
                                      ReadOnlyCollection<TValue> values)
     {
         m_Buckets = buckets;
         m_Entries = entries;
-        m_EqualityComparer = equalityComparer;
-        m_Comparer = comparer;
+        this.EqualityComparer = equalityComparer;
+        this.Comparer = comparer;
         this.Count = keys.Count;
         this.Keys = keys;
         this.Values = values;
     }
     private ReadOnlySortedDictionary(IOrderedEnumerable<KeyValuePair<TKey, TValue>> items,
                                      in Int32 count,
-                                     IEqualityComparer<TKey> equalityComparer,
-                                     IComparer<TKey> comparer)
+                                     TEqualityComparer equalityComparer,
+                                     TComparer comparer)
     {
         // Initialize
         Int32 size = Primes.GetNext(count);
@@ -196,8 +158,8 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
             m_Buckets[index] = -1;
         }
         m_Entries = new __DictionaryEntry<TKey, TValue>[size];
-        m_EqualityComparer = equalityComparer;
-        m_Comparer = comparer;
+        this.EqualityComparer = equalityComparer;
+        this.Comparer = comparer;
 
         // Adding
         List<TKey> keys = new();
@@ -205,7 +167,7 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
         index = 0;
         foreach (KeyValuePair<TKey, TValue> item in items)
         {
-            Int32 hashcode = m_EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
+            Int32 hashcode = this.EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
             Int32 bucket = hashcode % m_Buckets.Length;
 
             Boolean add = true;
@@ -214,8 +176,8 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
                  i = m_Entries[i].Next)
             {
                 if (m_Entries[i].HashCode == hashcode &&
-                    m_EqualityComparer.Equals(x: item.Key,
-                                              y: m_Entries[i].Key))
+                    this.EqualityComparer.Equals(x: item.Key,
+                                                 y: m_Entries[i].Key))
                 {
                     add = false;
                     break;
@@ -243,8 +205,8 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
         this.Values = ReadOnlyCollection<TValue>.CreateFrom(values);
     }
     private ReadOnlySortedDictionary(KeyValuePair<TKey, TValue>[] items,
-                                     IEqualityComparer<TKey> equalityComparer,
-                                     IComparer<TKey> comparer)
+                                     TEqualityComparer equalityComparer,
+                                     TComparer comparer)
     {
         // Initialize
         Int32 size = Primes.GetNext(items.Length);
@@ -257,8 +219,8 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
             m_Buckets[index] = -1;
         }
         m_Entries = new __DictionaryEntry<TKey, TValue>[size];
-        m_EqualityComparer = equalityComparer;
-        m_Comparer = comparer;
+        this.EqualityComparer = equalityComparer;
+        this.Comparer = comparer;
 
         // Adding
         List<TKey> keys = new();
@@ -266,7 +228,7 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
         index = 0;
         foreach (KeyValuePair<TKey, TValue> item in items)
         {
-            Int32 hashcode = m_EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
+            Int32 hashcode = this.EqualityComparer.GetHashCode(item.Key) & 0x7FFFFFFF;
             Int32 bucket = hashcode % m_Buckets.Length;
 
             Boolean add = true;
@@ -275,8 +237,8 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
                  i = m_Entries[i].Next)
             {
                 if (m_Entries[i].HashCode == hashcode &&
-                    m_EqualityComparer.Equals(x: item.Key,
-                                              y: m_Entries[i].Key))
+                    this.EqualityComparer.Equals(x: item.Key,
+                                                 y: m_Entries[i].Key))
                 {
                     add = false;
                     break;
@@ -311,14 +273,14 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
 
         if (m_Buckets is not null)
         {
-            Int32 hashCode = m_EqualityComparer.GetHashCode(key) & 0x7FFFFFFF;
+            Int32 hashCode = this.EqualityComparer.GetHashCode(key) & 0x7FFFFFFF;
             for (Int32 index = m_Buckets[hashCode % m_Buckets.Length];
                  index > -1;
                  index = m_Entries[index].Next)
             {
                 if (m_Entries[index].HashCode == hashCode &&
-                    m_EqualityComparer.Equals(x: m_Entries[index].Key,
-                                              y: key))
+                    this.EqualityComparer.Equals(x: m_Entries[index].Key,
+                                                 y: key))
                 {
                     return index;
                 }
@@ -327,43 +289,41 @@ partial struct ReadOnlySortedDictionary<TKey, TValue>
         return -1;
     }
 
-    private static ReadOnlySortedDictionary<TKey, TValue> Clone(ReadOnlySortedDictionary<TKey, TValue> dictionary) => 
+    private static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> Clone(ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> dictionary) => 
         new(buckets: dictionary.m_Buckets,
             entries: dictionary.m_Entries,
-            equalityComparer: dictionary.m_EqualityComparer,
-            comparer: dictionary.m_Comparer,
+            equalityComparer: dictionary.EqualityComparer,
+            comparer: dictionary.Comparer,
             keys: dictionary.Keys,
             values: dictionary.Values);
 
     internal readonly Int32[] m_Buckets;
     internal readonly __DictionaryEntry<TKey, TValue>[] m_Entries;
-    internal readonly IEqualityComparer<TKey> m_EqualityComparer;
-    internal readonly IComparer<TKey> m_Comparer;
 }
 
 // IReadOnlyCollection<T>
-partial struct ReadOnlySortedDictionary<TKey, TValue> : ICollectionWithCount<KeyValuePair<TKey, TValue>, CommonDictionaryEnumerator<TKey, TValue>>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : ICollectionWithCount<KeyValuePair<TKey, TValue>, CommonDictionaryEnumerator<TKey, TValue>>
 {
     /// <inheritdoc/>
     public Int32 Count { get; }
 }
 
 // IEnumerable
-partial struct ReadOnlySortedDictionary<TKey, TValue> : IEnumerable
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : IEnumerable
 {
     IEnumerator IEnumerable.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IEnumerable<T>
-partial struct ReadOnlySortedDictionary<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : IEnumerable<KeyValuePair<TKey, TValue>>
 {
     IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
         this.GetEnumerator();
 }
 
 // IReadOnlyDictionary<T, U>
-partial struct ReadOnlySortedDictionary<TKey, TValue> : IReadOnlyLookup<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : IReadOnlyLookup<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>, TEqualityComparer>
 {
     /// <inheritdoc/>
     public Boolean ContainsKey([DisallowNull] TKey key) =>
@@ -406,34 +366,45 @@ partial struct ReadOnlySortedDictionary<TKey, TValue> : IReadOnlyLookup<TKey, TV
 
     /// <inheritdoc/>
     public ReadOnlyCollection<TValue> Values { get; }
+
+    /// <inheritdoc/>
+    public TEqualityComparer EqualityComparer { get; }
+}
+
+// ISortedDictionary<T, U>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : ISortedDictionary<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>, TEqualityComparer, TComparer>
+{
+    /// <inheritdoc/>
+    public TComparer Comparer { get; }
 }
 
 // IStrongEnumerable<T, U>
-partial struct ReadOnlySortedDictionary<TKey, TValue> : IStrongEnumerable<KeyValuePair<TKey, TValue>, CommonDictionaryEnumerator<TKey, TValue>>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : IStrongEnumerable<KeyValuePair<TKey, TValue>, CommonDictionaryEnumerator<TKey, TValue>>
 {
     /// <inheritdoc/>
     public CommonDictionaryEnumerator<TKey, TValue> GetEnumerator() =>
-        new(m_Entries);
+        new(elements: m_Entries,
+            count: this.Count);
 }
 
 // __IReadOnlyDictionary<T, U>
-partial struct ReadOnlySortedDictionary<TKey, TValue> : __IReadOnlyDictionary<TKey, TValue>
+partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>
 {
-    Int32 __IReadOnlyDictionary<TKey, TValue>.Size =>
+    Int32 __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Size =>
         m_Entries.Length;
 
-    Int32[] __IReadOnlyDictionary<TKey, TValue>.Buckets =>
+    Int32[] __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Buckets =>
         m_Buckets;
 
-    __DictionaryEntry<TKey, TValue>[] __IReadOnlyDictionary<TKey, TValue>.Entries =>
+    __DictionaryEntry<TKey, TValue>[] __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Entries =>
         m_Entries;
 
-    IEqualityComparer<TKey> __IReadOnlyDictionary<TKey, TValue>.EqualityComparer =>
-        m_EqualityComparer;
+    TEqualityComparer __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.EqualityComparer =>
+        this.EqualityComparer;
 
-    ReadOnlyCollection<TKey> __IReadOnlyDictionary<TKey, TValue>.Keys =>
+    ReadOnlyCollection<TKey> __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Keys =>
         this.Keys;
 
-    ReadOnlyCollection<TValue> __IReadOnlyDictionary<TKey, TValue>.Values =>
+    ReadOnlyCollection<TValue> __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Values =>
         this.Values;
 }

@@ -1,7 +1,8 @@
 ﻿namespace Narumikazuchi.Collections;
 
-internal interface __IReadOnlyDictionary<TKey, TValue>
+internal interface __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>
     where TKey : notnull
+    where TEqualityComparer : IEqualityComparer<TKey>
 {
     internal Int32 Size { get; }
 
@@ -9,7 +10,7 @@ internal interface __IReadOnlyDictionary<TKey, TValue>
 
     internal __DictionaryEntry<TKey, TValue>[] Entries { get; }
 
-    internal IEqualityComparer<TKey> EqualityComparer { get; }
+    internal TEqualityComparer EqualityComparer { get; }
 
     internal ReadOnlyCollection<TKey> Keys { get; }
 

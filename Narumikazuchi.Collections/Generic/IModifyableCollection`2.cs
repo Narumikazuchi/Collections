@@ -19,8 +19,9 @@ public interface IModifyableCollection<TElement, TEnumerator> :
     /// </summary>
     /// <param name="enumerable">The elements to add to the <see cref="IModifyableCollection{TElement, TEnumerator}"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public void AddRange<TOtherEnumerator>(IStrongEnumerable<TElement, TOtherEnumerator> enumerable)
-        where TOtherEnumerator : struct, IStrongEnumerator<TElement>;
+    public void AddRange<TEnumerable, TOtherEnumerator>([DisallowNull] TEnumerable enumerable)
+        where TOtherEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TOtherEnumerator>;
 
     /// <summary>
     /// Removes all elements from the <see cref="IModifyableCollection{TElement, TEnumerator}"/>.

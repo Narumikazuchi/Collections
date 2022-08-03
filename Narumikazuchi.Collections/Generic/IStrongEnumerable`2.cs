@@ -10,12 +10,19 @@
 /// The idea for this interface and it's implementation is taken from the official source
 /// code of the <see cref="System.Collections.Immutable"/> namespace.
 /// </remarks>
-public interface IStrongEnumerable<out TElement, out TEnumerator>
+public interface IStrongEnumerable<out TElement, out TEnumerator> :
+    IEnumerable<TElement>
         where TEnumerator : struct, IStrongEnumerator<TElement>
 {
     /// <summary>
     /// Returns an enumerator that iterates through the collection.
     /// </summary>
     /// <returns>An enumerator that can be used to iterate through the collection.</returns>
-    public TEnumerator GetEnumerator();
+    public new TEnumerator GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+
+    IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() =>
+        this.GetEnumerator();
 }

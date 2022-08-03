@@ -1,7 +1,7 @@
 ﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
-/// Defines the Traversal method for a <see cref="BinaryTree{T}"/>.
+/// Defines the Traversal method for a <see cref="BinaryTree{TValue, TComparer}"/>.
 /// </summary>
 public enum BinaryTraversalMethod
 {

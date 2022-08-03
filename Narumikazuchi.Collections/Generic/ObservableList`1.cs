@@ -15,7 +15,8 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static new ObservableList<TElement> CreateFrom([DisallowNull] IEnumerable<TElement> items)
+    public static new ObservableList<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         return new(new List<TElement>(items));
@@ -25,8 +26,9 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static new ObservableList<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
+    public static new ObservableList<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(items);
 
@@ -118,10 +120,13 @@ partial class ObservableList<TElement> : IModifyableCollectionWithIndex<TElement
     }
 
     /// <inheritdoc />
-    public void InsertRange<TEnumerator>(Int32 index,
-                                         [DisallowNull] IStrongEnumerable<TElement, TEnumerator> enumerable)
+    public void InsertRange<TEnumerable, TEnumerator>(Int32 index,
+                                                      [DisallowNull] TEnumerable enumerable)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+        ArgumentNullException.ThrowIfNull(enumerable);
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         if (enumerable is ICollectionWithCount<TElement, TEnumerator> collection)
         {

@@ -1,7 +1,7 @@
 ﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
-/// Represents a node of a <see cref="BinaryTree{TValue}"/>.
+/// Represents a node of a <see cref="BinaryTree{TValue, TComparer}"/>.
 /// </summary>
 [DebuggerDisplay("{Value}")]
 public sealed partial class BinaryNode<TValue>
@@ -47,7 +47,7 @@ public sealed partial class BinaryNode<TValue>
         m_Right;
 
     /// <summary>
-    /// Gets the depth of this node in it's corresponding <see cref="BinaryTree{TValue}"/>. Should be 0 for root nodes.
+    /// Gets the depth of this node in it's corresponding <see cref="BinaryTree{TValue, TComparer}"/>. Should be 0 for root nodes.
     /// </summary>
     [Pure]
     public UInt32 Depth { get; }
@@ -94,8 +94,9 @@ partial class BinaryNode<TValue>
     internal void SetParent(BinaryNode<TValue>? parent) => 
         m_Parent = parent;
 
-    internal void SetLeftChild(BinaryNode<TValue>? node,
-                               IComparer<TValue> comparer)
+    internal void SetLeftChild<TComparer>(BinaryNode<TValue>? node,
+                                          TComparer comparer)
+        where TComparer : IComparer<TValue>
     {
         if (m_Right is not null &&
             node is not null &&
@@ -108,8 +109,9 @@ partial class BinaryNode<TValue>
         m_Left = node;
     }
 
-    internal void SetRightChild(BinaryNode<TValue>? node,
-                                IComparer<TValue> comparer)
+    internal void SetRightChild<TComparer>(BinaryNode<TValue>? node,
+                                           TComparer comparer)
+        where TComparer : IComparer<TValue>
     {
         if (m_Left is not null &&
             node is not null &&

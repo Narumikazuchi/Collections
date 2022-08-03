@@ -15,9 +15,11 @@ public partial class ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ObservableCollection<TElement> CreateFrom([DisallowNull] IEnumerable<TElement> items)
+    public static ObservableCollection<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
+
         return new(new List<TElement>(items));
     }
     /// <summary>
@@ -25,8 +27,9 @@ public partial class ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ObservableCollection<TElement> CreateFrom<TEnumerator>([DisallowNull] IStrongEnumerable<TElement, TEnumerator> items)
+    public static ObservableCollection<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
         ArgumentNullException.ThrowIfNull(items);
 
@@ -102,9 +105,12 @@ partial class ObservableCollection<TElement> : IModifyableCollection<TElement, C
     }
 
     /// <inheritdoc/>
-    public void AddRange<TEnumerator>(IStrongEnumerable<TElement, TEnumerator> collection)
+    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable collection)
         where TEnumerator : struct, IStrongEnumerator<TElement>
+        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+        ArgumentNullException.ThrowIfNull(collection);
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         if (collection is ICollectionWithCount<TElement, TEnumerator> counted)
         {
