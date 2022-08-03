@@ -419,9 +419,10 @@ public static class ListExtensions
     /// <param name="items">The collection whose elements should be inserted into the <see cref="IList{T}"/>.</param>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static void InsertRange<TElement>(this IList<TElement> source,
-                                             Int32 index,
-                                             [DisallowNull] IEnumerable<TElement> items)
+    public static void InsertRange<TEnumerable, TElement>(this IList<TElement> source,
+                                                          Int32 index,
+                                                          [DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(items);
         index.ThrowIfOutOfRange(0, source.Count - 1);

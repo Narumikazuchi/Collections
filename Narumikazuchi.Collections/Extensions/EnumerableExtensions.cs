@@ -13,39 +13,48 @@ public static class EnumerableExtensions
         ReadOnlyCollection<TElement>.CreateFrom(source);
 
     /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
     /// </summary>
     /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TValue> AsReadOnlyDictionary<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source)
-        where TKey : notnull =>
-            ReadOnlyDictionary<TKey, TValue>.CreateFrom(source);
-    /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
-    /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TElement> AsReadOnlyDictionary<TElement, TKey>(this IEnumerable<TElement> source,
-                                                                                          [DisallowNull] Func<TElement, TKey> keySelector)
+    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TKey, TValue, TEqualityComparer>(this IEnumerable<KeyValuePair<TKey, TValue>> source,
+                                                                                                                            [DisallowNull] TEqualityComparer equalityComparer)
         where TKey : notnull
+        where TEqualityComparer : IEqualityComparer<TKey> =>
+            ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source,
+                                                                           equalityComparer: equalityComparer);
+    /// <summary>
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
+    /// </summary>
+    /// <returns>An object that contains the objects of the source and is read-only.</returns>
+    public static ReadOnlyDictionary<TKey, TElement, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TEqualityComparer>(this IEnumerable<TElement> source,
+                                                                                                                                [DisallowNull] TEqualityComparer equalityComparer,
+                                                                                                                                [DisallowNull] Func<TElement, TKey> keySelector)
+        where TKey : notnull
+        where TEqualityComparer : IEqualityComparer<TKey>
     {
         ArgumentNullException.ThrowIfNull(keySelector);
 
-        return ReadOnlyDictionary<TKey, TElement>.CreateFrom(source.Select(x => new KeyValuePair<TKey, TElement>(key: keySelector.Invoke(x),
-                                                                                                                 value: x)));
+        return ReadOnlyDictionary<TKey, TElement, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TElement>(key: keySelector.Invoke(x),
+                                                                                                                                           value: x)),
+                                                                                equalityComparer: equalityComparer);
     }
     /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
     /// </summary>
     /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TValue> AsReadOnlyDictionary<TElement, TKey, TValue>(this IEnumerable<TElement> source,
-                                                                                                [DisallowNull] Func<TElement, TKey> keySelector,
-                                                                                                [DisallowNull] Func<TElement, TValue> valueSelector)
+    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TValue, TEqualityComparer>(this IEnumerable<TElement> source,
+                                                                                                                                      [DisallowNull] TEqualityComparer equalityComparer,
+                                                                                                                                      [DisallowNull] Func<TElement, TKey> keySelector,
+                                                                                                                                      [DisallowNull] Func<TElement, TValue> valueSelector)
         where TKey : notnull
+        where TEqualityComparer : IEqualityComparer<TKey>
     {
         ArgumentNullException.ThrowIfNull(keySelector);
         ArgumentNullException.ThrowIfNull(valueSelector);
 
-        return ReadOnlyDictionary<TKey, TValue>.CreateFrom(source.Select(x => new KeyValuePair<TKey, TValue>(key: keySelector.Invoke(x),
-                                                                                                             value: valueSelector.Invoke(x))));
+        return ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TValue>(key: keySelector.Invoke(x),
+                                                                                                                                       value: valueSelector.Invoke(x))),
+                                                                              equalityComparer: equalityComparer);
     }
 
     /// <summary>
@@ -56,18 +65,36 @@ public static class EnumerableExtensions
         ReadOnlyList<TElement>.CreateFrom(source);
 
     /// <summary>
-    /// Creates a <see cref="BinaryTree{TElement}"/> from an <see cref="IEnumerable{T}"/>.
+    /// Creates a <see cref="BinaryTree{TElement, TComparer}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
     [return: NotNull]
-    public static BinaryTree<TElement> ToBinaryTree<TElement>(this IEnumerable<TElement> source) 
+    public static BinaryTree<TElement, TComparer> ToBinaryTree<TElement, TComparer>(this IEnumerable<TElement> source,
+                                                                                    [DisallowNull] TComparer comparer) 
         where TElement : notnull
+        where TComparer : IComparer<TElement>
     {
-        if (source is BinaryTree<TElement> original)
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        if (source is BinaryTree<TElement, TComparer> original)
         {
             return original;
         }
-        return new(collection: source,
-                   comparer: Comparer<TElement>.Default);
+
+        if (!source.Any())
+        {
+            throw new InvalidOperationException("No elements in the source!");
+        }
+
+        TElement median = source.Median()!;
+        BinaryTree<TElement, TComparer> result = new(root: median,
+                                                     comparer: comparer);
+        foreach (TElement element in source)
+        {
+            result.Add(element);
+        }
+
+        return result;
     }
 
     /// <summary>

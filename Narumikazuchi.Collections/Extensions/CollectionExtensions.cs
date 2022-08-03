@@ -11,9 +11,9 @@ public static class CollectionExtensions
     /// <param name="source"></param>
     /// <param name="other">The collection to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public static void AddRange<TElement>(this ICollection<TElement> source,
-                                          [DisallowNull] IEnumerable<TElement> other)
-        where TElement : notnull
+    public static void AddRange<TEnumerable, TElement>(this ICollection<TElement> source,
+                                                       [DisallowNull] TEnumerable other)
+        where TEnumerable : IEnumerable<TElement>
     {
         ArgumentNullException.ThrowIfNull(other);
 
