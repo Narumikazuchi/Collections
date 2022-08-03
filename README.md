@@ -39,7 +39,7 @@ public class WithoutInterfaceEnumerable
 }
 ```  
 ## Compilation
-What happens when the compiler sees a foreach-loop? He resolves it, but what does he resolve it into? Arrays are actually a special case in that the compiler transforms them into a while loop like in the example below.  
+What happens when the compiler sees a foreach-loop? He lowers it, but what does he lower it into? Arrays are actually a special case in that the compiler transforms them into a while loop like in the example below.  
 ```csharp
 Int32[] array = new Int32[] { ... };
 foreach (Int32 value in array)
