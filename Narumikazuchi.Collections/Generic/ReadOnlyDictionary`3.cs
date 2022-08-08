@@ -159,7 +159,7 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
                                 TEqualityComparer equalityComparer)
     {
         // Initialize
-        Int32 size = Primes.GetNext(items.Length);
+        Int32 size = (Int32)Primes.GetNext(items.Length);
         m_Buckets = new Int32[size];
         Int32 index;
         for (index = 0;
@@ -218,7 +218,7 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
                                 TEqualityComparer equalityComparer)
     {
         // Initialize
-        Int32 size = Primes.GetNext(items.Length);
+        Int32 size = (Int32)Primes.GetNext(items.Length);
         m_Buckets = new Int32[size];
         Int32 index;
         for (index = 0;
@@ -277,7 +277,7 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
                                 TEqualityComparer equalityComparer)
     {
         // Initialize
-        Int32 size = Primes.GetNext(items.Count);
+        Int32 size = (Int32)Primes.GetNext(items.Count);
         m_Buckets = new Int32[size];
         Int32 index;
         for (index = 0;

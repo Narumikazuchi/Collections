@@ -148,7 +148,7 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
                                      TComparer comparer)
     {
         // Initialize
-        Int32 size = Primes.GetNext(count);
+        Int32 size = (Int32)Primes.GetNext(count);
         m_Buckets = new Int32[size];
         Int32 index;
         for (index = 0;
@@ -209,7 +209,7 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
                                      TComparer comparer)
     {
         // Initialize
-        Int32 size = Primes.GetNext(items.Length);
+        Int32 size = (Int32)Primes.GetNext(items.Length);
         m_Buckets = new Int32[size];
         Int32 index;
         for (index = 0;
