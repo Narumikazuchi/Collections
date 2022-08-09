@@ -536,12 +536,6 @@
             An enumerator that iterates through an array of type <typeparamref name="TElement"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor">
-            <summary>
-            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonArrayEnumerator`1"/> is not allowed.
-            </summary>
-            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
-        </member>
         <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor(`0[])">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonArrayEnumerator`1"/> struct.
@@ -566,12 +560,6 @@
             <summary>
             An enumerator that iterates through the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`4"/>.
             </summary>
-        </member>
-        <member name="M:Narumikazuchi.Collections.CommonDictionaryEnumerator`2.#ctor">
-            <summary>
-            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonDictionaryEnumerator`2"/> is not allowed.
-            </summary>
-            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
         </member>
         <member name="M:Narumikazuchi.Collections.CommonDictionaryEnumerator`2.#ctor(System.Collections.Generic.Dictionary{`0,`1})">
             <summary>
@@ -598,12 +586,6 @@
             An enumerator that iterates through a <see cref="T:System.Collections.Generic.List`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CommonHashSetEnumerator`1.#ctor">
-            <summary>
-            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonHashSetEnumerator`1"/> is not allowed.
-            </summary>
-            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
-        </member>
         <member name="M:Narumikazuchi.Collections.CommonHashSetEnumerator`1.#ctor(System.Collections.Generic.HashSet{`0})">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonHashSetEnumerator`1"/> struct.
@@ -621,12 +603,6 @@
             <summary>
             An enumerator that iterates through a <see cref="T:System.Collections.Generic.List`1"/>.
             </summary>
-        </member>
-        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor">
-            <summary>
-            The default constructor for the <see cref="T:Narumikazuchi.Collections.CommonListEnumerator`1"/> is not allowed.
-            </summary>
-            <exception cref="T:Narumikazuchi.NotAllowed"></exception>
         </member>
         <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
