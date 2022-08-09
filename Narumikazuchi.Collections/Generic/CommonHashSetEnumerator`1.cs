@@ -8,14 +8,6 @@ public struct CommonHashSetEnumerator<TElement> :
     IEnumerator<TElement>
 {
     /// <summary>
-    /// The default constructor for the <see cref="CommonHashSetEnumerator{TElement}"/> is not allowed.
-    /// </summary>
-    /// <exception cref="NotAllowed"></exception>
-    public CommonHashSetEnumerator()
-    {
-        throw new NotAllowed();
-    }
-    /// <summary>
     /// Initializes a new instance of the <see cref="CommonHashSetEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The <see cref="HashSet{T}"/> containing the items to iterate through.</param>

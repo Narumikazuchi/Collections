@@ -337,14 +337,25 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
     public Boolean TryGetValue([DisallowNull] TKey key,
                                [NotNullWhen(true)] out TValue? value)
     {
-        Int32 index = this.FindEntry(key);
-        if (index > -1)
+        if (m_Entries is null)
         {
-            value = m_Entries[index].Value!;
-            return true;
+            value = default;
+            return false;
         }
-        value = default;
-        return false;
+        else
+        {
+            Int32 index = this.FindEntry(key);
+            if (index > -1)
+            {
+                value = m_Entries[index].Value!;
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -352,12 +363,22 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
     {
         get
         {
-            Int32 index = this.FindEntry(key);
-            if (index > -1)
+            if (m_Entries is null)
             {
-                return m_Entries[index].Value;
+                throw new KeyNotFoundException();
             }
-            throw new KeyNotFoundException();
+            else
+            {
+                Int32 index = this.FindEntry(key);
+                if (index > -1)
+                {
+                    return m_Entries[index].Value;
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+            }
         }
     }
 
@@ -383,21 +404,33 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
 {
     /// <inheritdoc/>
     public CommonDictionaryEnumerator<TKey, TValue> GetEnumerator() =>
-        new(elements: m_Entries,
+        new(elements: m_Entries ?? Array.Empty<__DictionaryEntry<TKey, TValue>>(),
             count: this.Count);
 }
 
 // __IReadOnlyDictionary<T, U>
 partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>
 {
-    Int32 __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Size =>
-        m_Entries.Length;
+    Int32 __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Size
+    {
+        get
+        {
+            if (m_Entries is null)
+            {
+                return 0;
+            }
+            else
+            {
+                return m_Entries.Length;
+            }
+        }
+    }
 
     Int32[] __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Buckets =>
-        m_Buckets;
+        m_Buckets ?? Array.Empty<Int32>();
 
     __DictionaryEntry<TKey, TValue>[] __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.Entries =>
-        m_Entries;
+        m_Entries ?? Array.Empty<__DictionaryEntry<TKey, TValue>>();
 
     TEqualityComparer __IReadOnlyDictionary<TKey, TValue, TEqualityComparer>.EqualityComparer =>
         this.EqualityComparer;

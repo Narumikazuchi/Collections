@@ -8,14 +8,6 @@ public struct CommonArrayEnumerator<TElement> :
     IEnumerator<TElement>
 {
     /// <summary>
-    /// The default constructor for the <see cref="CommonArrayEnumerator{TElement}"/> is not allowed.
-    /// </summary>
-    /// <exception cref="NotAllowed"></exception>
-    public CommonArrayEnumerator()
-    {
-        throw new NotAllowed();
-    }
-    /// <summary>
     /// Initializes a new instance of the <see cref="CommonArrayEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The array containing the items to iterate through.</param>
@@ -41,8 +33,17 @@ public struct CommonArrayEnumerator<TElement> :
     }
 
     /// <inheritdoc/>
-    public Boolean MoveNext() =>
-        ++m_Index < m_Elements.Length;
+    public Boolean MoveNext()
+    {
+        if (m_Elements is null)
+        {
+            return false;
+        }
+        else
+        {
+            return ++m_Index < m_Elements.Length;
+        }
+    }
 
     void IEnumerator.Reset()
     { }

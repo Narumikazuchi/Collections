@@ -128,6 +128,41 @@ public readonly partial struct ReadOnlyList<TElement>
             return new(list.ToArray());
         }
     }
+
+#pragma warning disable CS1591
+    public static implicit operator ReadOnlyList<TElement>(TElement[] source)
+    {
+        TElement[] items = new TElement[source.Length];
+        Array.Copy(sourceArray: source,
+                   destinationArray: items,
+                   length: source.Length);
+        return new(items);
+    }
+    public static implicit operator ReadOnlyList<TElement>(in ImmutableArray<TElement> source)
+    {
+        TElement[] items = new TElement[source.Length];
+        Array.Copy(sourceArray: source.ToArray(),
+                   destinationArray: items,
+                   length: source.Length);
+        return new(items);
+    }
+    public static implicit operator ReadOnlyList<TElement>(List<TElement> source)
+    {
+        TElement[] items = new TElement[source.Count];
+        Array.Copy(sourceArray: source.ToArray(),
+                   destinationArray: items,
+                   length: source.Count);
+        return new(items);
+    }
+    public static implicit operator ReadOnlyList<TElement>(HashSet<TElement> source)
+    {
+        TElement[] items = new TElement[source.Count];
+        Array.Copy(sourceArray: source.ToArray(),
+                   destinationArray: items,
+                   length: source.Count);
+        return new(items);
+    }
+#pragma warning restore
 }
 
 // Non-Public
@@ -145,8 +180,20 @@ partial struct ReadOnlyList<TElement>
 partial struct ReadOnlyList<TElement> : ICollectionWithCount<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Int32 Count =>
-        m_Items.Length;
+    public Int32 Count
+    {
+        get
+        {
+            if (m_Items is null)
+            {
+                return 0;
+            }
+            else
+            {
+                return m_Items.Length;
+            }
+        }
+    }
 }
 
 // IEnumerable
@@ -167,34 +214,79 @@ partial struct ReadOnlyList<TElement> : IEnumerable<TElement>
 partial struct ReadOnlyList<TElement> : ICollectionWithReadIndexer<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Int32 IndexOf(TElement element) =>
-        Array.IndexOf(array: m_Items,
-                      value: element);
+    public Int32 IndexOf(TElement element)
+    {
+        if (m_Items is null)
+        {
+            return -1;
+        }
+        else
+        {
+            return Array.IndexOf(array: m_Items,
+                                 value: element);
+        }
+    }
 
     /// <inheritdoc/>
-    public TElement this[Int32 index] =>
-        m_Items[index];
+    public TElement this[Int32 index]
+    {
+        get
+        {
+            if (m_Items is null)
+            {
+                throw new ArgumentOutOfRangeException(paramName: nameof(index));
+            }
+            else
+            {
+                return m_Items[index];
+            }
+        }
+    }
     /// <inheritdoc/>
-    public TElement this[Index index] =>
-        m_Items[index];
+    public TElement this[Index index]
+    {
+        get
+        {
+            if (m_Items is null)
+            {
+                throw new ArgumentOutOfRangeException(paramName: nameof(index));
+            }
+            else
+            {
+                return m_Items[index];
+            }
+        }
+    }
 }
 
 // IReadOnlyCollection<T>
 partial struct ReadOnlyList<TElement> : IReadOnlyCollection<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Boolean Contains(TElement element) =>
-        Array.IndexOf(array: m_Items,
-                      value: element) > -1;
+    public Boolean Contains(TElement element)
+    {
+        if (m_Items is null)
+        {
+            return false;
+        }
+        else
+        {
+            return Array.IndexOf(array: m_Items,
+                                 value: element) > -1;
+        }
+    }
 
     /// <inheritdoc/>
     public void CopyTo([DisallowNull] TElement[] array)
     {
         ArgumentNullException.ThrowIfNull(array);
 
-        Array.Copy(sourceArray: m_Items,
-                   destinationArray: array,
-                   length: m_Items.Length);
+        if (m_Items is not null)
+        {
+            Array.Copy(sourceArray: m_Items,
+                       destinationArray: array,
+                       length: m_Items.Length);
+        }
     }
     /// <inheritdoc/>
     public void CopyTo([DisallowNull] TElement[] array,
@@ -203,11 +295,14 @@ partial struct ReadOnlyList<TElement> : IReadOnlyCollection<TElement, CommonArra
         ArgumentNullException.ThrowIfNull(array);
         destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
 
-        Array.Copy(sourceArray: m_Items,
-                   sourceIndex: 0,
-                   destinationArray: array,
-                   destinationIndex: destinationIndex,
-                   length: m_Items.Length);
+        if (m_Items is not null)
+        {
+            Array.Copy(sourceArray: m_Items,
+                       sourceIndex: 0,
+                       destinationArray: array,
+                       destinationIndex: destinationIndex,
+                       length: m_Items.Length);
+        }
     }
 }
 
@@ -216,7 +311,7 @@ partial struct ReadOnlyList<TElement> : IStrongEnumerable<TElement, CommonArrayE
 {
     /// <inheritdoc/>
     public CommonArrayEnumerator<TElement> GetEnumerator() =>
-        new(m_Items);
+        new(m_Items ?? Array.Empty<TElement>());
 }
 
 // __IReadOnlyCollection<T>
@@ -224,7 +319,7 @@ partial struct ReadOnlyList<TElement> : __IReadOnlyCollection<TElement>
 {
     Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
     {
-        array = m_Items;
+        array = m_Items ?? Array.Empty<TElement>();
         return true;
     }
 

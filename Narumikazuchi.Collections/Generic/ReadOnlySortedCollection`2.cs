@@ -158,8 +158,20 @@ partial struct ReadOnlySortedCollection<TElement, TComparer>
 partial struct ReadOnlySortedCollection<TElement, TComparer> : ICollectionWithCount<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Int32 Count =>
-        m_Items.Length;
+    public Int32 Count
+    {
+        get
+        {
+            if (m_Items is null)
+            {
+                return 0;
+            }
+            else
+            {
+                return m_Items.Length;
+            }
+        }
+    }
 }
 
 // IEnumerable
@@ -180,18 +192,30 @@ partial struct ReadOnlySortedCollection<TElement, TComparer> : IEnumerable<TElem
 partial struct ReadOnlySortedCollection<TElement, TComparer> : IReadOnlyCollection<TElement, CommonArrayEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Boolean Contains(TElement element) =>
-        Array.IndexOf(array: m_Items,
-                      value: element) > -1;
+    public Boolean Contains(TElement element)
+    {
+        if (m_Items is null)
+        {
+            return false;
+        }
+        else
+        {
+            return Array.IndexOf(array: m_Items,
+                                 value: element) > -1;
+        }
+    }
 
     /// <inheritdoc/>
     public void CopyTo([DisallowNull] TElement[] array)
     {
         ArgumentNullException.ThrowIfNull(array);
 
-        Array.Copy(sourceArray: m_Items,
-                   destinationArray: array,
-                   length: m_Items.Length);
+        if (m_Items is not null)
+        {
+            Array.Copy(sourceArray: m_Items,
+                       destinationArray: array,
+                       length: m_Items.Length);
+        }
     }
     /// <inheritdoc/>
     public void CopyTo([DisallowNull] TElement[] array,
@@ -200,11 +224,14 @@ partial struct ReadOnlySortedCollection<TElement, TComparer> : IReadOnlyCollecti
         ArgumentNullException.ThrowIfNull(array);
         destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
 
-        Array.Copy(sourceArray: m_Items,
-                   sourceIndex: 0,
-                   destinationArray: array,
-                   destinationIndex: destinationIndex,
-                   length: m_Items.Length);
+        if (m_Items is not null)
+        {
+            Array.Copy(sourceArray: m_Items,
+                       sourceIndex: 0,
+                       destinationArray: array,
+                       destinationIndex: destinationIndex,
+                       length: m_Items.Length);
+        }
     }
 }
 
@@ -220,7 +247,7 @@ partial struct ReadOnlySortedCollection<TElement, TComparer> : IStrongEnumerable
 {
     /// <inheritdoc/>
     public CommonArrayEnumerator<TElement> GetEnumerator() =>
-        new(m_Items);
+        new(m_Items ?? Array.Empty<TElement>());
 }
 
 // __IReadOnlyCollection<T>
@@ -228,7 +255,7 @@ partial struct ReadOnlySortedCollection<TElement, TComparer> : __IReadOnlyCollec
 {
     Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
     {
-        array = m_Items;
+        array = m_Items ?? Array.Empty<TElement>();
         return true;
     }
 

@@ -9,14 +9,6 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         where TKey : notnull
 {
     /// <summary>
-    /// The default constructor for the <see cref="CommonDictionaryEnumerator{TKey, TValue}"/> is not allowed.
-    /// </summary>
-    /// <exception cref="NotAllowed"></exception>
-    public CommonDictionaryEnumerator()
-    {
-        throw new NotAllowed();
-    }
-    /// <summary>
     /// Initializes a new instance of the <see cref="CommonArrayEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The <see cref="Dictionary{TKey, TValue}"/> containing the key-value pairs to iterate through.</param>
@@ -69,8 +61,17 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
     }
 
     /// <inheritdoc/>
-    public Boolean MoveNext() =>
-        ++m_Index < m_Count;
+    public Boolean MoveNext()
+    {
+        if (m_Elements is null)
+        {
+            return false;
+        }
+        else
+        {
+            return ++m_Index < m_Count;
+        }
+    }
 
     void IEnumerator.Reset()
     { }

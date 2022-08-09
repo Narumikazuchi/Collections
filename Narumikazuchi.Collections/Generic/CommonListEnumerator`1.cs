@@ -8,14 +8,6 @@ public struct CommonListEnumerator<TElement> :
     IEnumerator<TElement>
 {
     /// <summary>
-    /// The default constructor for the <see cref="CommonListEnumerator{TElement}"/> is not allowed.
-    /// </summary>
-    /// <exception cref="NotAllowed"></exception>
-    public CommonListEnumerator()
-    {
-        throw new NotAllowed();
-    }
-    /// <summary>
     /// Initializes a new instance of the <see cref="CommonListEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The <see cref="List{T}"/> containing the items to iterate through.</param>
@@ -29,8 +21,17 @@ public struct CommonListEnumerator<TElement> :
     }
 
     /// <inheritdoc/>
-    public Boolean MoveNext() =>
-        ++m_Index < m_Elements.Count;
+    public Boolean MoveNext()
+    {
+        if (m_Elements is null)
+        {
+            return false;
+        }
+        else
+        {
+            return ++m_Index < m_Elements.Count;
+        }
+    }
 
     void IEnumerator.Reset()
     { }
