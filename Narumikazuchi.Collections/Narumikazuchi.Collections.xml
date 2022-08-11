@@ -659,6 +659,14 @@
             <returns>The element at the specified index.</returns>
             <exception cref="T:System.IndexOutOfRangeException"/>
         </member>
+        <member name="P:Narumikazuchi.Collections.ICollectionWithReadIndexer`2.Item(System.Range)">
+            <summary>
+            Gets a slice specified by a range.
+            </summary>
+            <param name="range">The zero-based range of the slice to get.</param>
+            <returns>The slice specified by the range.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"/>
+        </member>
         <member name="T:Narumikazuchi.Collections.ICollectionWithReadWriteIndexer`2">
             <summary>
             Represents a strongly-typed collection which allows read-write access to it's elements via an indexer.
@@ -1041,6 +1049,9 @@
         <member name="P:Narumikazuchi.Collections.ObservableList`1.Item(System.Index)">
             <inheritdoc />
         </member>
+        <member name="P:Narumikazuchi.Collections.ObservableList`1.Item(System.Range)">
+            <inheritdoc />
+        </member>
         <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf(`0)">
             <inheritdoc />
         </member>
@@ -1217,6 +1228,9 @@
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.ReadOnlyList`1.Item(System.Index)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlyList`1.Item(System.Range)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.Contains(`0)">
@@ -1410,6 +1424,9 @@
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.ReadOnlySortedList`2.Item(System.Index)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedList`2.Item(System.Range)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`2.Contains(`0)">

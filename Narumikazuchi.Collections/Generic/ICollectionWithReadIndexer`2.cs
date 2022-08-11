@@ -36,4 +36,12 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator> :
     /// <exception cref="IndexOutOfRangeException"/>
     [Pure]
     public TElement this[Index index] { get; }
+    /// <summary>
+    /// Gets a slice specified by a range.
+    /// </summary>
+    /// <param name="range">The zero-based range of the slice to get.</param>
+    /// <returns>The slice specified by the range.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    [Pure]
+    public ImmutableArray<TElement> this[Range range] { get; }
 }

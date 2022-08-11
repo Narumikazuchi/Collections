@@ -237,6 +237,21 @@ partial struct ReadOnlySortedList<TElement, TComparer> : ICollectionWithReadInde
             }
         }
     }
+    /// <inheritdoc/>
+    public ImmutableArray<TElement> this[Range range]
+    {
+        get
+        {
+            if (m_Items is null)
+            {
+                throw new ArgumentOutOfRangeException(paramName: nameof(range));
+            }
+            else
+            {
+                return m_Items[range].ToImmutableArray();
+            }
+        }
+    }
 }
 
 // IReadOnlyCollection<T>

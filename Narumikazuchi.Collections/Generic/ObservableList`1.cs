@@ -84,6 +84,32 @@ partial class ObservableList<TElement> : ICollectionWithReadWriteIndexer<TElemen
         get => m_Items[index];
         set => m_Items[index] = value;
     }
+    /// <inheritdoc />
+    public ImmutableArray<TElement> this[Range range]
+    {
+        get
+        {
+            if ((range.Start.IsFromEnd &&
+                range.Start.Value > m_Items.Count - 1) ||
+                (!range.Start.IsFromEnd &&
+                range.Start.Value < 0))
+            {
+                throw new ArgumentOutOfRangeException(paramName: nameof(range));
+            }
+            if ((range.End.IsFromEnd &&
+                range.End.Value > m_Items.Count - 1) ||
+                (!range.End.IsFromEnd &&
+                range.End.Value < 0))
+            {
+                throw new ArgumentOutOfRangeException(paramName: nameof(range));
+            }
+
+            (Int32 offset, Int32 length) = range.GetOffsetAndLength(m_Items.Count);
+            return m_Items.GetRange(index: offset,
+                                    count: length)
+                          .ToImmutableArray();
+        }
+    }
 }
 
 // IEnumerable
