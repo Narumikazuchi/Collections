@@ -37,12 +37,31 @@ public readonly partial struct ReadOnlySortedList<TElement, TComparer>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
-                                                                                  [DisallowNull] TComparer comparer)
-        where TEnumerable : IEnumerable<TElement>
+    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerable : IEnumerable<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (items is IReadOnlyCollection<TElement> iReadOnlyCollection)
         {
@@ -69,13 +88,32 @@ public readonly partial struct ReadOnlySortedList<TElement, TComparer>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items,
-                                                                                               [DisallowNull] TComparer comparer)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (items is ISortedCollection<TElement, TEnumerator, TComparer> iSortedCollection)
         {
@@ -84,7 +122,7 @@ public readonly partial struct ReadOnlySortedList<TElement, TComparer>
                 if (iSortedCollection is __IReadOnlyCollection<TElement> iReadOnlyCollectionT &&
                     iReadOnlyCollectionT.TryGetReadOnlyArray(out TElement[]? array))
                 {
-                    return new(items: array,
+                    return new(items: array!,
                                comparer: comparer);
                 }
                 else
@@ -222,6 +260,7 @@ partial struct ReadOnlySortedList<TElement, TComparer> : ICollectionWithReadInde
             }
         }
     }
+#if NETCOREAPP3_1_OR_GREATER
     /// <inheritdoc/>
     public TElement this[Index index]
     {
@@ -252,6 +291,7 @@ partial struct ReadOnlySortedList<TElement, TComparer> : ICollectionWithReadInde
             }
         }
     }
+#endif
 }
 
 // IReadOnlyCollection<T>
@@ -272,9 +312,20 @@ partial struct ReadOnlySortedList<TElement, TComparer> : IReadOnlyCollection<TEl
     }
 
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TElement[] array)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
 
         if (m_Items is not null)
         {
@@ -284,11 +335,29 @@ partial struct ReadOnlySortedList<TElement, TComparer> : IReadOnlyCollection<TEl
         }
     }
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TElement[] array,
-                       Int32 destinationIndex)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array,
+        Int32 destinationIndex)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
+#if NETCOREAPP3_1_OR_GREATER
         destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
+#else
+        if (destinationIndex is < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+        }
+#endif
 
         if (m_Items is not null)
         {
@@ -319,13 +388,21 @@ partial struct ReadOnlySortedList<TElement, TComparer> : IStrongEnumerable<TElem
 // __IReadOnlyCollection<T>
 partial struct ReadOnlySortedList<TElement, TComparer> : __IReadOnlyCollection<TElement>
 {
-    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out TElement[]? array)
     {
         array = m_Items ?? Array.Empty<TElement>();
         return true;
     }
 
-    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyList([NotNullWhen(true)] out List<TElement>? list)
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyList(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out List<TElement>? list)
     {
         list = default;
         return false;

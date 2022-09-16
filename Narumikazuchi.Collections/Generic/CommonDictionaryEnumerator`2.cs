@@ -13,9 +13,20 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
     /// </summary>
     /// <param name="items">The <see cref="Dictionary{TKey, TValue}"/> containing the key-value pairs to iterate through.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public CommonDictionaryEnumerator([DisallowNull] Dictionary<TKey, TValue> items)
+    public CommonDictionaryEnumerator(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Dictionary<TKey, TValue> items)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         m_Elements = new __DictionaryEntry<TKey, TValue>[items.Count];
         m_Count = items.Count;
@@ -30,14 +41,26 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         }
         m_Index = -1;
     }
+#if NETCOREAPP3_1_OR_GREATER
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonArrayEnumerator{TElement}"/> struct.
     /// </summary>
     /// <param name="items">The <see cref="ImmutableDictionary{TKey, TValue}"/> containing the key-value pairs to iterate through.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public CommonDictionaryEnumerator([DisallowNull] ImmutableDictionary<TKey, TValue> items)
+    public CommonDictionaryEnumerator(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        ImmutableDictionary<TKey, TValue> items)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         m_Elements = new __DictionaryEntry<TKey, TValue>[items.Count];
         m_Count = items.Count;
@@ -52,6 +75,7 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         }
         m_Index = -1;
     }
+#endif
     internal CommonDictionaryEnumerator(__DictionaryEntry<TKey, TValue>[] elements,
                                         Int32 count)
     {

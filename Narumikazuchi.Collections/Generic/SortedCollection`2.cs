@@ -13,9 +13,12 @@ public partial class SortedCollection<TElement, TComparer>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
     public static SortedCollection<TElement, TComparer> Create(in Int32 capacity,
-                                                               [DisallowNull] TComparer comparer) =>
-        new(capacity: capacity,
-            comparer: comparer);
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer) =>
+            new(capacity: capacity,
+                comparer: comparer);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SortedCollection{TElement, TComparer}"/> class.
@@ -23,12 +26,31 @@ public partial class SortedCollection<TElement, TComparer>
     /// <param name="collection">The collection of items that this collection will initially hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
-    public static SortedCollection<TElement, TComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable collection,
-                                                                                [DisallowNull] TComparer comparer)
-        where TEnumerable : IEnumerable<TElement>
+    public static SortedCollection<TElement, TComparer> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable collection,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerable : IEnumerable<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(collection);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         List<TElement> elements = new(collection);
         return new(collection: elements,
@@ -40,13 +62,32 @@ public partial class SortedCollection<TElement, TComparer>
     /// <param name="collection">The collection of items that this collection will initially hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
-    public static SortedCollection<TElement, TComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable collection,
-                                                                                             [DisallowNull] TComparer comparer)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public static SortedCollection<TElement, TComparer> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable collection,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(collection);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (collection is ICollectionWithCount<TElement, TEnumerator> counted)
         {
@@ -81,9 +122,19 @@ partial class SortedCollection<TElement, TComparer>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
     protected SortedCollection(in Int32 capacity,
-                               [DisallowNull] TComparer comparer)
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         m_Elements = new(capacity);
         this.Comparer = comparer;
@@ -94,11 +145,30 @@ partial class SortedCollection<TElement, TComparer>
     /// <param name="collection">The collection of items that this collection will initially hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException"/>
-    protected SortedCollection([DisallowNull] List<TElement> collection,
-                               [DisallowNull] TComparer comparer)
+    protected SortedCollection(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        List<TElement> collection,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(collection);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         m_Elements = collection;
         this.Comparer = comparer;
@@ -153,11 +223,22 @@ partial class SortedCollection<TElement, TComparer> : IModifyableCollection<TEle
     }
 
     /// <inheritdoc/>
-    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable enumerable)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public void AddRange<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         foreach (TElement item in enumerable)
         {

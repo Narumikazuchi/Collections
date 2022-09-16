@@ -1,6 +1,4 @@
-﻿using Narumikazuchi.Collections.Extensions;
-
-namespace Narumikazuchi.Collections;
+﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a fast binary lookup data structure.
@@ -15,10 +13,21 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerable>([DisallowNull] TEnumerable enumerable)
-        where TEnumerable : IEnumerable<TValue>
+    public void AddRange<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerable : IEnumerable<TValue>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         foreach (TValue value in enumerable)
         {
@@ -33,10 +42,23 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// <returns>The <see cref="BinaryNode{TValue}"/> which contains the specified value or <see langword="null"/> if no node with such value exists in the tree.</returns>
     /// <exception cref="ArgumentNullException"/>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
-    public BinaryNode<TValue>? Find([DisallowNull] TValue value)
+#endif
+    public BinaryNode<TValue>? Find(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue value)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(value);
+#else
+        if (value is null)
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
+#endif
 
         BinaryNode<TValue>? node = m_Root;
         Int32 compare = this.Comparer.Compare(value, node.Value);
@@ -65,9 +87,20 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// <param name="predicate">The condition that the <typeparamref name="TValue"/> needs to meet to be deleted.</param>
     /// <returns>The number of <see cref="BinaryNode{TValue}"/> objects that have been removed.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate)
+    public Int32 RemoveAll(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Func<TValue, Boolean> predicate)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
+#else
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+#endif
 
         List<TValue> remove = new();
         foreach (BinaryNode<TValue>? item in this.TraverseInOrder())
@@ -104,7 +137,9 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// </summary>
     /// <returns>The <typeparamref name="TValue"/> of the lowest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
+#endif
     public TValue LowBound()
     {
         BinaryNode<TValue> node = m_Root;
@@ -120,7 +155,9 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// </summary>
     /// <returns>The <typeparamref name="TValue"/> of the highest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
+#endif
     public TValue HighBound()
     {
         BinaryNode<TValue> node = m_Root;
@@ -137,7 +174,6 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// <param name="traverseMethod">The method to use when traversing.</param>
     /// <returns>An <see cref="IStrongEnumerable{TElement, TEnumerator}"/> containing all <typeparamref name="TValue"/> in this <see cref="BinaryTree{TValue, TComparer}"/> in the order specified by the <paramref name="traverseMethod"/>.</returns>
     [Pure]
-    [return: NotNull]
     public Enumerator Traverse(in BinaryTraversalMethod traverseMethod) =>
         new(tree: this,
             method: traverseMethod);
@@ -148,11 +184,30 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// <param name="root">The value of the root node.</param>
     /// <param name="comparer">The comparer that will be used to compare two <typeparamref name="TValue"/> instances.</param>
     /// <exception cref="ArgumentNullException"/>
-    public static BinaryTree<TValue, TComparer> Create([DisallowNull] TValue root,
-                                                       [DisallowNull] TComparer comparer)
+    public static BinaryTree<TValue, TComparer> Create(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue root,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(root);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (root is null)
+        {
+            throw new ArgumentNullException(nameof(root));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         return new(root: root,
                    comparer: comparer);
@@ -161,7 +216,9 @@ public sealed partial class BinaryTree<TValue, TComparer>
     /// <summary>
     /// Gets the root for the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
+#endif
     [Pure]
     public BinaryNode<TValue> RootNode =>
         m_Root;
@@ -326,9 +383,20 @@ partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValue, Bina
     /// <param name="element">The element to add to the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <returns><see langword="true"/> if the element was added to the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Add([DisallowNull] TValue element)
+    public Boolean Add(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue element)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
 
         BinaryNode<TValue>? node = m_Root;
         Int32 compare = this.Comparer.Compare(element, node.Value);
@@ -382,11 +450,22 @@ partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValue, Bina
     /// </summary>
     /// <param name="enumerable">The elements to add to the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable enumerable)
-        where TEnumerator : struct, IStrongEnumerator<TValue>
-        where TEnumerable : IStrongEnumerable<TValue, TEnumerator>
+    public void AddRange<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerator : struct, IStrongEnumerator<TValue>
+            where TEnumerable : IStrongEnumerable<TValue, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         foreach (TValue item in enumerable)
         {
@@ -412,9 +491,20 @@ partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValue, Bina
     /// <param name="element">Tehe element to remove from the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <returns><see langword="true"/> if the element was removed from the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Remove([DisallowNull] TValue element)
+    public Boolean Remove(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue element)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
 
         if (this.Comparer.Compare(element, m_Root.Value) == 0)
         {
@@ -498,17 +588,39 @@ partial class BinaryTree<TValue, TComparer> : IReadOnlyCollection<TValue, Binary
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Contains([DisallowNull] TValue element)
+    public Boolean Contains(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue element)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
 
         return this.Find(element) is not null;
     }
 
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TValue[] array)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue[] array)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
 
         Int32 index = 0;
         foreach (TValue value in this.TraverseInOrder())
@@ -517,10 +629,21 @@ partial class BinaryTree<TValue, TComparer> : IReadOnlyCollection<TValue, Binary
         }
     }
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TValue[] array,
-                       Int32 destinationIndex)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TValue[] array,
+        Int32 destinationIndex)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
 
         Int32 index = 0;
         foreach (TValue value in this.TraverseInOrder())
@@ -534,8 +657,10 @@ partial class BinaryTree<TValue, TComparer> : IReadOnlyCollection<TValue, Binary
 partial class BinaryTree<TValue, TComparer> : ISortedCollection<TValue, BinaryTree<TValue, TComparer>.Enumerator, TComparer>
 {
     /// <inheritdoc/>
-    [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
+#endif
+    [Pure]
     public TComparer Comparer { get; }
 }
 
@@ -601,18 +726,25 @@ partial class BinaryTree<TValue, TComparer>
             }
         }
 
+#if !NETCOREAPP3_1_OR_GREATER
+        void IDisposable.Dispose()
+        { }
+
         void IEnumerator.Reset()
         { }
 
-        void IDisposable.Dispose()
-        { }
+        Object? IEnumerator.Current =>
+            this.Current;
+
+        IEnumerator IEnumerable.GetEnumerator() =>
+        this.GetEnumerator();
+        IEnumerator<TValue> IEnumerable<TValue>.GetEnumerator() =>
+            this.GetEnumerator();
+#endif
 
         /// <inheritdoc/>
         public TValue Current =>
             m_Elements[m_Index].Value;
-
-        Object IEnumerator.Current =>
-            this.Current;
 
         private readonly List<BinaryNode<TValue>> m_Elements;
         private Int32 m_Index;

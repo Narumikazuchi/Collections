@@ -17,22 +17,38 @@ public static class EnumerableExtensions
     /// </summary>
     /// <returns>An object that contains the objects of the source and is read-only.</returns>
     public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TKey, TValue, TEqualityComparer>(this IEnumerable<KeyValuePair<TKey, TValue>> source,
-                                                                                                                            [DisallowNull] TEqualityComparer equalityComparer)
-        where TKey : notnull
-        where TEqualityComparer : IEqualityComparer<TKey> =>
-            ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source,
-                                                                           equalityComparer: equalityComparer);
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer)
+            where TKey : notnull
+            where TEqualityComparer : IEqualityComparer<TKey> =>
+                ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source,
+                                                                               equalityComparer: equalityComparer);
     /// <summary>
     /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
     /// </summary>
     /// <returns>An object that contains the objects of the source and is read-only.</returns>
     public static ReadOnlyDictionary<TKey, TElement, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TEqualityComparer>(this IEnumerable<TElement> source,
-                                                                                                                                [DisallowNull] TEqualityComparer equalityComparer,
-                                                                                                                                [DisallowNull] Func<TElement, TKey> keySelector)
-        where TKey : notnull
-        where TEqualityComparer : IEqualityComparer<TKey>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Func<TElement, TKey> keySelector)
+            where TKey : notnull
+            where TEqualityComparer : IEqualityComparer<TKey>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(keySelector);
+#else
+        if (keySelector is null)
+        {
+            throw new ArgumentNullException(nameof(keySelector));
+        }
+#endif
 
         return ReadOnlyDictionary<TKey, TElement, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TElement>(key: keySelector.Invoke(x),
                                                                                                                                            value: x)),
@@ -43,14 +59,35 @@ public static class EnumerableExtensions
     /// </summary>
     /// <returns>An object that contains the objects of the source and is read-only.</returns>
     public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TValue, TEqualityComparer>(this IEnumerable<TElement> source,
-                                                                                                                                      [DisallowNull] TEqualityComparer equalityComparer,
-                                                                                                                                      [DisallowNull] Func<TElement, TKey> keySelector,
-                                                                                                                                      [DisallowNull] Func<TElement, TValue> valueSelector)
-        where TKey : notnull
-        where TEqualityComparer : IEqualityComparer<TKey>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Func<TElement, TKey> keySelector,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Func<TElement, TValue> valueSelector)
+            where TKey : notnull
+            where TEqualityComparer : IEqualityComparer<TKey>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(keySelector);
         ArgumentNullException.ThrowIfNull(valueSelector);
+#else
+        if (keySelector is null)
+        {
+            throw new ArgumentNullException(nameof(keySelector));
+        }
+
+        if (valueSelector is null)
+        {
+            throw new ArgumentNullException(nameof(valueSelector));
+        }
+#endif
 
         return ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TValue>(key: keySelector.Invoke(x),
                                                                                                                                        value: valueSelector.Invoke(x))),
@@ -67,14 +104,31 @@ public static class EnumerableExtensions
     /// <summary>
     /// Creates a <see cref="BinaryTree{TElement, TComparer}"/> from an <see cref="IEnumerable{T}"/>.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
+#endif
     public static BinaryTree<TElement, TComparer> ToBinaryTree<TElement, TComparer>(this IEnumerable<TElement> source,
-                                                                                    [DisallowNull] TComparer comparer) 
-        where TElement : notnull
-        where TComparer : IComparer<TElement>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer) 
+            where TElement : notnull
+            where TComparer : IComparer<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (source is BinaryTree<TElement, TComparer> original)
         {
@@ -100,7 +154,9 @@ public static class EnumerableExtensions
     /// <summary>
     /// Creates a <see cref="Trie{TElement}"/> from an <see cref="IEnumerable{String}"/>.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
+#endif
     public static Trie<TElement> ToTrie<TElement>(this IEnumerable<String> source) 
         where TElement : class
     {
@@ -115,12 +171,14 @@ public static class EnumerableExtensions
     /// Returns the item <typeparamref name="TElement"/> at the center of the collection.
     /// </summary>
     /// <returns>The item <typeparamref name="TElement"/> at the center of the collection</returns>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
+#endif
     public static TElement Median<TElement>(this IEnumerable<TElement> source)
     {
         if (!source.Any())
         {
-            return default;
+            return default!;
         }
 
         if (source is IReadOnlyList<TElement> rlist)

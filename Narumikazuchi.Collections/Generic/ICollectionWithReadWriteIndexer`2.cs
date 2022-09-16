@@ -19,6 +19,7 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator> :
         get;
         set;
     }
+#if NETCOREAPP3_1_OR_GREATER
     /// <summary>
     /// Gets or sets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
@@ -30,4 +31,5 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator> :
         get;
         set;
     }
+#endif
 }

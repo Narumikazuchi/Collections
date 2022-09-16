@@ -10,13 +10,10 @@
 /// <see cref="IDisposable.Dispose"/> method, making the resulting type 
 /// even more memory efficient.
 /// </summary>
-/// <remarks>
-/// The idea for this interface and it's implementation is taken from the official source
-/// code of the <see cref="System.Collections.Immutable"/> namespace.
-/// </remarks>
 public interface IStrongEnumerator<out TElement> :
     IEnumerator<TElement>
 {
+#if NETCOREAPP3_1_OR_GREATER
     void IDisposable.Dispose()
     { }
 
@@ -25,4 +22,5 @@ public interface IStrongEnumerator<out TElement> :
 
     Object? IEnumerator.Current =>
         this.Current;
+#endif
 }

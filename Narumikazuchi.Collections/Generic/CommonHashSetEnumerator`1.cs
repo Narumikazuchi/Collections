@@ -12,9 +12,20 @@ public struct CommonHashSetEnumerator<TElement> :
     /// </summary>
     /// <param name="items">The <see cref="HashSet{T}"/> containing the items to iterate through.</param>
     /// <exception cref="ArgumentNullException"/>
-    public CommonHashSetEnumerator([DisallowNull] HashSet<TElement> items)
+    public CommonHashSetEnumerator(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        HashSet<TElement> items)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         m_Enumerator = items.GetEnumerator();
     }

@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace Narumikazuchi.Collections;
+﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a strongly-typed collection of key-value pairs with a significantly faster enumerator to
@@ -41,23 +39,44 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue, TEqualityCompare
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
-                                                                                              [DisallowNull] TEqualityComparer equalityComparer)
-        where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
+    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer)
+            where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+#endif
 
         if (items is KeyValuePair<TKey, TValue>[] array)
         {
             return new(items: array,
                        equalityComparer: equalityComparer);
         }
+#if NETCOREAPP3_1_OR_GREATER
         else if (items is ImmutableArray<KeyValuePair<TKey, TValue>> immutableArray)
         {
             return new(items: immutableArray,
                        equalityComparer: equalityComparer);
         }
+#endif
         else if (items is List<KeyValuePair<TKey, TValue>> list)
         {
             return new(items: list.ToArray(),
@@ -98,13 +117,32 @@ public readonly partial struct ReadOnlyDictionary<TKey, TValue, TEqualityCompare
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items,
-                                                                                                           [DisallowNull] TEqualityComparer equalityComparer)
-        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
-        where TEnumerable : IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator>
+    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer)
+            where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
+            where TEnumerable : IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+#endif
 
         if (items is ReadOnlyDictionary<TKey, TValue, TEqualityComparer> readOnlyDictionary)
         {
@@ -216,6 +254,7 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
         this.Keys = ReadOnlyCollection<TKey>.CreateFrom(keys);
         this.Values = ReadOnlyCollection<TValue>.CreateFrom(values);
     }
+#if NETCOREAPP3_1_OR_GREATER
     internal ReadOnlyDictionary(ImmutableArray<KeyValuePair<TKey, TValue>> items,
                                 TEqualityComparer equalityComparer)
     {
@@ -275,6 +314,7 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
         this.Keys = ReadOnlyCollection<TKey>.CreateFrom(keys);
         this.Values = ReadOnlyCollection<TValue>.CreateFrom(values);
     }
+#endif
     internal ReadOnlyDictionary(Dictionary<TKey, TValue> items,
                                 TEqualityComparer equalityComparer)
     {
@@ -313,7 +353,14 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
 
     private Int32 FindEntry(TKey key)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(key);
+#else
+        if (key is null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+#endif
 
         if (m_Buckets is not null)
         {
@@ -370,16 +417,27 @@ partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer> : ICollection
 partial struct ReadOnlyDictionary<TKey, TValue, TEqualityComparer> : IReadOnlyLookup<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>, TEqualityComparer>
 {
     /// <inheritdoc/>
-    public Boolean ContainsKey([DisallowNull] TKey key) =>
-        this.FindEntry(key) > -1;
+    public Boolean ContainsKey(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TKey key) =>
+            this.FindEntry(key) > -1;
 
     /// <inheritdoc/>
     public Boolean ContainsValue(TValue value) =>
         this.Values.Contains(value);
 
     /// <inheritdoc/>
-    public Boolean TryGetValue([DisallowNull] TKey key,
-                               [NotNullWhen(true)] out TValue? value)
+    public Boolean TryGetValue(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TKey key,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out TValue? value)
     {
         if (m_Entries is null)
         {

@@ -12,9 +12,20 @@ public struct CommonListEnumerator<TElement> :
     /// </summary>
     /// <param name="items">The <see cref="List{T}"/> containing the items to iterate through.</param>
     /// <exception cref="ArgumentNullException"/>
-    public CommonListEnumerator([DisallowNull] List<TElement> items)
+    public CommonListEnumerator(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        List<TElement> items)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         m_Elements = items;
         m_Index = -1;

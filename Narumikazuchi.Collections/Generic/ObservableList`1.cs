@@ -15,10 +15,22 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static new ObservableList<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
-        where TEnumerable : IEnumerable<TElement>
+    public static new ObservableList<TElement> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
+            where TEnumerable : IEnumerable<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
+
         return new(new List<TElement>(items));
     }
     /// <summary>
@@ -26,11 +38,22 @@ public partial class ObservableList<TElement> : ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static new ObservableList<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public static new ObservableList<TElement> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         ObservableList<TElement> result = new();
         foreach (TElement item in items)
@@ -78,6 +101,7 @@ partial class ObservableList<TElement> : ICollectionWithReadWriteIndexer<TElemen
                         item: value);
         }
     }
+#if NETCOREAPP3_1_OR_GREATER
     /// <inheritdoc />
     public TElement this[Index index]
     {
@@ -110,6 +134,7 @@ partial class ObservableList<TElement> : ICollectionWithReadWriteIndexer<TElemen
                           .ToImmutableArray();
         }
     }
+#endif
 }
 
 // IEnumerable
@@ -147,11 +172,21 @@ partial class ObservableList<TElement> : IModifyableCollectionWithIndex<TElement
 
     /// <inheritdoc />
     public void InsertRange<TEnumerable, TEnumerator>(Int32 index,
-                                                      [DisallowNull] TEnumerable enumerable)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable == null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         if (enumerable is ICollectionWithCount<TElement, TEnumerator> collection)

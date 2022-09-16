@@ -32,10 +32,21 @@ public readonly partial struct ReadOnlyCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
         where TEnumerable : IEnumerable<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         if (items is TElement[] array)
         {
@@ -45,12 +56,14 @@ public readonly partial struct ReadOnlyCollection<TElement>
                        length: array.Length);
             return new(elements);
         }
+#if NETCOREAPP3_1_OR_GREATER
         else if (items is ImmutableArray<TElement> immutableArray)
         {
             TElement[] elements = new TElement[immutableArray.Length];
             immutableArray.CopyTo(elements);
             return new(elements);
         }
+#endif
         else if (items is List<TElement> list)
         {
             TElement[] elements = new TElement[list.Count];
@@ -91,11 +104,22 @@ public readonly partial struct ReadOnlyCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public static ReadOnlyCollection<TElement> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         if (items is ICollectionWithCount<TElement, TEnumerator> counted)
         {
@@ -103,7 +127,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
             if (counted is __IReadOnlyCollection<TElement> iReadOnlyCollectionT &&
                 iReadOnlyCollectionT.TryGetReadOnlyArray(out TElement[]? array))
             {
-                return new(array);
+                return new(array!);
             }
             if (counted is IReadOnlyCollection<TElement, TEnumerator> iReadOnlyCollection)
             {
@@ -142,6 +166,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
                    length: source.Length);
         return new(items);
     }
+#if NETCOREAPP3_1_OR_GREATER
     public static implicit operator ReadOnlyCollection<TElement>(in ImmutableArray<TElement> source)
     {
         TElement[] items = new TElement[source.Length];
@@ -150,6 +175,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
                    length: source.Length);
         return new(items);
     }
+#endif
     public static implicit operator ReadOnlyCollection<TElement>(List<TElement> source)
     {
         TElement[] items = new TElement[source.Count];
@@ -232,9 +258,20 @@ partial struct ReadOnlyCollection<TElement> : IReadOnlyCollection<TElement, Comm
     }
 
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TElement[] array)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
 
         if (m_Items is not null)
         {
@@ -244,11 +281,29 @@ partial struct ReadOnlyCollection<TElement> : IReadOnlyCollection<TElement, Comm
         }
     }
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TElement[] array,
-                       Int32 destinationIndex)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array,
+        Int32 destinationIndex)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
+#if NETCOREAPP3_1_OR_GREATER
         destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
+#else
+        if (destinationIndex is < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+        }
+#endif
 
         if (m_Items is not null)
         {
@@ -272,13 +327,21 @@ partial struct ReadOnlyCollection<TElement> : IStrongEnumerable<TElement, Common
 // __IReadOnlyCollection<T>
 partial struct ReadOnlyCollection<TElement> : __IReadOnlyCollection<TElement>
 {
-    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray([NotNullWhen(true)] out TElement[]? array)
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyArray(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out TElement[]? array)
     {
         array = m_Items ?? Array.Empty<TElement>();
         return true;
     }
 
-    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyList([NotNullWhen(true)] out List<TElement>? list)
+    Boolean __IReadOnlyCollection<TElement>.TryGetReadOnlyList(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out List<TElement>? list)
     {
         list = default;
         return false;

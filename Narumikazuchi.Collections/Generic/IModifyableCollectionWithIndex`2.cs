@@ -25,9 +25,12 @@ public interface IModifyableCollectionWithIndex<TElement, TEnumerator> :
     /// <param name="enumerable">The elements to insert.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
     public void InsertRange<TEnumerable, TOtherEnumerator>(Int32 index,
-                                                           [DisallowNull] TEnumerable enumerable)
-        where TOtherEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TOtherEnumerator>;
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TOtherEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TOtherEnumerator>;
 
     /// <summary>
     /// Removes the element at the specified index.

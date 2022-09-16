@@ -21,7 +21,11 @@ public interface IReadOnlyCollection<TElement, TEnumerator> :
     /// The <see cref="Array"/> must have zero-based indexing.</param>
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
-    public void CopyTo([DisallowNull] TElement[] array);
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array);
     /// <summary>
     /// Copies the entire <see cref="IReadOnlyCollection{TElement, TEnumerator}"/> to a compatible one-dimensional array, starting at the specified index of the target array.
     /// </summary>
@@ -31,6 +35,10 @@ public interface IReadOnlyCollection<TElement, TEnumerator> :
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="ArgumentOutOfRangeException" />
-    public void CopyTo([DisallowNull] TElement[] array,
-                       Int32 destinationIndex);
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TElement[] array,
+        Int32 destinationIndex);
 }

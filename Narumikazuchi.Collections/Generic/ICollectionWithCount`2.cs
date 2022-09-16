@@ -11,6 +11,5 @@ public interface ICollectionWithCount<out TElement, TEnumerator> :
     /// Gets the number of elements in the collection.
     /// </summary>
     [Pure]
-    [NotNull]
     public Int32 Count { get; }
 }

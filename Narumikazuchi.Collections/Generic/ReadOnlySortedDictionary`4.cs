@@ -42,14 +42,41 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer,
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
-                                                                                                               [DisallowNull] TEqualityComparer equalityComparer,
-                                                                                                               [DisallowNull] TComparer comparer)
-        where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
+    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (items is IReadOnlyCollection<KeyValuePair<TKey, TValue>> roc)
         {
@@ -80,15 +107,42 @@ public readonly partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer,
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items,
-                                                                                                                            [DisallowNull] TEqualityComparer equalityComparer,
-                                                                                                                            [DisallowNull] TComparer comparer)
-        where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
-        where TEnumerable : IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator>
+    public static ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEqualityComparer equalityComparer,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TComparer comparer)
+            where TEnumerator : struct, IStrongEnumerator<KeyValuePair<TKey, TValue>>
+            where TEnumerable : IStrongEnumerable<KeyValuePair<TKey, TValue>, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(equalityComparer);
         ArgumentNullException.ThrowIfNull(comparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+
+        if (comparer is null)
+        {
+            throw new ArgumentNullException(nameof(comparer));
+        }
+#endif
 
         if (items is ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> readOnlySortedDictionary)
         {
@@ -269,7 +323,14 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
 
     private Int32 FindEntry(TKey key)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(key);
+#else
+        if (key is null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+#endif
 
         if (m_Buckets is not null)
         {
@@ -326,16 +387,27 @@ partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityCompar
 partial struct ReadOnlySortedDictionary<TKey, TValue, TComparer, TEqualityComparer> : IReadOnlyLookup<TKey, TValue, CommonDictionaryEnumerator<TKey, TValue>, TEqualityComparer>
 {
     /// <inheritdoc/>
-    public Boolean ContainsKey([DisallowNull] TKey key) =>
-        this.FindEntry(key) > -1;
+    public Boolean ContainsKey(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TKey key) =>
+            this.FindEntry(key) > -1;
 
     /// <inheritdoc/>
     public Boolean ContainsValue(TValue value) =>
         this.Values.Contains(value);
 
     /// <inheritdoc/>
-    public Boolean TryGetValue([DisallowNull] TKey key,
-                               [NotNullWhen(true)] out TValue? value)
+    public Boolean TryGetValue(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TKey key,
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [NotNullWhen(true)]
+#endif
+        out TValue? value)
     {
         if (m_Entries is null)
         {

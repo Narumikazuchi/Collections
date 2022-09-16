@@ -18,7 +18,9 @@ public sealed partial class BinaryNode<TValue>
     /// Gets the <typeparamref name="TValue"/> value of this <see cref="BinaryNode{TValue}"/>.
     /// </summary>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
+#endif
     public TValue Value =>
         m_Value;
 
@@ -26,7 +28,9 @@ public sealed partial class BinaryNode<TValue>
     /// Gets the parent of the current <see cref="BinaryNode{TValue}"/>. Should return <see langword="null"/> for root nodes.
     /// </summary>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [MaybeNull]
+#endif
     public BinaryNode<TValue>? Parent =>
         m_Parent;
 
@@ -34,7 +38,9 @@ public sealed partial class BinaryNode<TValue>
     /// Gets the left child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no left sided child node.
     /// </summary>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [MaybeNull]
+#endif
     public BinaryNode<TValue>? LeftChild =>
         m_Left;
 
@@ -42,7 +48,9 @@ public sealed partial class BinaryNode<TValue>
     /// Gets the right child <see cref="BinaryNode{TValue}"/>. Returns <see langword="null"/> if the <see cref="BinaryNode{TValue}"/> has no right sided child node.
     /// </summary>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [MaybeNull]
+#endif
     public BinaryNode<TValue>? RightChild =>
         m_Right;
 

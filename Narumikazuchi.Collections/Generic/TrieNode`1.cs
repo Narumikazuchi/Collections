@@ -12,10 +12,21 @@ public sealed partial class TrieNode<TContent>
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerable>([DisallowNull] TEnumerable enumerable)
-        where TEnumerable : IEnumerable<TContent>
+    public void AddRange<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerable : IEnumerable<TContent>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable == null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         foreach (TContent item in enumerable)
         {
@@ -33,9 +44,20 @@ public sealed partial class TrieNode<TContent>
     /// <param name="predicate">The condition that objects need to meet to be deleted.</param>
     /// <returns>The amount of items removed</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Int32 RemoveAll([DisallowNull] Func<TContent, Boolean> predicate)
+    public Int32 RemoveAll(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        Func<TContent, Boolean> predicate)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
+#else
+        if (predicate == null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+#endif
 
         Collection<TContent> remove = new();
         foreach (TContent item in m_Items)
@@ -86,13 +108,17 @@ public sealed partial class TrieNode<TContent>
     /// </summary>
     /// <param name="value">The value to lookup in the child-nodes of the <see cref="TrieNode{T}"/>.</param>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
+#endif
     public TrieNode<TContent>? FindChildNode(Char value) => 
         m_Children.FirstOrDefault(n => n is not null &&
                                        n.Value == Char.ToLower(c: value));
 
     /// <inheritdoc/>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
+#endif
     public override String ToString()
     {
         StringBuilder builder = new();
@@ -117,7 +143,9 @@ public sealed partial class TrieNode<TContent>
     /// Gets the parent of the current node. Should return <see langword="null"/> for root nodes.
     /// </summary>
     [Pure]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [MaybeNull]
+#endif
     public TrieNode<TContent>? Parent { get; }
 
     /// <summary>
@@ -136,7 +164,9 @@ public sealed partial class TrieNode<TContent>
     /// <summary>
     /// Gets the child nodes of this <see cref="TrieNode{TContent}"/>.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
+#endif
     [Pure]
     public IStrongEnumerable<TrieNode<TContent>, CommonListEnumerator<TrieNode<TContent>>> Children =>
         m_Children;
@@ -144,7 +174,9 @@ public sealed partial class TrieNode<TContent>
     /// <summary>
     /// Gets the items associated with this <see cref="TrieNode{TContent}"/>.
     /// </summary>
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
+#endif
     public IStrongEnumerable<TContent, Enumerator> Items => 
         new Enumerator(this);
 }
@@ -212,9 +244,20 @@ partial class TrieNode<TContent> : IModifyableCollection<TContent, CommonHashSet
     /// <param name="item">The value to be added to the <see cref="TrieNode{TContent}"/>.</param>
     /// <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Add([DisallowNull] TContent item)
+    public Boolean Add(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TContent item)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item == null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
 
         return m_Items.Add(item);
     }
@@ -224,11 +267,22 @@ partial class TrieNode<TContent> : IModifyableCollection<TContent, CommonHashSet
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable enumerable)
-        where TEnumerator : struct, IStrongEnumerator<TContent>
-        where TEnumerable : IStrongEnumerable<TContent, TEnumerator>
+    public void AddRange<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable enumerable)
+            where TEnumerator : struct, IStrongEnumerator<TContent>
+            where TEnumerable : IStrongEnumerable<TContent, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable == null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
 
         foreach (TContent item in enumerable)
         {
@@ -252,9 +306,20 @@ partial class TrieNode<TContent> : IModifyableCollection<TContent, CommonHashSet
     /// <param name="item">The item to remove.</param>
     /// <returns><see langword="true"/> if the item was found and removed; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Remove([DisallowNull] TContent item)
+    public Boolean Remove(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TContent item)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item == null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
 
         if (m_Items.Contains(item: item))
         {
@@ -286,26 +351,66 @@ partial class TrieNode<TContent> : IReadOnlyCollection<TContent, CommonHashSetEn
     /// <param name="item">The object to locate in the <see cref="TrieNode{TContent}"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="TrieNode{TContent}"/>; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Contains([DisallowNull] TContent item)
+    public Boolean Contains(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TContent item)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item == null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
 
         return m_Items.Contains(item: item);
     }
 
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TContent[] array)
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TContent[] array)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array == null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
 
         m_Items.CopyTo(array);
     }
     /// <inheritdoc/>
-    public void CopyTo([DisallowNull] TContent[] array,
+    public void CopyTo(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TContent[] array,
                        Int32 destinationIndex)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array == null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
+#if NETCOREAPP3_0_OR_GREATER
         destinationIndex.ThrowIfOutOfRange(0, Int32.MaxValue);
+#else
+        if (destinationIndex is < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+        }
+#endif
 
         m_Items.CopyTo(array: array,
                        arrayIndex: destinationIndex);
@@ -392,6 +497,23 @@ partial class TrieNode<TContent>
                 return new(m_Parent);
             }
         }
+
+#if !NETCOREAPP3_1_OR_GREATER
+        void IDisposable.Dispose()
+        { }
+
+        void IEnumerator.Reset()
+        { }
+
+        Object? IEnumerator.Current =>
+            this.Current;
+
+        IEnumerator IEnumerable.GetEnumerator() =>
+            this.GetEnumerator();
+
+        IEnumerator<TContent> IEnumerable<TContent>.GetEnumerator() =>
+            this.GetEnumerator();
+#endif
 
         /// <inheritdoc/>
         public TContent Current =>

@@ -908,10 +908,6 @@
             method. Using this interface will reduce the delegation cost of virtual IL calls
             and therefore improve iteration times of <see langword="foreach"/>-loops.
             </summary>
-            <remarks>
-            The idea for this interface and it's implementation is taken from the official source
-            code of the <see cref="N:System.Collections.Immutable"/> namespace.
-            </remarks>
         </member>
         <member name="M:Narumikazuchi.Collections.IStrongEnumerable`2.GetEnumerator">
             <summary>
@@ -930,10 +926,6 @@
             <see cref="M:System.IDisposable.Dispose"/> method, making the resulting type 
             even more memory efficient.
             </summary>
-            <remarks>
-            The idea for this interface and it's implementation is taken from the official source
-            code of the <see cref="N:System.Collections.Immutable"/> namespace.
-            </remarks>
         </member>
         <member name="T:Narumikazuchi.Collections.ObservableCollection`1">
             <summary>
@@ -1702,13 +1694,13 @@
         <member name="M:Narumikazuchi.Collections.Trie`1.FindLast(System.Func{System.String,System.Boolean})">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String@,`0)">
+        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String,`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``1(System.String@,``0)">
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``1(System.String,``0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``2(System.String@,``0)">
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``2(System.String,``0)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.Trie`1.Clear">

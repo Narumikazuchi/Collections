@@ -13,10 +13,12 @@ public interface ICollectionWithWriteIndexer<TElement, TEnumerator> :
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to set.</param>
     /// <exception cref="IndexOutOfRangeException"/>
     public TElement this[Int32 index] { set; }
+#if NETCOREAPP3_1_OR_GREATER
     /// <summary>
     /// Sets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to set.</param>
     /// <exception cref="IndexOutOfRangeException"/>
     public TElement this[Index index] { set; }
+#endif
 }

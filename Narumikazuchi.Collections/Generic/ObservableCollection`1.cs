@@ -15,10 +15,21 @@ public partial class ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ObservableCollection<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
-        where TEnumerable : IEnumerable<TElement>
+    public static ObservableCollection<TElement> CreateFrom<TEnumerable>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
+            where TEnumerable : IEnumerable<TElement>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         return new(new List<TElement>(items));
     }
@@ -27,11 +38,22 @@ public partial class ObservableCollection<TElement>
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ObservableCollection<TElement> CreateFrom<TEnumerable, TEnumerator>([DisallowNull] TEnumerable items)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public static ObservableCollection<TElement> CreateFrom<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable items)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         ObservableCollection<TElement> result = new();
         foreach (TElement item in items)
@@ -59,7 +81,14 @@ partial class ObservableCollection<TElement>
     /// <exception cref="ArgumentNullException" />
     protected ObservableCollection(List<TElement> items)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items == null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
         m_Items = items;
     }
@@ -105,11 +134,22 @@ partial class ObservableCollection<TElement> : IModifyableCollection<TElement, C
     }
 
     /// <inheritdoc/>
-    public void AddRange<TEnumerable, TEnumerator>([DisallowNull] TEnumerable collection)
-        where TEnumerator : struct, IStrongEnumerator<TElement>
-        where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
+    public void AddRange<TEnumerable, TEnumerator>(
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        [DisallowNull]
+#endif
+        TEnumerable collection)
+            where TEnumerator : struct, IStrongEnumerator<TElement>
+            where TEnumerable : IStrongEnumerable<TElement, TEnumerator>
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(collection);
+#else
+        if (collection == null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+#endif
 
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         if (collection is ICollectionWithCount<TElement, TEnumerator> counted)
@@ -180,7 +220,14 @@ partial class ObservableCollection<TElement> : INotifyCollectionChangedHelper
 {
     void INotifyCollectionChangedHelper.OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(eventArgs);
+#else
+        if (eventArgs == null)
+        {
+            throw new ArgumentNullException(nameof(eventArgs));
+        }
+#endif
 
         this.CollectionChanged?.Invoke(sender: this,
                                        e: eventArgs);
@@ -199,7 +246,14 @@ partial class ObservableCollection<TElement> : INotifyPropertyChangingHelper
 {
     void INotifyPropertyChangingHelper.OnPropertyChanging(String propertyName)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(propertyName);
+#else
+        if (propertyName == null)
+        {
+            throw new ArgumentNullException(nameof(propertyName));
+        }
+#endif
 
         this.PropertyChanging?.Invoke(sender: this,
                                       e: new(propertyName));
@@ -218,7 +272,14 @@ partial class ObservableCollection<TElement> : INotifyPropertyChangedHelper
 {
     void INotifyPropertyChangedHelper.OnPropertyChanged(String propertyName)
     {
+#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(propertyName);
+#else
+        if (propertyName == null)
+        {
+            throw new ArgumentNullException(nameof(propertyName));
+        }
+#endif
 
         this.PropertyChanged?.Invoke(sender: this,
                                      e: new(propertyName));

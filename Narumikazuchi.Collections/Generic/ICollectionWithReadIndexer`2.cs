@@ -17,7 +17,6 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator> :
     /// <see cref="ICollectionWithReadIndexer{TElement, TEnumerator}"/>, if found; otherwise, -1.
     /// </returns>
     [Pure]
-    [return: NotNull]
     public Int32 IndexOf(TElement element);
 
     /// <summary>
@@ -28,6 +27,7 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator> :
     /// <exception cref="IndexOutOfRangeException"/>
     [Pure]
     public TElement this[Int32 index] { get; }
+#if NETCOREAPP3_1_OR_GREATER
     /// <summary>
     /// Gets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
@@ -44,4 +44,5 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator> :
     /// <exception cref="ArgumentOutOfRangeException"/>
     [Pure]
     public ImmutableArray<TElement> this[Range range] { get; }
+#endif
 }
