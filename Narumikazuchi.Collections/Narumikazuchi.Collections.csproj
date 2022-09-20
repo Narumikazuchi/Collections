@@ -18,7 +18,7 @@
 		<DocumentationFile>Narumikazuchi.Collections.xml</DocumentationFile>
 		<Authors>Narumikazuchi</Authors>
 		<Copyright>©2021 Narumikazuchi</Copyright>
-		<Version>7.0.3-beta</Version>
+		<Version>7.0.4-beta</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>

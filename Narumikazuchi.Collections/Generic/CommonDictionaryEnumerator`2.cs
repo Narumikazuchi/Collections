@@ -97,19 +97,21 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
         }
     }
 
+    /// <inheritdoc/>
+    public KeyValuePair<TKey, TValue> Current =>
+        new(key: m_Elements[m_Index].Key,
+            value: m_Elements[m_Index].Value);
+
+#if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
     { }
 
     void IDisposable.Dispose()
     { }
 
-    /// <inheritdoc/>
-    public KeyValuePair<TKey, TValue> Current =>
-        new(key: m_Elements[m_Index].Key,
-            value: m_Elements[m_Index].Value);
-
     Object? IEnumerator.Current =>
         this.Current;
+#endif
 
     private readonly __DictionaryEntry<TKey, TValue>[] m_Elements;
     private readonly Int32 m_Count;

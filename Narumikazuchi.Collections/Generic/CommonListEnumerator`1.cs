@@ -44,18 +44,20 @@ public struct CommonListEnumerator<TElement> :
         }
     }
 
+    /// <inheritdoc/>
+    public TElement Current =>
+        m_Elements[m_Index];
+
+#if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
     { }
 
     void IDisposable.Dispose()
     { }
 
-    /// <inheritdoc/>
-    public TElement Current =>
-        m_Elements[m_Index];
-
     Object? IEnumerator.Current =>
         this.Current;
+#endif
 
     internal readonly List<TElement> m_Elements;
     private Int32 m_Index;

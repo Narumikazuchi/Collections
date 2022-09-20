@@ -34,18 +34,20 @@ public struct CommonHashSetEnumerator<TElement> :
     public Boolean MoveNext() =>
         m_Enumerator.MoveNext();
 
+    /// <inheritdoc/>
+    public TElement Current =>
+        m_Enumerator.Current;
+
+#if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
     { }
 
     void IDisposable.Dispose()
     { }
 
-    /// <inheritdoc/>
-    public TElement Current =>
-        m_Enumerator.Current;
-
     Object? IEnumerator.Current =>
         this.Current;
+#endif
 
     internal HashSet<TElement>.Enumerator m_Enumerator;
 }
