@@ -22,7 +22,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ReadOnlyCollection{TElement}"/> class.
+    /// Initializes a new instance of the <see cref="ReadOnlyCollection{TElement}"/> struct.
     /// </summary>
     public static ReadOnlyCollection<TElement> Create() =>
         new();
@@ -37,7 +37,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
         [DisallowNull]
 #endif
         TEnumerable items)
-        where TEnumerable : IEnumerable<TElement>
+            where TEnumerable : IEnumerable<TElement>
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(items);
@@ -167,7 +167,7 @@ public readonly partial struct ReadOnlyCollection<TElement>
         return new(items);
     }
 #if NETCOREAPP3_1_OR_GREATER
-    public static implicit operator ReadOnlyCollection<TElement>(in ImmutableArray<TElement> source)
+    public static implicit operator ReadOnlyCollection<TElement>(ImmutableArray<TElement> source)
     {
         TElement[] items = new TElement[source.Length];
         Array.Copy(sourceArray: source.ToArray(),
