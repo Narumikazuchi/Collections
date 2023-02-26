@@ -39,7 +39,7 @@ dotnet_style_parentheses_in_other_operators = never_if_unnecessary:suggestion
 dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
 
 # Modifier preferences
-dotnet_style_require_accessibility_modifiers = for_non_interface_members
+dotnet_style_require_accessibility_modifiers = always:suggestion
 
 # Expression-level preferences
 dotnet_style_coalesce_expression = true
@@ -48,7 +48,7 @@ dotnet_style_explicit_tuple_names = true
 dotnet_style_namespace_match_folder = true
 dotnet_style_null_propagation = false
 dotnet_style_object_initializer = true
-dotnet_style_operator_placement_when_wrapping = beginning_of_line
+dotnet_style_operator_placement_when_wrapping = end_of_line
 dotnet_style_prefer_auto_properties = false:suggestion
 dotnet_style_prefer_compound_assignment = true
 dotnet_style_prefer_conditional_expression_over_assignment = false:suggestion
@@ -80,14 +80,14 @@ csharp_style_var_for_built_in_types = false:suggestion
 csharp_style_var_when_type_is_apparent = false:suggestion
 
 # Expression-bodied members
-csharp_style_expression_bodied_accessors = true:suggestion
+csharp_style_expression_bodied_accessors = false:suggestion
 csharp_style_expression_bodied_constructors = false:suggestion
-csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_indexers = false:suggestion
 csharp_style_expression_bodied_lambdas = true:suggestion
-csharp_style_expression_bodied_local_functions = true:suggestion
-csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_local_functions = false:suggestion
+csharp_style_expression_bodied_methods = false:suggestion
 csharp_style_expression_bodied_operators = false:suggestion
-csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_properties = false:suggestion
 
 # Pattern matching preferences
 csharp_style_pattern_matching_over_as_with_null_check = true
@@ -103,7 +103,7 @@ csharp_style_prefer_parameter_null_checking = true
 
 # Modifier preferences
 csharp_prefer_static_local_function = true
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
+csharp_preferred_modifier_order = static,extern,public,internal,protected,private,file,new,abstract,virtual,override,sealed,readonly,unsafe,required,volatile,asnyc:suggestion
 
 # Code-block preferences
 csharp_prefer_braces = true:suggestion
@@ -278,7 +278,7 @@ dotnet_naming_style.s_underscore.word_separator =
 dotnet_naming_style.s_underscore.capitalization = pascal_case
 
 dotnet_naming_style.async_suffix.required_prefix = 
-dotnet_naming_style.async_suffix.required_suffix = Async
+dotnet_naming_style.async_suffix.required_suffix = Asynchronously
 dotnet_naming_style.async_suffix.word_separator = 
 dotnet_naming_style.async_suffix.capitalization = pascal_case
 
@@ -286,3 +286,6 @@ dotnet_naming_style.internal_type.required_prefix = __
 dotnet_naming_style.internal_type.required_suffix = 
 dotnet_naming_style.internal_type.word_separator = 
 dotnet_naming_style.internal_type.capitalization = pascal_case
+
+# CA1050: Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = none

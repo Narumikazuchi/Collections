@@ -1,7 +1,7 @@
 ﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
-/// An enumerator that iterates through the <see cref="ReadOnlySortedDictionary{TKey, TValue, TComparer, TEqualityComparer}"/>.
+/// An enumerator that iterates through the <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/>.
 /// </summary>
 public struct CommonDictionaryEnumerator<TKey, TValue> :
     IStrongEnumerator<KeyValuePair<TKey, TValue>>,
@@ -30,9 +30,14 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
     }
 
     /// <inheritdoc/>
-    public KeyValuePair<TKey, TValue> Current =>
-        new(key: m_Elements[m_Index].Key,
-            value: m_Elements[m_Index].Value);
+    public KeyValuePair<TKey, TValue> Current
+    {
+        get
+        {
+            return new(key: m_Elements[m_Index].Key,
+                       value: m_Elements[m_Index].Value);
+        }
+    }
 
 #if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
@@ -41,8 +46,13 @@ public struct CommonDictionaryEnumerator<TKey, TValue> :
     void IDisposable.Dispose()
     { }
 
-    Object? IEnumerator.Current =>
-        this.Current;
+    Object? IEnumerator.Current
+    {
+        get
+        {
+            return this.Current;
+        }
+    }
 #endif
 
     private readonly __DictionaryEntry<TKey, TValue>[] m_Elements;

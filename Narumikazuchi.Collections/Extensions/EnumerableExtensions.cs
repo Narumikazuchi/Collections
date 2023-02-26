@@ -3,168 +3,99 @@
 /// <summary>
 /// Extends the <see cref="IEnumerable{T}"/> interface.
 /// </summary>
-public static class EnumerableExtensions
+static public class EnumerableExtensions
 {
     /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyCollection{T}"/> wrapper for the current collection.
+    /// Retrieves all the elements that match the conditions defined by the specified predicate.
     /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyCollection<TElement> AsReadOnlyCollection<TElement>(this IEnumerable<TElement> source) =>
-        ReadOnlyCollection<TElement>.CreateFrom(source);
-
-    /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
-    /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TKey, TValue, TEqualityComparer>(this IEnumerable<KeyValuePair<TKey, TValue>> source,
+    /// <param name="source"></param>
+    /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the elements to search for.</param>
+    /// <returns>A <see cref="ReadOnlyList{T}"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="ReadOnlyList{T}"/>.</returns>
+    /// <exception cref="ArgumentNullException"/>
+    static public NotNull<ReadOnlyList<TElement>> FindAll<TElement>(
+        this IEnumerable<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TEqualityComparer equalityComparer)
-            where TKey : notnull
-            where TEqualityComparer : IEqualityComparer<TKey> =>
-                ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source,
-                                                                               equalityComparer: equalityComparer);
-    /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
-    /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TElement, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TEqualityComparer>(this IEnumerable<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        TEqualityComparer equalityComparer,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, TKey> keySelector)
-            where TKey : notnull
-            where TEqualityComparer : IEqualityComparer<TKey>
+        Func<TElement, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(keySelector);
+        ArgumentNullException.ThrowIfNull(predicate);
 #else
-        if (keySelector is null)
+        if (predicate is null)
         {
-            throw new ArgumentNullException(nameof(keySelector));
+            throw new ArgumentNullException(nameof(predicate));
         }
 #endif
 
-        return ReadOnlyDictionary<TKey, TElement, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TElement>(key: keySelector.Invoke(x),
-                                                                                                                                           value: x)),
-                                                                                equalityComparer: equalityComparer);
-    }
-    /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue, TEqualityComparer}"/> wrapper for the current collection.
-    /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyDictionary<TKey, TValue, TEqualityComparer> AsReadOnlyDictionary<TElement, TKey, TValue, TEqualityComparer>(this IEnumerable<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        TEqualityComparer equalityComparer,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, TKey> keySelector,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, TValue> valueSelector)
-            where TKey : notnull
-            where TEqualityComparer : IEqualityComparer<TKey>
-    {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(keySelector);
-        ArgumentNullException.ThrowIfNull(valueSelector);
-#else
-        if (keySelector is null)
-        {
-            throw new ArgumentNullException(nameof(keySelector));
-        }
-
-        if (valueSelector is null)
-        {
-            throw new ArgumentNullException(nameof(valueSelector));
-        }
-#endif
-
-        return ReadOnlyDictionary<TKey, TValue, TEqualityComparer>.CreateFrom(items: source.Select(x => new KeyValuePair<TKey, TValue>(key: keySelector.Invoke(x),
-                                                                                                                                       value: valueSelector.Invoke(x))),
-                                                                              equalityComparer: equalityComparer);
+        return new ReadOnlyList<TElement>(source.Where(predicate)
+                                                .ToArray());
     }
 
     /// <summary>
-    /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current list.
+    /// Performs the specified action on each element of the <see cref="IEnumerable{T}"/>.
     /// </summary>
-    /// <returns>An object that contains the objects of the source and is read-only.</returns>
-    public static ReadOnlyList<TElement> AsReadOnlyList<TElement>(this IEnumerable<TElement> source) =>
-        ReadOnlyList<TElement>.CreateFrom(source);
-
-    /// <summary>
-    /// Creates a <see cref="BinaryTree{TElement, TComparer}"/> from an <see cref="IEnumerable{T}"/>.
-    /// </summary>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    [return: NotNull]
-#endif
-    public static BinaryTree<TElement, TComparer> ToBinaryTree<TElement, TComparer>(this IEnumerable<TElement> source,
+    /// <param name="source"></param>
+    /// <param name="action">The <see cref="Action{T}"/> delegate to perform on each element of the <see cref="IEnumerable{T}"/>.</param>
+    /// <exception cref="ArgumentNullException"/>
+    static public void ForEach<TElement>(
+        this IEnumerable<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TComparer comparer) 
-            where TElement : notnull
-            where TComparer : IComparer<TElement>
+        Action<TElement> action)
     {
 #if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(comparer);
+        ArgumentNullException.ThrowIfNull(action);
 #else
-        if (source is null)
+        if (action is null)
         {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        if (comparer is null)
-        {
-            throw new ArgumentNullException(nameof(comparer));
+            throw new ArgumentNullException(nameof(action));
         }
 #endif
 
-        if (source is BinaryTree<TElement, TComparer> original)
-        {
-            return original;
-        }
-
-        if (!source.Any())
-        {
-            throw new InvalidOperationException("No elements in the source!");
-        }
-
-        TElement median = source.Median()!;
-        BinaryTree<TElement, TComparer> result = new(root: median,
-                                                     comparer: comparer);
         foreach (TElement element in source)
         {
-            result.Add(element);
+            action.Invoke(element);
         }
-
-        return result;
     }
 
     /// <summary>
-    /// Creates a <see cref="Trie{TElement}"/> from an <see cref="IEnumerable{String}"/>.
+    /// Determines whether every element in the <see cref="IEnumerable{T}"/> matches the conditions defined by the specified predicate.
     /// </summary>
+    /// <param name="source"></param>
+    /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions to check against the elements.</param>
+    /// <returns>
+    /// <see langword="true"/> if every element in the <see cref="IEnumerable{T}"/> matches the conditions
+    /// defined by the specified predicate; otherwise, <see langword="false"/>. If the collection has no elements,
+    /// the return value is <see langword="true"/>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"/>
+    static public Boolean TrueForAll<TElement>(
+        this IEnumerable<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-    [return: NotNull]
+        [DisallowNull]
 #endif
-    public static Trie<TElement> ToTrie<TElement>(this IEnumerable<String> source) 
-        where TElement : class
+        Func<TElement, Boolean> predicate)
     {
-        if (source is Trie<TElement> original)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(predicate);
+#else
+        if (predicate is null)
         {
-            return original;
+            throw new ArgumentNullException(nameof(predicate));
         }
-        return new(collection: source);
+#endif
+
+        foreach (TElement element in source)
+        {
+            if (!predicate.Invoke(element))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -174,7 +105,7 @@ public static class EnumerableExtensions
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
 #endif
-    public static TElement Median<TElement>(this IEnumerable<TElement> source)
+    static public MaybeNull<TElement> Median<TElement>(this IEnumerable<TElement> source)
     {
         if (!source.Any())
         {
@@ -201,6 +132,7 @@ public static class EnumerableExtensions
                 enumerator.MoveNext();
                 ++index;
             }
+
             return enumerator.Current;
         }
 
@@ -212,6 +144,7 @@ public static class EnumerableExtensions
             {
                 counter.MoveNext();
             }
+
             ++index;
         }
         return counter.Current;

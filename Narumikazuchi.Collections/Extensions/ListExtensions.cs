@@ -3,7 +3,7 @@
 /// <summary>
 /// Extends the <see cref="IList{T}"/> interface.
 /// </summary>
-public static class ListExtensions
+static public class ListExtensions
 {
     /// <summary>
     /// Searches the entire sorted <see cref="IList{T}"/> for an element using the default comparer and returns the zero-based index of the element.
@@ -18,21 +18,13 @@ public static class ListExtensions
     /// </returns>
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="InvalidOperationException" />
-    public static Int32 BinarySearch<TElement>(this IList<TElement> source,
+    static public Int32 BinarySearch<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item)
+        NotNull<TElement> item)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-#endif
-
         if (source is List<TElement> list)
         {
             return list.BinarySearch(item);
@@ -61,25 +53,19 @@ public static class ListExtensions
     /// <exception cref="ArgumentException" />
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="InvalidOperationException" />
-    public static Int32 BinarySearch<TElement, TComparer>(this IList<TElement> source,
+    static public Int32 BinarySearch<TElement, TComparer>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [AllowNull]
 #endif
-        TComparer? comparer)
+        MaybeNull<TComparer> comparer)
             where TComparer : IComparer<TElement>
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-#endif
+        TComparer? comparer1 = comparer;
 
         if (source is List<TElement> list)
         {
@@ -90,13 +76,13 @@ public static class ListExtensions
         {
             return Array.BinarySearch(array: array,
                                       value: item,
-                                      comparer: comparer);
+                                      comparer: comparer1);
         }
 
         TElement[] elements = source.ToArray();
         return Array.BinarySearch(array: elements,
                                   value: item,
-                                  comparer: comparer);
+                                  comparer: comparer1);
     }
     /// <summary>
     /// Searches the entire sorted <see cref="IList{T}"/> for an element using the specified comparer and returns the zero-based index of the element.
@@ -115,27 +101,21 @@ public static class ListExtensions
     /// <exception cref="ArgumentNullException" />
     /// <exception cref="ArgumentOutOfRangeException" />
     /// <exception cref="InvalidOperationException" />
-    public static Int32 BinarySearch<TElement, TComparer>(this IList<TElement> source,
+    static public Int32 BinarySearch<TElement, TComparer>(
+        this IList<TElement> source,
         Int32 index,
         Int32 count,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [AllowNull]
 #endif
-        TComparer? comparer)
+        MaybeNull<TComparer> comparer)
             where TComparer : IComparer<TElement>
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-#endif
+        TComparer? comparer1 = comparer;
 
         if (source is List<TElement> list)
         {
@@ -150,7 +130,7 @@ public static class ListExtensions
                                       index: index,
                                       length: count,
                                       value: item,
-                                      comparer: comparer);
+                                      comparer: comparer1);
         }
 
         TElement[] elements = source.ToArray();
@@ -158,7 +138,7 @@ public static class ListExtensions
                                   value: item,
                                   index: index,
                                   length: count,
-                                  comparer: comparer);
+                                  comparer: comparer1);
     }
 
     /// <summary>
@@ -168,7 +148,8 @@ public static class ListExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static TElement? FindFirstOrDefault<TElement>(this IList<TElement> source,
+    static public MaybeNull<TElement> FindFirstOrDefault<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -205,7 +186,8 @@ public static class ListExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
+    static public Int32 FindFirstIndex<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -243,8 +225,9 @@ public static class ListExtensions
     /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
-                                                 Int32 startIndex,
+    static public Int32 FindFirstIndex<TElement>(
+        this IList<TElement> source,
+        Int32 startIndex,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -292,9 +275,10 @@ public static class ListExtensions
     /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static Int32 FindFirstIndex<TElement>(this IList<TElement> source,
-                                                 Int32 startIndex,
-                                                 Int32 count,
+    static public Int32 FindFirstIndex<TElement>(
+        this IList<TElement> source,
+        Int32 startIndex,
+        Int32 count,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -345,7 +329,8 @@ public static class ListExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type <typeparamref name="TElement"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static TElement? FindLastOrDefault<TElement>(this IList<TElement> source,
+    static public MaybeNull<TElement> FindLastOrDefault<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -382,7 +367,8 @@ public static class ListExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the element to search for.</param>
     /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
+    static public Int32 FindLastIndex<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -420,8 +406,9 @@ public static class ListExtensions
     /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
-                                                Int32 startIndex,
+    static public Int32 FindLastIndex<TElement>(
+        this IList<TElement> source,
+        Int32 startIndex,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -469,9 +456,10 @@ public static class ListExtensions
     /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by <paramref name="predicate"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static Int32 FindLastIndex<TElement>(this IList<TElement> source,
-                                                Int32 startIndex,
-                                                Int32 count,
+    static public Int32 FindLastIndex<TElement>(
+        this IList<TElement> source,
+        Int32 startIndex,
+        Int32 count,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
@@ -524,9 +512,9 @@ public static class ListExtensions
     /// <returns>A shallow copy of a range of elements the source <see cref="IList{T}"/>.</returns>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static ReadOnlyList<TElement> GetRange<TElement>(this IList<TElement> source,
-                                                            Int32 startIndex,
-                                                            Int32 count)
+    static public NotNull<ReadOnlyList<TElement>> GetRange<TElement>(this IList<TElement> source,
+                                                                     Int32 startIndex,
+                                                                     Int32 count)
     {
 #if NETCOREAPP3_1_OR_GREATER
         startIndex.ThrowIfOutOfRange(0, source.Count - 1);
@@ -547,12 +535,13 @@ public static class ListExtensions
 
         if (source is List<TElement> list)
         {
-            return ReadOnlyList<TElement>.CreateFrom(list.GetRange(index: startIndex,
-                                                                   count: count));
+            return ReadOnlyList<TElement>.CreateFrom<List<TElement>>(list.GetRange(index: startIndex,
+                                                                                   count: count));
         }
 
-        return ReadOnlyList<TElement>.CreateFrom(source.Skip(startIndex)
-                                                       .Take(count));
+        return ReadOnlyList<TElement>.CreateFrom<TElement[]>(source.Skip(startIndex)
+                                                                   .Take(count)
+                                                                   .ToArray());
     }
 
     /// <summary>
@@ -563,38 +552,26 @@ public static class ListExtensions
     /// <param name="equalityComparer">The equality comparer that will be used to compare two instances of <typeparamref name="TElement"/>.</param>
     /// <returns>The zero-based index of the first occurrence of item withthe entire <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 IndexOf<TElement, TComparer>(this IList<TElement> source,
+    static public Int32 IndexOf<TElement, TEqualityComparer>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TComparer equalityComparer)
-            where TComparer : IEqualityComparer<TElement>
+        NotNull<TEqualityComparer> equalityComparer)
+            where TEqualityComparer : IEqualityComparer<TElement>
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-        ArgumentNullException.ThrowIfNull(equalityComparer);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-
-        if (equalityComparer is null)
-        {
-            throw new ArgumentNullException(nameof(equalityComparer));
-        }
-#endif
+        TEqualityComparer comparer = equalityComparer;
 
         for (Int32 i = 0;
              i < source.Count;
              i++)
         {
-            if (equalityComparer.Equals(x: item,
-                                        y: source[i]))
+            if (comparer.Equals(x: item,
+                                y: source[i]))
             {
                 return i;
             }
@@ -611,22 +588,15 @@ public static class ListExtensions
     /// <param name="items">The collection whose elements should be inserted into the <see cref="IList{T}"/>.</param>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static void InsertRange<TEnumerable, TElement>(this IList<TElement> source,
-                                                          Int32 index,
+    static public void InsertRange<TEnumerable, TElement>(
+        this IList<TElement> source,
+        Int32 index,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TEnumerable items)
+        NotNull<TEnumerable> items)
             where TEnumerable : IEnumerable<TElement>
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(items);
-#else
-        if (items is null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
-#endif
 #if NETCOREAPP3_1_OR_GREATER
         index.ThrowIfOutOfRange(0, source.Count - 1);
 #else
@@ -637,8 +607,9 @@ public static class ListExtensions
         }
 #endif
 
+        TEnumerable enumerable = items;
         Int32 i = index;
-        foreach (TElement item in items)
+        foreach (TElement item in enumerable)
         {
             if (source is INotifyPropertyChangingHelper changing)
             {
@@ -652,8 +623,8 @@ public static class ListExtensions
             }
             if (source is INotifyCollectionChangedHelper collection)
             {
-                collection.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                                   changedItem: item));
+                collection.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add,
+                                                                                    changedItem: item));
             }
         }
     }
@@ -665,14 +636,18 @@ public static class ListExtensions
     /// <param name="item">The object to locate the <see cref="IList{T}"/>.</param>
     /// <returns>The zero-based index of the last occurrence of item withthe entire the <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 LastIndexOf<TElement>(this IList<TElement> source,
+    static public Int32 LastIndexOf<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item) =>
-            LastIndexOf(source: source,
-                        item: item,
-                        equalityComparer: EqualityComparer<TElement>.Default);
+        NotNull<TElement> item)
+    {
+        return LastIndexOf<TElement, EqualityComparer<TElement>>(source: source,
+                                                                 item: item,
+                                                                 equalityComparer: EqualityComparer<TElement>.Default);
+    }
+
     /// <summary>
     /// Searches for the specified object and returns the zero-based index of the last occurrence withthe entire <see cref="IList{T}"/>.
     /// </summary>
@@ -681,38 +656,25 @@ public static class ListExtensions
     /// <param name="equalityComparer">The equality comparer that will be used to compare two instances of <typeparamref name="TElement"/>.</param>
     /// <returns>The zero-based index of the last occurrence of item withthe entire the <see cref="IList{T}"/>, if found; otherwise, -1.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public static Int32 LastIndexOf<TElement, TComparer>(this IList<TElement> source,
+    static public Int32 LastIndexOf<TElement, TEqualityComparer>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TComparer equalityComparer)
-            where TComparer : IEqualityComparer<TElement>
+        NotNull<TEqualityComparer> equalityComparer)
+            where TEqualityComparer : IEqualityComparer<TElement>
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-        ArgumentNullException.ThrowIfNull(equalityComparer);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-
-        if (equalityComparer is null)
-        {
-            throw new ArgumentNullException(nameof(equalityComparer));
-        }
-#endif
-
+        TEqualityComparer comparer = equalityComparer;
         for (Int32 i = source.Count - 1;
              i > 0;
              i--)
         {
-            if (equalityComparer.Equals(x: item,
-                                        y: source[i]))
+            if (comparer.Equals(x: item,
+                                y: source[i]))
             {
                 return i;
             }
@@ -724,7 +686,7 @@ public static class ListExtensions
     /// <summary>
     /// Moves the item at the given index one position the specified direction the <see cref="IList{T}"/>.
     /// </summary>
-    public static void MoveItem<TElement>(this IList<TElement> source,
+    static public void MoveItem<TElement>(this IList<TElement> source,
                                           Int32 index,
                                           ItemMoveDirection direction)
     {
@@ -752,7 +714,7 @@ public static class ListExtensions
     /// <summary>
     /// Moves the item at the given index the given amount of positions the specified direction the <see cref="IList{T}"/>.
     /// </summary>
-    public static void MoveItem<TElement>(this IList<TElement> source,
+    static public void MoveItem<TElement>(this IList<TElement> source,
                                           Int32 index,
                                           ItemMoveDirection direction,
                                           Int32 positions)
@@ -777,27 +739,20 @@ public static class ListExtensions
     /// <summary>
     /// Moves the item one position the specified direction the <see cref="IList{T}"/>.
     /// </summary>
-    public static void MoveItem<TElement>(this IList<TElement> source,
+    static public void MoveItem<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
         ItemMoveDirection direction)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-#endif
-
         Int32 index = source.IndexOf(item);
         if (index == -1)
         {
             return;
         }
+
         if (direction == ItemMoveDirection.ToLowerIndex)
         {
             if (index > 0)
@@ -819,23 +774,15 @@ public static class ListExtensions
     /// <summary>
     /// Moves the item at the given index the given amount of positions the specified direction the <see cref="IList{T}"/>.
     /// </summary>
-    public static void MoveItem<TElement>(this IList<TElement> source,
+    static public void MoveItem<TElement>(
+        this IList<TElement> source,
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        TElement item,
+        NotNull<TElement> item,
         ItemMoveDirection direction,
         Int32 positions)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(item);
-#else
-        if (item is null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-#endif
-
         if (positions == 0)
         {
             return;
@@ -854,6 +801,7 @@ public static class ListExtensions
                           item: item);
             return;
         }
+
         source.Insert(index: index - positions,
                       item: item);
     }
@@ -865,7 +813,7 @@ public static class ListExtensions
     /// <param name="startIndex">The zero-based starting index of the range of elements to remove.</param>
     /// <param name="count">The number of elements to remove.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public static void RemoveRange<TElement>(this IList<TElement> source,
+    static public void RemoveRange<TElement>(this IList<TElement> source,
                                              Int32 startIndex,
                                              Int32 count)
     {
@@ -902,8 +850,8 @@ public static class ListExtensions
             }
             if (source is INotifyCollectionChangedHelper collection)
             {
-                collection.OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
-                                                   changedItem: item));
+                collection.OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Remove,
+                                                                                    changedItem: item));
             }
         }
     }

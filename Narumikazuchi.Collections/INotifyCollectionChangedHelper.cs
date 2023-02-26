@@ -13,5 +13,5 @@ public interface INotifyCollectionChangedHelper :
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        NotifyCollectionChangedEventArgs eventArgs);
+        NotNull<NotifyCollectionChangedEventArgs> eventArgs);
 }

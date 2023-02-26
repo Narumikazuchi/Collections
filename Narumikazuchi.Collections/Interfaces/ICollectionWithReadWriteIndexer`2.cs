@@ -3,9 +3,9 @@
 /// <summary>
 /// Represents a strongly-typed collection which allows read-write access to it's elements via an indexer.
 /// </summary>
-public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator> : 
-    ICollectionWithReadIndexer<TElement, TEnumerator>,
-    ICollectionWithWriteIndexer<TElement, TEnumerator>
+public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator>
+    : ICollectionWithReadIndexer<TElement, TEnumerator>,
+      ICollectionWithWriteIndexer<TElement, TEnumerator>
         where TEnumerator : struct, IStrongEnumerator<TElement>
 {
     /// <summary>
@@ -14,7 +14,10 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator> :
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to get or set.</param>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
-    public new TElement this[Int32 index]
+#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    [NotNull]
+#endif
+    public new NotNull<TElement> this[Int32 index]
     {
         get;
         set;
@@ -26,7 +29,8 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator> :
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to get or set.</param>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
-    public new TElement this[Index index]
+    [NotNull]
+    public new NotNull<TElement> this[Index index]
     {
         get;
         set;

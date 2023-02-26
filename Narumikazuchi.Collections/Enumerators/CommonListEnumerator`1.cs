@@ -16,17 +16,8 @@ public struct CommonListEnumerator<TElement> :
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        List<TElement> items)
+        NotNull<List<TElement>> items)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(items);
-#else
-        if (items == null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
-#endif
-
         m_Elements = items;
         m_Index = -1;
     }
@@ -45,8 +36,13 @@ public struct CommonListEnumerator<TElement> :
     }
 
     /// <inheritdoc/>
-    public TElement Current =>
-        m_Elements[m_Index];
+    public TElement Current
+    {
+        get
+        {
+            return m_Elements[m_Index];
+        }
+    }
 
 #if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
@@ -55,8 +51,13 @@ public struct CommonListEnumerator<TElement> :
     void IDisposable.Dispose()
     { }
 
-    Object? IEnumerator.Current =>
-        this.Current;
+    Object? IEnumerator.Current
+    {
+        get
+        {
+            return this.Current;
+        }
+    }
 #endif
 
     internal readonly List<TElement> m_Elements;

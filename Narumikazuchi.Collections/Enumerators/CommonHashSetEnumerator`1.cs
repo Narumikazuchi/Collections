@@ -16,27 +16,26 @@ public struct CommonHashSetEnumerator<TElement> :
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         [DisallowNull]
 #endif
-        HashSet<TElement> items)
+        NotNull<HashSet<TElement>> items)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(items);
-#else
-        if (items == null)
-        {
-            throw new ArgumentNullException(nameof(items));
-        }
-#endif
-
-        m_Enumerator = items.GetEnumerator();
+        HashSet<TElement> elements = items;
+        m_Enumerator = elements.GetEnumerator();
     }
 
     /// <inheritdoc/>
-    public Boolean MoveNext() =>
-        m_Enumerator.MoveNext();
+    public Boolean MoveNext()
+    {
+        return m_Enumerator.MoveNext();
+    }
 
     /// <inheritdoc/>
-    public TElement Current =>
-        m_Enumerator.Current;
+    public TElement Current
+    {
+        get
+        {
+            return m_Enumerator.Current;
+        }
+    }
 
 #if !NETCOREAPP3_1_OR_GREATER
     void IEnumerator.Reset()
@@ -45,8 +44,13 @@ public struct CommonHashSetEnumerator<TElement> :
     void IDisposable.Dispose()
     { }
 
-    Object? IEnumerator.Current =>
-        this.Current;
+    Object? IEnumerator.Current
+    {
+        get
+        {
+            return this.Current;
+        }
+    }
 #endif
 
     internal HashSet<TElement>.Enumerator m_Enumerator;
