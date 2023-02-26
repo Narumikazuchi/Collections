@@ -18,7 +18,7 @@
 		<DocumentationFile>Narumikazuchi.Collections.xml</DocumentationFile>
 		<Authors>Narumikazuchi</Authors>
 		<Copyright>©2023 Narumikazuchi</Copyright>
-		<Version>2023.02.26.1-prerelease</Version>
+		<Version>2023.02.26.2-prerelease</Version>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -53,7 +53,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Narumikazuchi" Version="2023.2.24.1-prerelease" />
+		<PackageReference Include="Narumikazuchi" Version="2023.2.26.1-prerelease" />
 	</ItemGroup>
 
 	<ItemGroup>
