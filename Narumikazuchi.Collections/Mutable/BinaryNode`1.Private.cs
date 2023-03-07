@@ -21,9 +21,9 @@ public partial class BinaryNode<TValue>
         TValue min = this.Value;
         BinaryNode<TValue>? node = this.RightChild;
         while (node is not null &&
-               !node.LeftChild.IsNull)
+               node.LeftChild is not null)
         {
-            min = ((BinaryNode<TValue>)node.LeftChild)!.Value;
+            min = node.LeftChild.Value;
             node = node.LeftChild;
         }
 

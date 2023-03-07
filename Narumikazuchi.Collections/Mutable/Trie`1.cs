@@ -12,15 +12,10 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     /// </summary>
     /// <param name="separators">The separators used to split inserted words.</param>
     /// <exception cref="ArgumentNullException" />
-    static public Trie<TContent> CreateFrom<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> separators)
-            where TEnumerable : IEnumerable<Char>
+    static public Trie<TContent> CreateFrom<TEnumerable>([DisallowNull] TEnumerable separators)
+        where TEnumerable : IEnumerable<Char>
     {
-        TEnumerable source = separators;
-        return new(source);
+        return new(separators.ToArray());
     }
 
     /// <summary>
@@ -38,11 +33,7 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-    public Boolean Exists(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public Boolean Exists([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -68,14 +59,8 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
-#endif
-    public MaybeNull<TrieNode<TContent>> Find(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public TrieNode<TContent>? Find([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -115,11 +100,7 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-    public NotNull<ReadOnlyList<TrieNode<TContent>>> FindAll(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public ReadOnlyList<TrieNode<TContent>> FindAll([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -160,11 +141,7 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-    public NotNull<ReadOnlyList<TrieNode<TContent>>> FindExcept(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public ReadOnlyList<TrieNode<TContent>> FindExcept([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -206,14 +183,8 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
-#endif
-    public MaybeNull<TrieNode<TContent>> FindLast(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public TrieNode<TContent>? FindLast([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -254,37 +225,51 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-    public void Insert(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNullOrEmpty<String> index,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TContent> item)
+    public void Insert([DisallowNull] String index,
+                       [DisallowNull] TContent item)
     {
-        this.InsertRange<TContent[]>(index: index,
-                                     enumerable: new TContent[] { item });
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(index);
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (index is null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+        
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
+        this.InsertRange(index: index,
+                         enumerable: new TContent[] { item });
     }
 
     /// <inheritdoc/>
-    public void InsertRange<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNullOrEmpty<String> index,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> enumerable)
-            where TEnumerable : IEnumerable<TContent>
+    public void InsertRange<TEnumerable>([DisallowNull] String index,
+                                         [DisallowNull] TEnumerable enumerable)
+        where TEnumerable : IEnumerable<TContent>
     {
-        String insert = index;
-        TEnumerable source = enumerable;
-        String[] words = insert.ToLower()
-                               .Split(separator: m_Separators,
-                                      options: StringSplitOptions.RemoveEmptyEntries);
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(index);
+        ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (index is null)
+        {
+            throw new ArgumentNullException(nameof(index));
+        }
+        
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
+
+        String[] words = index.ToLower()
+                              .Split(separator: m_Separators,
+                                     options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
             TrieNode<TContent>? current = this.Find(prefix => prefix == word);
@@ -313,7 +298,7 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
                 }
 
                 current.IsWord = true;
-                foreach (TContent item in source)
+                foreach (TContent item in enumerable)
                 {
                     if (item is null)
                     {
@@ -325,8 +310,8 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
             }
 
             ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
-            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Add,
-                                                                                                            changedItem: word));
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new(action: NotifyCollectionChangedAction.Add,
+                                                                           changedItem: word));
         }
     }
 
@@ -341,17 +326,21 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     }
 
     /// <inheritdoc/>
-    public Boolean Remove(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNullOrEmpty<String> item)
+    public Boolean Remove([DisallowNull] String item)
     {
-        String remove = item;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         Boolean result = false;
-        String[] words = remove.ToLower()
-                               .Split(separator: m_Separators,
-                                      options: StringSplitOptions.RemoveEmptyEntries);
+        String[] words = item.ToLower()
+                             .Split(separator: m_Separators,
+                                    options: StringSplitOptions.RemoveEmptyEntries);
         foreach (String word in words)
         {
             ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
@@ -383,18 +372,14 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
             }
 
             ((INotifyPropertyChangedHelper)this).OnPropertyChanged(nameof(this.Count));
-            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Remove,
-                                                                                                            changedItem: word));
+            ((INotifyCollectionChangedHelper)this).OnCollectionChanged(new(action: NotifyCollectionChangedAction.Remove,
+                                                                           changedItem: word));
         }
         return result;
     }
 
     /// <inheritdoc/>
-    public Int32 RemoveAll(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<String, Boolean> predicate)
+    public Int32 RemoveAll([DisallowNull] Func<String, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(predicate);
@@ -430,16 +415,14 @@ public sealed partial class Trie<TContent> : StrongEnumerable<String, CommonArra
     /// Traverses through the <see cref="Trie{TContent}"/> and returns the inserted words in alphabetic order.
     /// </summary>
     /// <returns>An <see cref="IEnumerable"/> which iterates through all inserted words of this <see cref="Trie{TContent}"/></returns>
-    public NotNull<ReadOnlyList<String>> Traverse()
+    public ReadOnlyList<String> Traverse()
     {
         return this.TraverseInternal(m_Root);
     }
 
     /// <inheritdoc/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<TrieNode<TContent>> RootNode
+    public TrieNode<TContent> RootNode
     {
         get
         {

@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace Narumikazuchi.Collections;
+﻿namespace Narumikazuchi.Collections;
 
 /// <summary>
 /// Represents a strongly-typed readonly collection of elements with a significantly faster enumerator to
@@ -25,7 +23,7 @@ public sealed partial class ReadOnlyList<TElement> : BaseReadOnlyCollection<TEle
         return new(items);
     }
 
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     static public implicit operator ReadOnlyList<TElement>(ImmutableArray<TElement> source)
     {
         TElement[] items = new TElement[source.Length];
@@ -71,15 +69,19 @@ public sealed partial class ReadOnlyList<TElement> : BaseReadOnlyCollection<TEle
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    static public ReadOnlyList<TElement> CreateFrom<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> items)
-            where TEnumerable : IEnumerable<TElement>
+    static public ReadOnlyList<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
-        TEnumerable source = items;
-        if (source is TElement[] array)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
+
+        if (items is TElement[] array)
         {
             TElement[] elements = new TElement[array.Length];
             Array.Copy(sourceArray: array,
@@ -87,35 +89,35 @@ public sealed partial class ReadOnlyList<TElement> : BaseReadOnlyCollection<TEle
                        length: array.Length);
             return new(elements);
         }
-#if NETCOREAPP3_1_OR_GREATER
-        else if (source is ImmutableArray<TElement> immutableArray)
+#if NET6_0_OR_GREATER
+        else if (items is ImmutableArray<TElement> immutableArray)
         {
             TElement[] elements = new TElement[immutableArray.Length];
             immutableArray.CopyTo(elements);
             return new(elements);
         }
 #endif
-        else if (source is List<TElement> list)
+        else if (items is List<TElement> list)
         {
             TElement[] elements = new TElement[list.Count];
             list.CopyTo(elements);
             return new(elements);
         }
-        else if (source is ICollection<TElement> iCollectionT)
+        else if (items is ICollection<TElement> iCollectionT)
         {
             TElement[] elements = new TElement[iCollectionT.Count];
             iCollectionT.CopyTo(array: elements,
                                 arrayIndex: 0);
             return new(elements);
         }
-        else if (source is ICollection iCollection)
+        else if (items is ICollection iCollection)
         {
             TElement[] elements = new TElement[iCollection.Count];
             iCollection.CopyTo(array: elements,
                                index: 0);
             return new(elements);
         }
-        else if (source is IReadOnlyList<TElement> iReadOnlyList)
+        else if (items is IReadOnlyList<TElement> iReadOnlyList)
         {
             TElement[] elements = new TElement[iReadOnlyList.Count];
             Int32 index = 0;
@@ -125,11 +127,11 @@ public sealed partial class ReadOnlyList<TElement> : BaseReadOnlyCollection<TEle
             }
             return new(elements);
         }
-        else if (source is IHasCount counted)
+        else if (items is IHasCount counted)
         {
             TElement[] elements = new TElement[counted.Count];
             Int32 index = 0;
-            foreach (TElement element in source)
+            foreach (TElement element in items)
             {
                 elements[index++] = element;
             }
@@ -138,7 +140,7 @@ public sealed partial class ReadOnlyList<TElement> : BaseReadOnlyCollection<TEle
         }
         else
         {
-            return new(source.ToArray());
+            return new(items.ToArray());
         }
     }
 

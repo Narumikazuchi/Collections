@@ -8,12 +8,17 @@ public partial class TrieNode<TContent> : IModifyableCollection<TContent, Common
     /// <param name="item">The value to be added to the <see cref="TrieNode{TContent}"/>.</param>
     /// <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Add(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TContent> item)
+    public Boolean Add([DisallowNull] TContent item)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         return m_Items.Add(item);
     }
 
@@ -22,15 +27,19 @@ public partial class TrieNode<TContent> : IModifyableCollection<TContent, Common
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> enumerable)
-            where TEnumerable : IEnumerable<TContent>
+    public void AddRange<TEnumerable>([DisallowNull] TEnumerable enumerable)
+        where TEnumerable : IEnumerable<TContent>
     {
-        TEnumerable source = enumerable;
-        foreach (TContent item in source)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
+
+        foreach (TContent item in enumerable)
         {
             if (item is null)
             {
@@ -54,12 +63,17 @@ public partial class TrieNode<TContent> : IModifyableCollection<TContent, Common
     /// <param name="item">The item to remove.</param>
     /// <returns><see langword="true"/> if the item was found and removed; otherwise, <see langword="false"/></returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Remove(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TContent> item)
+    public Boolean Remove([DisallowNull] TContent item)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         if (m_Items.Contains(item: item))
         {
             return m_Items.Remove(item);

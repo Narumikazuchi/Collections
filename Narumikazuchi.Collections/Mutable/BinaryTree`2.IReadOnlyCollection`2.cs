@@ -4,54 +4,76 @@ public partial class BinaryTree<TValue, TComparer> : IReadOnlyCollection<TValue,
 {
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Contains(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> element)
+    public Boolean Contains([DisallowNull] TValue element)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
+
         return this.FindInternal(element) is not null;
     }
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Contains<TEqualityComparer>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> element,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEqualityComparer> equalityComparer)
-            where TEqualityComparer : IEqualityComparer<TValue>
+    public Boolean Contains<TEqualityComparer>([DisallowNull] TValue element,
+                                               [DisallowNull] TEqualityComparer equalityComparer)
+        where TEqualityComparer : IEqualityComparer<TValue>
     {
-        return this.FindInternal<TEqualityComparer>(value: element,
-                                                    equalityComparer: equalityComparer) is not null;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(equalityComparer);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+        
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+#endif
+
+        return this.FindInternal(value: element,
+                                 equalityComparer: equalityComparer) is not null;
     }
 
     /// <inheritdoc/>
-    public void CopyTo(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue[]> array)
+    public void CopyTo([DisallowNull] TValue[] array)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
+
         this.CopyTo(array: array,
                     destinationIndex: 0);
     }
     /// <inheritdoc/>
-    public void CopyTo(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue[]> array,
-        Int32 destinationIndex)
+    public void CopyTo([DisallowNull] TValue[] array,
+                       Int32 destinationIndex)
     {
-        TValue[] destination = array;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(array);
+#else
+        if (array is null)
+        {
+            throw new ArgumentNullException(nameof(array));
+        }
+#endif
+
         Int32 index = 0;
         foreach (TValue value in this.TraverseInOrder())
         {
-            destination[destinationIndex + index++] = value;
+            array[destinationIndex + index++] = value;
         }
     }
 }

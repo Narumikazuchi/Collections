@@ -12,16 +12,21 @@ public struct CommonArrayEnumerator<TElement> :
     /// </summary>
     /// <param name="items">The array containing the items to iterate through.</param>
     /// <exception cref="ArgumentNullException"/>
-    public CommonArrayEnumerator(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement[]> items)
+    public CommonArrayEnumerator([DisallowNull] TElement[] items)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
+
         m_Elements = items;
         m_Index = -1;
     }
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Initializes a new instance of the <see cref="CommonArrayEnumerator{TElement}"/> struct.
     /// </summary>
@@ -56,7 +61,7 @@ public struct CommonArrayEnumerator<TElement> :
         }
     }
 
-#if !NETCOREAPP3_1_OR_GREATER
+#if !NET6_0_OR_GREATER
     void IEnumerator.Reset()
     { }
 

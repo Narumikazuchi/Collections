@@ -3,12 +3,17 @@
 public partial class ObservableList<TElement> : IModifyableCollection<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Boolean Add(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> item)
+    public Boolean Add([DisallowNull] TElement item)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         m_Items.Add(item);
         NotifyCollectionChangedEventArgs eventArgs = new(action: NotifyCollectionChangedAction.Add,
@@ -19,20 +24,24 @@ public partial class ObservableList<TElement> : IModifyableCollection<TElement, 
     }
 
     /// <inheritdoc/>
-    public void AddRange<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> collection)
-            where TEnumerable : IEnumerable<TElement>
+    public void AddRange<TEnumerable>([DisallowNull] TEnumerable collection)
+        where TEnumerable : IEnumerable<TElement>
     {
-        TEnumerable source = collection;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(collection);
+#else
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+#endif
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
-        if (source is IHasCount counted)
+        if (collection is IHasCount counted)
         {
             TElement[] changed = new TElement[counted.Count];
             Int32 index = 0;
-            foreach (TElement item in source)
+            foreach (TElement item in collection)
             {
                 changed[index++] = item;
                 m_Items.Add(item);
@@ -46,7 +55,7 @@ public partial class ObservableList<TElement> : IModifyableCollection<TElement, 
         else
         {
             List<TElement> changed = new();
-            foreach (TElement item in source)
+            foreach (TElement item in collection)
             {
                 changed.Add(item);
                 m_Items.Add(item);
@@ -70,12 +79,17 @@ public partial class ObservableList<TElement> : IModifyableCollection<TElement, 
     }
 
     /// <inheritdoc/>
-    public Boolean Remove(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> item)
+    public Boolean Remove([DisallowNull] TElement item)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         ((INotifyPropertyChangingHelper)this).OnPropertyChanging(nameof(this.Count));
         if (!m_Items.Remove(item))
         {

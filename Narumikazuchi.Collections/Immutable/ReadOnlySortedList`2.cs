@@ -33,31 +33,31 @@ public sealed partial class ReadOnlySortedList<TElement, TComparer> : BaseReadOn
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="comparer">The comparer that will be used to compare two instances of type <typeparamref name="TElement"/>.</param>
     /// <exception cref="ArgumentNullException" />
-    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> items,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TComparer> comparer)
-            where TEnumerable : IEnumerable<TElement>
+    public static ReadOnlySortedList<TElement, TComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
+                                                                                  [DisallowNull] TComparer comparer)
+        where TEnumerable : IEnumerable<TElement>
     {
-        TEnumerable source = items;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
 
-        if (source is ReadOnlySortedList<TElement, TComparer> other)
+        if (items is ReadOnlySortedList<TElement, TComparer> other)
         {
             return new(items: other.m_Items,
                        comparer: comparer);
         }
-        else if (source is IReadOnlyCollection<TElement> iReadOnlyCollection)
+        else if (items is IReadOnlyCollection<TElement> iReadOnlyCollection)
         {
             return new(items: iReadOnlyCollection.OrderBy(x => x, (TComparer)comparer)
                                                  .ToArray(),
                        comparer: comparer);
         }
-        else if (source is ICollection<TElement> iCollection)
+        else if (items is ICollection<TElement> iCollection)
         {
             return new(items: iCollection.OrderBy(x => x, (TComparer)comparer)
                                          .ToArray(),
@@ -65,8 +65,8 @@ public sealed partial class ReadOnlySortedList<TElement, TComparer> : BaseReadOn
         }
         else
         {
-            return new(items: source.OrderBy(x => x, (TComparer)comparer)
-                                    .ToArray(),
+            return new(items: items.OrderBy(x => x, (TComparer)comparer)
+                                   .ToArray(),
                        comparer: comparer);
         }
     }

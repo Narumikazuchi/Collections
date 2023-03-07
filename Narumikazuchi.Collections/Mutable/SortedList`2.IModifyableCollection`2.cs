@@ -3,32 +3,36 @@
 public partial class SortedList<TElement, TComparer> : IModifyableCollection<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Boolean Add(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> item)
+    public Boolean Add([DisallowNull] TElement item)
     {
-        TComparer comparer = this.Comparer;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         Boolean shouldInsert = false;
         for (Int32 index = 0;
              index < this.Count;
              index++)
         {
-            if (comparer.Compare(x: item,
-                                 y: m_Items[index]) < 0)
+            if (this.Comparer.Compare(x: item,
+                                      y: m_Items[index]) < 0)
             {
                 m_Items.Insert(index: index,
                                item: item);
                 return true;
             }
-            else if (comparer.Compare(x: item,
-                                      y: m_Items[index]) == 0)
+            else if (this.Comparer.Compare(x: item,
+                                           y: m_Items[index]) == 0)
             {
                 shouldInsert = true;
             }
-            else if (comparer.Compare(x: item,
-                                      y: m_Items[index]) > 0)
+            else if (this.Comparer.Compare(x: item,
+                                           y: m_Items[index]) > 0)
             {
                 if (shouldInsert)
                 {
@@ -44,15 +48,19 @@ public partial class SortedList<TElement, TComparer> : IModifyableCollection<TEl
     }
 
     /// <inheritdoc/>
-    public void AddRange<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> collection)
-            where TEnumerable : IEnumerable<TElement>
+    public void AddRange<TEnumerable>([DisallowNull] TEnumerable collection)
+        where TEnumerable : IEnumerable<TElement>
     {
-        TEnumerable source = collection;
-        foreach (TElement item in source)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(collection);
+#else
+        if (collection is null)
+        {
+            throw new ArgumentNullException(nameof(collection));
+        }
+#endif
+
+        foreach (TElement item in collection)
         {
             this.Add(item!);
         }
@@ -65,12 +73,17 @@ public partial class SortedList<TElement, TComparer> : IModifyableCollection<TEl
     }
 
     /// <inheritdoc/>
-    public Boolean Remove(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> item)
+    public Boolean Remove([DisallowNull] TElement item)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(item);
+#else
+        if (item is null)
+        {
+            throw new ArgumentNullException(nameof(item));
+        }
+#endif
+
         return m_Items.Remove(item);
     }
 }

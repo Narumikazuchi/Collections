@@ -9,8 +9,6 @@ public interface IPerformsComparisons<TElement, TComparer>
     /// <summary>
     /// Gets the <see cref="IComparer{T}"/> which is used by the <see cref="IPerformsComparisons{TElement, TComparer}"/>.
     /// </summary>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<TComparer> Comparer { get; }
+    public TComparer Comparer { get; }
 }

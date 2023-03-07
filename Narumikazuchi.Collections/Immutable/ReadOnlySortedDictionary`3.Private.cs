@@ -57,21 +57,12 @@ public partial class ReadOnlySortedDictionary<TKey, TValue, TEqualityComparer>
             index++;
         }
 
-        this.Keys = ReadOnlyList<TKey>.CreateFrom<List<TKey>>(keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom<List<TValue>>(values);
+        this.Keys = ReadOnlyList<TKey>.CreateFrom(keys);
+        this.Values = ReadOnlyList<TValue>.CreateFrom(values);
     }
 
     private Int32 FindEntry(TKey key)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(key);
-#else
-        if (key is null)
-        {
-            throw new ArgumentNullException(nameof(key));
-        }
-#endif
-
         if (m_Buckets is not null)
         {
             Int32 hashCode = this.EqualityComparer.GetHashCode(key) & 0x7FFFFFFF;

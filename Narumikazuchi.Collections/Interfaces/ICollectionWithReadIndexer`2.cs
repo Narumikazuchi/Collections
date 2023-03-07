@@ -16,11 +16,7 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator>
     /// The zero-based index of the first occurrence of item within the entire 
     /// <see cref="ICollectionWithReadIndexer{TElement, TEnumerator}"/>, if found; otherwise, -1.
     /// </returns>
-    public Int32 IndexOf(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element);
+    public Int32 IndexOf([DisallowNull] TElement element);
     /// <summary>
     /// Searches for the specified <typeparamref name="TElement"/> and returns the zero-based index of the first
     /// occurrence within the entire <see cref="ICollectionWithReadIndexer{TElement, TEnumerator}"/>.
@@ -31,16 +27,9 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator>
     /// The zero-based index of the first occurrence of item within the entire 
     /// <see cref="ICollectionWithReadIndexer{TElement, TEnumerator}"/>, if found; otherwise, -1.
     /// </returns>
-    public Int32 IndexOf<TEqualityComparer>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEqualityComparer> equalityComparer)
-            where TEqualityComparer : IEqualityComparer<TElement>;
+    public Int32 IndexOf<TEqualityComparer>([DisallowNull] TElement element,
+                                            [DisallowNull] TEqualityComparer equalityComparer)
+        where TEqualityComparer : IEqualityComparer<TElement>;
 
     /// <summary>
     /// Gets the <typeparamref name="TElement"/> at the specified index.
@@ -48,18 +37,16 @@ public interface ICollectionWithReadIndexer<TElement, TEnumerator>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to get.</param>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<TElement> this[Int32 index] { get; }
-#if NETCOREAPP3_1_OR_GREATER
+    public TElement this[Int32 index] { get; }
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Gets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to get.</param>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
-    public NotNull<TElement> this[Index index] { get; }
+    public TElement this[Index index] { get; }
     /// <summary>
     /// Gets a slice specified by a range.
     /// </summary>

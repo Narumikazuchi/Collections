@@ -9,9 +9,5 @@ public interface INotifyCollectionChangedHelper :
     /// <summary>
     /// Raises the <see cref="INotifyCollectionChanged.CollectionChanged"/> event with the specified event args.
     /// </summary>
-    public void OnCollectionChanged(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<NotifyCollectionChangedEventArgs> eventArgs);
+    public void OnCollectionChanged([DisallowNull] NotifyCollectionChangedEventArgs eventArgs);
 }

@@ -12,16 +12,18 @@ static public class EnumerableExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the elements to search for.</param>
     /// <returns>A <see cref="ReadOnlyList{T}"/> containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty <see cref="ReadOnlyList{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    static public NotNull<ReadOnlyList<TElement>> FindAll<TElement>(
-        this IEnumerable<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, Boolean> predicate)
+    static public ReadOnlyList<TElement> FindAll<TElement>(this IEnumerable<TElement> source,
+                                                          [DisallowNull] Func<TElement, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (predicate is null)
         {
             throw new ArgumentNullException(nameof(predicate));
@@ -38,16 +40,18 @@ static public class EnumerableExtensions
     /// <param name="source"></param>
     /// <param name="action">The <see cref="Action{T}"/> delegate to perform on each element of the <see cref="IEnumerable{T}"/>.</param>
     /// <exception cref="ArgumentNullException"/>
-    static public void ForEach<TElement>(
-        this IEnumerable<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Action<TElement> action)
+    static public void ForEach<TElement>(this IEnumerable<TElement> source,
+                                         [DisallowNull] Action<TElement> action)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(action);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (action is null)
         {
             throw new ArgumentNullException(nameof(action));
@@ -71,16 +75,18 @@ static public class EnumerableExtensions
     /// the return value is <see langword="true"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException"/>
-    static public Boolean TrueForAll<TElement>(
-        this IEnumerable<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, Boolean> predicate)
+    static public Boolean TrueForAll<TElement>(this IEnumerable<TElement> source,
+                                               [DisallowNull] Func<TElement, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (predicate is null)
         {
             throw new ArgumentNullException(nameof(predicate));
@@ -105,8 +111,17 @@ static public class EnumerableExtensions
 #if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
 #endif
-    static public MaybeNull<TElement> Median<TElement>(this IEnumerable<TElement> source)
+    static public TElement Median<TElement>(this IEnumerable<TElement> source)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
+#else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+#endif
+
         if (!source.Any())
         {
             return default!;

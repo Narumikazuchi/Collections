@@ -14,15 +14,13 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to get or set.</param>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public new NotNull<TElement> this[Int32 index]
+    public new TElement this[Int32 index]
     {
         get;
         set;
     }
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Gets or sets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
@@ -30,7 +28,7 @@ public interface ICollectionWithReadWriteIndexer<TElement, TEnumerator>
     /// <returns>The element at the specified index.</returns>
     /// <exception cref="IndexOutOfRangeException"/>
     [NotNull]
-    public new NotNull<TElement> this[Index index]
+    public new TElement this[Index index]
     {
         get;
         set;

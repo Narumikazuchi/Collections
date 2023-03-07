@@ -11,16 +11,26 @@ static public class CollectionExtensions
     /// <param name="source"></param>
     /// <param name="other">The collection to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    static public void AddRange<TElement, TOther>(
-        this ICollection<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TOther> other)
+    static public void AddRange<TElement, TOther>(this ICollection<TElement> source,
+                                                  [DisallowNull] TOther other)
             where TOther : IEnumerable<TElement>
     {
-        TOther enumerable = other;
-        foreach (TElement element in enumerable)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(other);
+#else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
+        if (other is null)
+        {
+            throw new ArgumentNullException(nameof(other));
+        }
+#endif
+
+        foreach (TElement element in other)
         {
             source.Add(element);
         }
@@ -32,9 +42,18 @@ static public class CollectionExtensions
     /// <param name="source"></param>
     /// <returns>A <see cref="IReadOnlyCollection{T}"/> of the target type containing the converted elements from the current <see cref="ICollection{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    static public NotNull<ReadOnlyList<TOther>> ConvertAll<TElement, TOther>(this ICollection<TElement> source)
+    static public ReadOnlyList<TOther> ConvertAll<TElement, TOther>(this ICollection<TElement> source)
         where TElement : IConvertible<TOther>
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
+#else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+#endif
+
         TOther[] result = new TOther[source.Count];
         Int32 index = 0;
         foreach (TElement element in source)
@@ -51,16 +70,18 @@ static public class CollectionExtensions
     /// <param name="converter">A <see cref="Converter{TInput, TOutput}"/> delegate that converts each element from one type to another type.</param>
     /// <returns>A <see cref="IReadOnlyCollection{T}"/> of the target type containing the converted elements from the current <see cref="ICollection{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    static public NotNull<ReadOnlyList<TOther>> ConvertAll<TElement, TOther>(
-        this ICollection<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Converter<TElement, TOther> converter)
+    static public ReadOnlyList<TOther> ConvertAll<TElement, TOther>(this ICollection<TElement> source,
+                                                                    [DisallowNull] Converter<TElement, TOther> converter)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(converter);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (converter is null)
         {
             throw new ArgumentNullException(nameof(converter));
@@ -84,16 +105,18 @@ static public class CollectionExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the elements to search for.</param>
     /// <returns><see langword="true"/> if the <see cref="ICollection{T}"/> contains one or more elements that match the conditions defined by the specified predicate; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    static public Boolean Exists<TElement>(
-        this ICollection<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, Boolean> predicate)
+    static public Boolean Exists<TElement>(this ICollection<TElement> source,
+                                           [DisallowNull] Func<TElement, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (predicate is null)
         {
             throw new ArgumentNullException(nameof(predicate));
@@ -118,16 +141,18 @@ static public class CollectionExtensions
     /// <param name="predicate">The <see cref="Func{T, TResult}"/> delegate that defines the conditions of the elements to remove.</param>
     /// <returns>The number of elements removed from the <see cref="ICollection{T}"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    static public Int32 RemoveAll<TElement>(
-        this ICollection<TElement> source,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        Func<TElement, Boolean> predicate)
+    static public Int32 RemoveAll<TElement>(this ICollection<TElement> source,
+                                            [DisallowNull] Func<TElement, Boolean> predicate)
     {
 #if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(predicate);
 #else
+        if (source is null)
+        {
+            throw new ArgumentNullException(nameof(source));
+        }
+        
         if (predicate is null)
         {
             throw new ArgumentNullException(nameof(predicate));

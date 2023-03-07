@@ -12,12 +12,17 @@ public struct CommonHashSetEnumerator<TElement> :
     /// </summary>
     /// <param name="items">The <see cref="HashSet{T}"/> containing the items to iterate through.</param>
     /// <exception cref="ArgumentNullException"/>
-    public CommonHashSetEnumerator(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<HashSet<TElement>> items)
+    public CommonHashSetEnumerator([DisallowNull] HashSet<TElement> items)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
+
         HashSet<TElement> elements = items;
         m_Enumerator = elements.GetEnumerator();
     }
@@ -37,7 +42,7 @@ public struct CommonHashSetEnumerator<TElement> :
         }
     }
 
-#if !NETCOREAPP3_1_OR_GREATER
+#if !NET6_0_OR_GREATER
     void IEnumerator.Reset()
     { }
 

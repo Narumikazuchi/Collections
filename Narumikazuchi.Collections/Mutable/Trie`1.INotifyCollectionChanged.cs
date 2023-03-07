@@ -2,8 +2,17 @@
 
 public partial class Trie<TContent> : INotifyCollectionChangedHelper
 {
-    void INotifyCollectionChangedHelper.OnCollectionChanged(NotNull<NotifyCollectionChangedEventArgs> eventArgs)
+    void INotifyCollectionChangedHelper.OnCollectionChanged(NotifyCollectionChangedEventArgs eventArgs)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(eventArgs);
+#else
+        if (eventArgs is null)
+        {
+            throw new ArgumentNullException(nameof(eventArgs));
+        }
+#endif
+
         if (this.CollectionChanged is not null)
         {
             this.CollectionChanged.Invoke(sender: this,

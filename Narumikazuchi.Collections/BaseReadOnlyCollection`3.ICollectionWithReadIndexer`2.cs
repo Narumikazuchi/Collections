@@ -3,36 +3,43 @@
 public partial class BaseReadOnlyCollection<TElement, TCollection, TEnumerator> : ICollectionWithReadIndexer<TElement, TEnumerator>
 {
     /// <inheritdoc/>
-    public Int32 IndexOf(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element)
+    public Int32 IndexOf([DisallowNull] TElement element)
     {
-        return this.IndexOf<EqualityComparer<TElement>>(element: element,
-                                                        equalityComparer: EqualityComparer<TElement>.Default);
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
+
+        return this.IndexOf(element: element,
+                            equalityComparer: EqualityComparer<TElement>.Default);
     }
     /// <inheritdoc/>
-    public Int32 IndexOf<TEqualityComparer>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEqualityComparer> equalityComparer)
-            where TEqualityComparer : IEqualityComparer<TElement>
+    public Int32 IndexOf<TEqualityComparer>([DisallowNull] TElement element,
+                                            [DisallowNull] TEqualityComparer equalityComparer)
+        where TEqualityComparer : IEqualityComparer<TElement>
     {
-        TEqualityComparer comparer = equalityComparer;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
 
-        Int32 hashcode = comparer.GetHashCode(element);
-        for (Int32 index = m_SectionStart; index < m_SectionEnd; index++)
+        Int32 hashcode = equalityComparer.GetHashCode(element);
+        for (Int32 index = m_SectionStart;
+             index < m_SectionEnd;
+             index++)
         {
             TElement current = m_Items[index];
-            if (comparer.GetHashCode(current!) == hashcode &&
-                comparer.Equals(x: element,
-                                y: current))
+            if (equalityComparer.GetHashCode(current!) == hashcode &&
+                equalityComparer.Equals(x: element,
+                                        y: current))
             {
                 return index;
             }
@@ -42,7 +49,8 @@ public partial class BaseReadOnlyCollection<TElement, TCollection, TEnumerator> 
     }
 
     /// <inheritdoc/>
-    public NotNull<TElement> this[Int32 index]
+    [NotNull]
+    public TElement this[Int32 index]
     {
         get
         {
@@ -61,9 +69,9 @@ public partial class BaseReadOnlyCollection<TElement, TCollection, TEnumerator> 
             }
         }
     }
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     /// <inheritdoc/>
-    public NotNull<TElement> this[Index index]
+    public TElement this[Index index]
     {
         get
         {

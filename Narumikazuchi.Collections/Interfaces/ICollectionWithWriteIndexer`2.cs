@@ -12,17 +12,15 @@ public interface ICollectionWithWriteIndexer<TElement, TEnumerator>
     /// </summary>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to set.</param>
     /// <exception cref="IndexOutOfRangeException"/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<TElement> this[Int32 index] { set; }
-#if NETCOREAPP3_1_OR_GREATER
+    public TElement this[Int32 index] { set; }
+#if NET6_0_OR_GREATER
     /// <summary>
     /// Sets the <typeparamref name="TElement"/> at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the <typeparamref name="TElement"/> to set.</param>
     /// <exception cref="IndexOutOfRangeException"/>
     [NotNull]
-    public NotNull<TElement> this[Index index] { set; }
+    public TElement this[Index index] { set; }
 #endif
 }

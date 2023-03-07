@@ -13,15 +13,8 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
     /// <param name="root">The value of the root node.</param>
     /// <param name="comparer">The comparer that will be used to compare two <typeparamref name="TValue"/> instances.</param>
     /// <exception cref="ArgumentNullException"/>
-    static public BinaryTree<TValue, TComparer> Create(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> root,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TComparer> comparer)
+    static public BinaryTree<TValue, TComparer> Create([DisallowNull] TValue root,
+                                                       [DisallowNull] TComparer comparer)
     {
         return new(root: root,
                    comparer: comparer);
@@ -34,33 +27,25 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
                    method: BinaryTraversalMethod.InOrder);
     }
 
-#if false
     /// <summary>
     /// Finds the first <typeparamref name="TValue"/> matching the specified value.
     /// </summary>
     /// <param name="value">The value to lookup in the tree.</param>
     /// <returns>The <typeparamref name="TValue"/> or <see langword="null"/> if no node with such value exists in the tree.</returns>
     /// <exception cref="ArgumentNullException"/>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: MaybeNull]
-#endif
-    public MaybeNull<TValue> Find(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> value)
+    public TValue? Find([DisallowNull] TValue value)
     {
         BinaryNode<TValue>? node = this.FindInternal(value);
         if (node is null)
         {
-            return default(TValue);
+            return default;
         }
         else
         {
-            return (TValue)node.Value;
+            return node.Value;
         }
     }
-#endif
 
     /// <summary>
     /// Removes all <see cref="BinaryNode{TValue}"/> objects from the <see cref="BinaryTree{TValue, TComparer}"/>, only when their <typeparamref name="TValue"/> matches the specified condition.
@@ -68,17 +53,21 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
     /// <param name="predicate">The condition that the <typeparamref name="TValue"/> needs to meet to be deleted.</param>
     /// <returns>The number of <see cref="BinaryNode{TValue}"/> objects that have been removed.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Int32 RemoveAll(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<Func<TValue, Boolean>> predicate)
+    public Int32 RemoveAll([DisallowNull] Func<TValue, Boolean> predicate)
     {
-        Func<TValue, Boolean> func = predicate;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(predicate);
+#else
+        if (predicate is null)
+        {
+            throw new ArgumentNullException(nameof(predicate));
+        }
+#endif
+
         List<TValue> remove = new();
         foreach (BinaryNode<TValue>? item in this.TraverseInOrder())
         {
-            if (func.Invoke(item.Value))
+            if (predicate.Invoke(item.Value))
             {
                 remove.Add(item.Value);
             }
@@ -111,15 +100,13 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
     /// Determines the lowest value in the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     /// <returns>The <typeparamref name="TValue"/> of the lowest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
-#endif
-    public NotNull<TValue> Minimum()
+    public TValue Minimum()
     {
         BinaryNode<TValue> node = m_Root;
-        while (!node!.LeftChild.IsNull)
+        while (node.LeftChild is not null)
         {
-            node = node.LeftChild!;
+            node = node.LeftChild;
         }
 
         return node.Value;
@@ -129,15 +116,13 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
     /// Determines the highest value in the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
     /// <returns>The <typeparamref name="TValue"/> of the highest element in the <see cref="BinaryTree{TValue, TComparer}"/>.</returns>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [return: NotNull]
-#endif
-    public NotNull<TValue> Maximum()
+    public TValue Maximum()
     {
         BinaryNode<TValue> node = m_Root;
-        while (!node!.RightChild.IsNull)
+        while (node.RightChild is not null)
         {
-            node = node.RightChild!;
+            node = node.RightChild;
         }
 
         return node.Value;
@@ -157,10 +142,8 @@ public sealed partial class BinaryTree<TValue, TComparer> : StrongEnumerable<TVa
     /// <summary>
     /// Gets the root for the <see cref="BinaryTree{TValue, TComparer}"/>.
     /// </summary>
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<BinaryNode<TValue>> RootNode
+    public BinaryNode<TValue> RootNode
     {
         get
         {

@@ -3,38 +3,49 @@
 public partial class SortedList<TElement, TComparer> : ICollectionWithReadIndexer<TElement, CommonListEnumerator<TElement>>
 {
     /// <inheritdoc/>
-    public Int32 IndexOf(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element)
+    public Int32 IndexOf([DisallowNull] TElement element)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
+
         return m_Items.BinarySearch(item: element,
-                                    comparer: (TComparer)this.Comparer);
+                                    comparer: this.Comparer);
     }
     /// <inheritdoc/>
-    public Int32 IndexOf<TEqualityComparer>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEqualityComparer> equalityComparer)
-            where TEqualityComparer : IEqualityComparer<TElement>
+    public Int32 IndexOf<TEqualityComparer>([DisallowNull] TElement element,
+                                            [DisallowNull] TEqualityComparer equalityComparer)
+        where TEqualityComparer : IEqualityComparer<TElement>
     {
-        TEqualityComparer comparer = equalityComparer;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(equalityComparer);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+        
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+#endif
 
-        Int32 hashcode = comparer.GetHashCode(element);
+        Int32 hashcode = equalityComparer.GetHashCode(element);
         for (Int32 index = 0;
              index < m_Items.Count;
              index++)
         {
             TElement current = m_Items[index];
-            if (comparer.GetHashCode(current!) == hashcode &&
-                comparer.Equals(x: element,
-                                y: current))
+            if (equalityComparer.GetHashCode(current!) == hashcode &&
+                equalityComparer.Equals(x: element,
+                                        y: current))
             {
                 return index;
             }
@@ -44,20 +55,18 @@ public partial class SortedList<TElement, TComparer> : ICollectionWithReadIndexe
     }
 
     /// <inheritdoc />
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
     [NotNull]
-#endif
-    public NotNull<TElement> this[Int32 index]
+    public TElement this[Int32 index]
     {
         get
         {
             return m_Items[index]!;
         }
     }
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     /// <inheritdoc />
     [NotNull]
-    public NotNull<TElement> this[Index index]
+    public TElement this[Index index]
     {
         get
         {

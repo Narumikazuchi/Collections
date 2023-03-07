@@ -54,18 +54,18 @@ public partial class BinaryTree<TValue, TComparer>
 
     private UInt32 GetDepth(BinaryNode<TValue> node)
     {
-        if (node.LeftChild.IsNull &&
-            node.RightChild.IsNull)
+        if (node.LeftChild is null &&
+            node.RightChild is null)
         {
             return node.Depth;
         }
-        else if (node.LeftChild.IsNull &&
-                 !node.RightChild.IsNull)
+        else if (node.LeftChild is null &&
+                 node.RightChild is not null)
         {
             return this.GetDepth(node.RightChild!);
         }
-        else if (!node.LeftChild.IsNull &&
-                 node.RightChild.IsNull)
+        else if (node.LeftChild is not null &&
+                 node.RightChild is null)
         {
             return this.GetDepth(node.LeftChild!);
         }
@@ -88,13 +88,13 @@ public partial class BinaryTree<TValue, TComparer>
                                   BinaryNode<TValue> current)
     {
         nodes.Add(current);
-        if (!current.LeftChild.IsNull)
+        if (current.LeftChild is not null)
         {
             this.TraversePreOrder(nodes: nodes, 
                                   current: current.LeftChild!);
         }
 
-        if (!current.RightChild.IsNull)
+        if (current.RightChild is not null)
         {
             this.TraversePreOrder(nodes: nodes, 
                                   current: current.RightChild!);
@@ -112,14 +112,14 @@ public partial class BinaryTree<TValue, TComparer>
     private void TraverseInOrder(List<BinaryNode<TValue>> nodes, 
                                  BinaryNode<TValue> current)
     {
-        if (!current.LeftChild.IsNull)
+        if (current.LeftChild is not null)
         {
             this.TraverseInOrder(nodes: nodes, 
                                  current: current.LeftChild!);
         }
 
         nodes.Add(current);
-        if (!current.RightChild.IsNull)
+        if (current.RightChild is not null)
         {
             this.TraverseInOrder(nodes: nodes, 
                                  current: current.RightChild!);
@@ -137,13 +137,13 @@ public partial class BinaryTree<TValue, TComparer>
     private void TraversePostOrder(List<BinaryNode<TValue>> nodes, 
                                    BinaryNode<TValue> current)
     {
-        if (!current.LeftChild.IsNull)
+        if (current.LeftChild is not null)
         {
             this.TraverseInOrder(nodes: nodes, 
                                  current: current.LeftChild!);
         }
 
-        if (!current.RightChild.IsNull)
+        if (current.RightChild is not null)
         {
             this.TraverseInOrder(nodes: nodes, 
                                  current: current.RightChild!);
@@ -157,8 +157,6 @@ public partial class BinaryTree<TValue, TComparer>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private Int32 m_Count;
 
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private const String CANNOT_CREATE_FROM_EMPTY_COLLECTION = "Cannot create BinaryTree from empty IEnumerable.";
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private const String NO_PARENT = "Only the root node can have no parent.";
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

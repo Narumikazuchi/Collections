@@ -58,10 +58,10 @@ public partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
             index++;
         }
 
-        this.Keys = ReadOnlyList<TKey>.CreateFrom<List<TKey>>(keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom<List<TValue>>(values);
+        this.Keys = ReadOnlyList<TKey>.CreateFrom(keys);
+        this.Values = ReadOnlyList<TValue>.CreateFrom(values);
     }
-#if NETCOREAPP3_1_OR_GREATER
+#if NET6_0_OR_GREATER
     internal ReadOnlyDictionary(ImmutableArray<KeyValuePair<TKey, TValue>> items,
                                 TEqualityComparer equalityComparer)
     {
@@ -118,8 +118,8 @@ public partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
             index++;
         }
         
-        this.Keys = ReadOnlyList<TKey>.CreateFrom<List<TKey>>(keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom<List<TValue>>(values);
+        this.Keys = ReadOnlyList<TKey>.CreateFrom(keys);
+        this.Values = ReadOnlyList<TValue>.CreateFrom(values);
     }
 #endif
     internal ReadOnlyDictionary(Dictionary<TKey, TValue> items,
@@ -154,8 +154,8 @@ public partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer>
             index++;
         }
 
-        this.Keys = ReadOnlyList<TKey>.CreateFrom<Dictionary<TKey, TValue>.KeyCollection>(items.Keys);
-        this.Values = ReadOnlyList<TValue>.CreateFrom<Dictionary<TKey, TValue>.ValueCollection>(items.Values);
+        this.Keys = ReadOnlyList<TKey>.CreateFrom(items.Keys);
+        this.Values = ReadOnlyList<TValue>.CreateFrom(items.Values);
     }
 
     private Int32 FindEntry(TKey key)

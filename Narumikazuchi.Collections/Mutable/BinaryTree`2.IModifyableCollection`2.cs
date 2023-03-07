@@ -8,16 +8,11 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
     /// <param name="element">The element to add to the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <returns><see langword="true"/> if the element was added to the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Add(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> element)
+    public Boolean Add([DisallowNull] TValue element)
     {
         BinaryNode<TValue>? node = m_Root;
-        TComparer comparer = this.Comparer;
-        Int32 compare = comparer.Compare(x: element,
-                                         y: node.Value);
+        Int32 compare = this.Comparer.Compare(x: element,
+                                              y: node.Value);
         while (node is not null)
         {
             if (compare == 0)
@@ -34,11 +29,11 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
             }
             else if (compare < 0)
             {
-                if (node.LeftChild.IsNull)
+                if (node.LeftChild is null)
                 {
                     node.SetLeftChild(node: new(value: element,
                                                 parent: node),
-                                      comparer: comparer);
+                                      comparer: this.Comparer);
                     m_Count++;
                     return true;
                 }
@@ -46,11 +41,11 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
             }
             else if (compare > 0)
             {
-                if (node.RightChild.IsNull)
+                if (node.RightChild is null)
                 {
                     node.SetRightChild(node: new(value: element,
                                                  parent: node),
-                                       comparer: comparer);
+                                       comparer: this.Comparer);
                     m_Count++;
                     return true;
                 }
@@ -59,8 +54,8 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
 
             if (node is not null)
             {
-                compare = comparer.Compare(x: element,
-                                           y: node.Value);
+                compare = this.Comparer.Compare(x: element,
+                                                y: node.Value);
             }
         }
 
@@ -72,15 +67,19 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
     /// </summary>
     /// <param name="enumerable">The collection of items to add.</param>
     /// <exception cref="ArgumentNullException"/>
-    public void AddRange<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> enumerable)
-            where TEnumerable : IEnumerable<TValue>
+    public void AddRange<TEnumerable>([DisallowNull] TEnumerable enumerable)
+        where TEnumerable : IEnumerable<TValue>
     {
-        TEnumerable source = enumerable;
-        foreach (TValue value in source)
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(enumerable);
+#else
+        if (enumerable is null)
+        {
+            throw new ArgumentNullException(nameof(enumerable));
+        }
+#endif
+
+        foreach (TValue value in enumerable)
         {
             this.Add(value!);
         }
@@ -91,11 +90,10 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
     /// </summary>
     public void Clear()
     {
-        TComparer comparer = this.Comparer;
         m_Root.SetLeftChild(node: null,
-                            comparer: comparer);
+                            comparer: this.Comparer);
         m_Root.SetRightChild(node: null,
-                             comparer: comparer);
+                             comparer: this.Comparer);
         m_Count = 0;
     }
 
@@ -105,15 +103,20 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
     /// <param name="element">Tehe element to remove from the <see cref="BinaryTree{TValue, TComparer}"/>.</param>
     /// <returns><see langword="true"/> if the element was removed from the <see cref="BinaryTree{TValue, TComparer}"/>; otherwise, <see langword="false"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public Boolean Remove(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> element)
+    public Boolean Remove([DisallowNull] TValue element)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(element);
+#else
+        if (element is null)
+        {
+            throw new ArgumentNullException(nameof(element));
+        }
+#endif
+
         TComparer comparer = this.Comparer;
-        if (comparer.Compare(x: element,
-                             y: m_Root.Value) == 0)
+        if (this.Comparer.Compare(x: element,
+                                  y: m_Root.Value) == 0)
         {
             throw new ArgumentException(message: CANNOT_REMOVE_ROOT);
         }
@@ -124,59 +127,71 @@ public partial class BinaryTree<TValue, TComparer> : IModifyableCollection<TValu
             return false;
         }
 
-        if (node.LeftChild.IsNull)
+        if (node.LeftChild is null)
         {
-            if (node.Parent.IsNull)
+            if (node.Parent is null)
             {
                 throw new NotAllowed(message: NO_PARENT);
             }
 
-            BinaryNode<TValue> parent = node.Parent!;
+            BinaryNode<TValue> parent = node.Parent;
             if (parent.LeftChild == node)
             {
                 parent.SetLeftChild(node: node.RightChild,
-                                    comparer: comparer);
-                node.RightChild.WhenNotNull(rightChild => rightChild.SetParent(parent));
+                                    comparer: this.Comparer);
+                if (node.RightChild is not null)
+                {
+                    node.RightChild.SetParent(parent);
+                }
             }
             else if (parent.RightChild == node)
             {
                 parent.SetRightChild(node: node.RightChild,
-                                     comparer: comparer);
-                node.RightChild.WhenNotNull(rightChild => rightChild.SetParent(parent));
+                                     comparer: this.Comparer);
+                if (node.RightChild is not null)
+                {
+                    node.RightChild.SetParent(parent);
+                }
             }
         }
-        else if (!node.RightChild.IsNull)
+        else if (node.RightChild is not null)
         {
-            if (!node.Parent.IsNull)
+            if (node.Parent is null)
             {
                 throw new NotAllowed(message: NO_PARENT);
             }
 
-            BinaryNode<TValue> parent = node.Parent!;
+            BinaryNode<TValue> parent = node.Parent;
             if (parent.LeftChild == node)
             {
                 parent.SetLeftChild(node: node.LeftChild,
-                                    comparer: comparer);
-                node.LeftChild.WhenNotNull(leftChild => leftChild.SetParent(parent));
+                                    comparer: this.Comparer);
+                if (node.LeftChild is not null)
+                {
+                    node.LeftChild.SetParent(parent);
+                }
             }
             else if (parent.RightChild == node)
             {
                 parent.SetRightChild(node: node.LeftChild,
-                                     comparer: comparer);
-                node.LeftChild.WhenNotNull(leftChild => leftChild.SetParent(parent));
+                                     comparer: this.Comparer);
+                if (node.LeftChild is not null)
+                {
+                    node.LeftChild.SetParent(parent);
+                }
             }
         }
         else
         {
             BinaryNode<TValue> min = node.SetToMinBranchValue();
-            if (min.Parent.IsNull)
+            if (min.Parent is null)
             {
                 throw new NotAllowed(message: NO_PARENT);
             }
 
             BinaryNode<TValue> parent = min.Parent!;
             parent.SetLeftChild(node: null,
-                                comparer: comparer);
+                                comparer: this.Comparer);
         }
 
         m_Count--;

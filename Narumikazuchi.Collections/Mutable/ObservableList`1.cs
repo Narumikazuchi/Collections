@@ -10,14 +10,19 @@ public partial class ObservableList<TElement> : StrongEnumerable<TElement, Commo
     /// </summary>
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <exception cref="ArgumentNullException" />
-    static public ObservableList<TElement> CreateFrom<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> items)
-            where TEnumerable : IEnumerable<TElement>
+    static public ObservableList<TElement> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items)
+        where TEnumerable : IEnumerable<TElement>
     {
-        return new(new List<TElement>((TEnumerable)items));
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+#endif
+
+        return new(new List<TElement>(items));
     }
 
     /// <inheritdoc/>

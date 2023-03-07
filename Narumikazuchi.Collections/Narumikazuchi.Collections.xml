@@ -9,10 +9,10 @@
             Provides the basic functionality for the readonly collections in this library.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.IndexOf(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.IndexOf(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.IndexOf``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.IndexOf``1(`0,``0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Item(System.Int32)">
@@ -27,16 +27,16 @@
         <member name="P:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Count">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Contains(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.Contains``1(`0,``0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.CopyTo(`0[])">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.BaseReadOnlyCollection`3.CopyTo(`0[],System.Int32)">
             <inheritdoc/>
         </member>
         <member name="T:Narumikazuchi.Collections.CommonArrayEnumerator`1">
@@ -44,7 +44,7 @@
             An enumerator that iterates through an array of type <typeparamref name="TElement"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.CommonArrayEnumerator`1.#ctor(`0[])">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonArrayEnumerator`1"/> struct.
             </summary>
@@ -80,7 +80,7 @@
             An enumerator that iterates through a <see cref="T:System.Collections.Generic.List`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CommonHashSetEnumerator`1.#ctor(Narumikazuchi.NotNull{System.Collections.Generic.HashSet{`0}})">
+        <member name="M:Narumikazuchi.Collections.CommonHashSetEnumerator`1.#ctor(System.Collections.Generic.HashSet{`0})">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonHashSetEnumerator`1"/> struct.
             </summary>
@@ -98,7 +98,7 @@
             An enumerator that iterates through a <see cref="T:System.Collections.Generic.List`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor(Narumikazuchi.NotNull{System.Collections.Generic.List{`0}})">
+        <member name="M:Narumikazuchi.Collections.CommonListEnumerator`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.CommonListEnumerator`1"/> struct.
             </summary>
@@ -116,7 +116,7 @@
             Extends the <see cref="T:System.Collections.Generic.ICollection`1"/> interface.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.AddRange``2(System.Collections.Generic.ICollection{``0},Narumikazuchi.NotNull{``1})">
+        <member name="M:Narumikazuchi.Collections.Extensions.CollectionExtensions.AddRange``2(System.Collections.Generic.ICollection{``0},``1)">
             <summary>
             Adds the elements of the specified collection to the end of the <see cref="T:System.Collections.Generic.ICollection`1"/>.
             </summary>
@@ -205,7 +205,7 @@
             Extends the <see cref="T:System.Collections.Generic.IList`1"/> interface.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``1(System.Collections.Generic.IList{``0},``0)">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the default comparer and returns the zero-based index of the element.
             </summary>
@@ -220,7 +220,7 @@
             <exception cref="T:System.ArgumentNullException" />
             <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``2(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0},Narumikazuchi.MaybeNull{``1})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``2(System.Collections.Generic.IList{``0},``0,``1)">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
             </summary>
@@ -236,7 +236,7 @@
             <exception cref="T:System.ArgumentNullException" />
             <exception cref="T:System.InvalidOperationException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``2(System.Collections.Generic.IList{``0},System.Int32,System.Int32,Narumikazuchi.NotNull{``0},Narumikazuchi.MaybeNull{``1})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.BinarySearch``2(System.Collections.Generic.IList{``0},System.Int32,System.Int32,``0,``1)">
             <summary>
             Searches the entire sorted <see cref="T:System.Collections.Generic.IList`1"/> for an element using the specified comparer and returns the zero-based index of the element.
             </summary>
@@ -360,7 +360,7 @@
             <exception cref="T:System.ArgumentException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.IndexOf``2(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0},Narumikazuchi.NotNull{``1})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.IndexOf``2(System.Collections.Generic.IList{``0},``0,``1)">
             <summary>
             Searches for the specified object and returns the zero-based index of the first occurrence withthe entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -370,7 +370,7 @@
             <returns>The zero-based index of the first occurrence of item withthe entire <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.InsertRange``2(System.Collections.Generic.IList{``1},System.Int32,Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.InsertRange``2(System.Collections.Generic.IList{``1},System.Int32,``0)">
             <summary>
             Inserts the elements of a collection into the <see cref="T:System.Collections.Generic.IList`1"/> at the specified index.
             </summary>
@@ -380,7 +380,7 @@
             <exception cref="T:System.ArgumentNullException"/>
             <exception cref="T:System.ArgumentOutOfRangeException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.LastIndexOf``1(System.Collections.Generic.IList{``0},``0)">
             <summary>
             Searches for the specified object and returns the zero-based index of the last occurrence withthe entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -389,7 +389,7 @@
             <returns>The zero-based index of the last occurrence of item withthe entire the <see cref="T:System.Collections.Generic.IList`1"/>, if found; otherwise, -1.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.LastIndexOf``2(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0},Narumikazuchi.NotNull{``1})">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.LastIndexOf``2(System.Collections.Generic.IList{``0},``0,``1)">
             <summary>
             Searches for the specified object and returns the zero-based index of the last occurrence withthe entire <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -409,12 +409,12 @@
             Moves the item at the given index the given amount of positions the specified direction the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0},Narumikazuchi.Collections.ItemMoveDirection)">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection)">
             <summary>
             Moves the item one position the specified direction the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},Narumikazuchi.NotNull{``0},Narumikazuchi.Collections.ItemMoveDirection,System.Int32)">
+        <member name="M:Narumikazuchi.Collections.Extensions.ListExtensions.MoveItem``1(System.Collections.Generic.IList{``0},``0,Narumikazuchi.Collections.ItemMoveDirection,System.Int32)">
             <summary>
             Moves the item at the given index the given amount of positions the specified direction the <see cref="T:System.Collections.Generic.IList`1"/>.
             </summary>
@@ -443,7 +443,7 @@
             abstract class with generics to avoid call virutalization.
             </remarks>
         </member>
-        <member name="M:Narumikazuchi.Collections.ListView`2.#ctor(Narumikazuchi.NotNull{`1},System.Int32,System.Int32)">
+        <member name="M:Narumikazuchi.Collections.ListView`2.#ctor(`1,System.Int32,System.Int32)">
             <summary>
             Initializes a new instance of type <see cref="T:Narumikazuchi.Collections.ListView`2"/>.
             </summary>
@@ -487,7 +487,7 @@
             efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
             </remarks>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.CreateFrom``1(Narumikazuchi.NotNull{``0},Narumikazuchi.NotNull{`2})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.CreateFrom``1(``0,`2)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyDictionary`3"/> type.
             </summary>
@@ -498,16 +498,16 @@
         <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.ContainsKey(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.ContainsKey(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.ContainsValue(Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.ContainsValue(`1)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.TryGetValue(Narumikazuchi.NotNull{`0},`1@)">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyDictionary`3.TryGetValue(`0,`1@)">
             <inheritdoc/>
         </member>
-        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`3.Item(Narumikazuchi.NotNull{`0})">
+        <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`3.Item(`0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.ReadOnlyDictionary`3.Keys">
@@ -535,7 +535,7 @@
             the compiler generated IL.
             </remarks>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.CreateFrom``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlyList`1.CreateFrom``1(``0)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlyList`1"/> type.
             </summary>
@@ -563,7 +563,7 @@
             efficiency of the enumerator will be lost due to call virtualization in the compiler generated IL.
             </remarks>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.CreateFrom``2(Narumikazuchi.NotNull{``1},Narumikazuchi.NotNull{`2},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.CreateFrom``2(``1,`2,``0)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedDictionary`3"/> struct.
             </summary>
@@ -575,16 +575,16 @@
         <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.ContainsKey(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.ContainsKey(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.ContainsValue(Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.ContainsValue(`1)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.TryGetValue(Narumikazuchi.NotNull{`0},`1@)">
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.TryGetValue(`0,`1@)">
             <inheritdoc/>
         </member>
-        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.Item(Narumikazuchi.NotNull{`0})">
+        <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.Item(`0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.ReadOnlySortedDictionary`3.Keys">
@@ -614,7 +614,7 @@
             compiler generated IL.
             </remarks>
         </member>
-        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`2.CreateFrom``1(Narumikazuchi.NotNull{``0},Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.ReadOnlySortedList`2.CreateFrom``1(``0,`1)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ReadOnlySortedList`2"/> type.
             </summary>
@@ -638,7 +638,7 @@
             Implements a way for extensions methods to raise the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.INotifyCollectionChangedHelper.OnCollectionChanged(Narumikazuchi.NotNull{System.Collections.Specialized.NotifyCollectionChangedEventArgs})">
+        <member name="M:Narumikazuchi.Collections.INotifyCollectionChangedHelper.OnCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
             <summary>
             Raises the <see cref="E:System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged"/> event with the specified event args.
             </summary>
@@ -648,7 +648,7 @@
             Represents a strongly-typed collection which allows read access to it's elements via an indexer.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ICollectionWithReadIndexer`2.IndexOf(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ICollectionWithReadIndexer`2.IndexOf(`0)">
             <summary>
             Searches for the specified <typeparamref name="TElement"/> and returns the zero-based index of the first
             occurrence within the entire <see cref="T:Narumikazuchi.Collections.ICollectionWithReadIndexer`2"/>.
@@ -659,7 +659,7 @@
             <see cref="T:Narumikazuchi.Collections.ICollectionWithReadIndexer`2"/>, if found; otherwise, -1.
             </returns>
         </member>
-        <member name="M:Narumikazuchi.Collections.ICollectionWithReadIndexer`2.IndexOf``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ICollectionWithReadIndexer`2.IndexOf``1(`0,``0)">
             <summary>
             Searches for the specified <typeparamref name="TElement"/> and returns the zero-based index of the first
             occurrence within the entire <see cref="T:Narumikazuchi.Collections.ICollectionWithReadIndexer`2"/>.
@@ -750,7 +750,7 @@
             Represents a strongly-typed collection that can be modified and accessed by index.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.IModifyableCollectionWithIndex`2.Insert(System.Int32,Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.IModifyableCollectionWithIndex`2.Insert(System.Int32,`0)">
             <summary>
             Inserts the specified element at the specified index in the <see cref="T:Narumikazuchi.Collections.IModifyableCollectionWithIndex`2"/>.
             </summary>
@@ -770,14 +770,14 @@
             Represents a strongly-typed collection that can be modified.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.Add(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.Add(`0)">
             <summary>
             Adds an element to the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>.
             </summary>
             <param name="element">The element to add to the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>.</param>
             <returns><see langword="true"/> if the element was added to the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>; otherwise, <see langword="false"/>.</returns>
         </member>
-        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.AddRange``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.AddRange``1(``0)">
             <summary>
             Adds the elements of the specified <typeparamref name="TEnumerable"/> to the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>.
             </summary>
@@ -789,7 +789,7 @@
             Removes all elements from the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.Remove(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.IModifyableCollection`2.Remove(`0)">
             <summary>
             Removes the first occurrence of an element from the <see cref="T:Narumikazuchi.Collections.IModifyableCollection`2"/>.
             </summary>
@@ -811,14 +811,14 @@
             Represents a strongly-typed read-only collection of elements.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.Contains(`0)">
             <summary>
             Determines whether the <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/> contains the specified element.
             </summary>
             <param name="element">The element to locate in the <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/>.</param>
             <returns><see langword="true"/> if the element is found in the <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/>; otherwise, <see langword="false"/>.</returns>
         </member>
-        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.Contains``1(`0,``0)">
             <summary>
             Determines whether the <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/> contains the specified element.
             </summary>
@@ -826,7 +826,7 @@
             <param name="equalityComparer">The equality comparer to use to check for equality.</param>
             <returns><see langword="true"/> if the element is found in the <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/>; otherwise, <see langword="false"/>.</returns>
         </member>
-        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.CopyTo(`0[])">
             <summary>
             Copies the entire <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/> to a compatible one-dimensional array, starting at the beginning of the target array.
             </summary>
@@ -835,7 +835,7 @@
             <exception cref="T:System.ArgumentException" />
             <exception cref="T:System.ArgumentNullException" />
         </member>
-        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.IReadOnlyCollection`2.CopyTo(`0[],System.Int32)">
             <summary>
             Copies the entire <see cref="T:Narumikazuchi.Collections.IReadOnlyCollection`2"/> to a compatible one-dimensional array, starting at the specified index of the target array.
             </summary>
@@ -896,7 +896,7 @@
             Represents a fast binary lookup data structure.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Create(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Create(`0,`1)">
             <summary>
             Instantiates a new <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/> with the <paramref name="root"/> as root node.
             </summary>
@@ -907,7 +907,15 @@
         <member name="M:Narumikazuchi.Collections.BinaryTree`2.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.RemoveAll(Narumikazuchi.NotNull{System.Func{`0,System.Boolean}})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Find(`0)">
+            <summary>
+            Finds the first <typeparamref name="TValue"/> matching the specified value.
+            </summary>
+            <param name="value">The value to lookup in the tree.</param>
+            <returns>The <typeparamref name="TValue"/> or <see langword="null"/> if no node with such value exists in the tree.</returns>
+            <exception cref="T:System.ArgumentNullException"/>
+        </member>
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.RemoveAll(System.Func{`0,System.Boolean})">
             <summary>
             Removes all <see cref="T:Narumikazuchi.Collections.BinaryNode`1"/> objects from the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>, only when their <typeparamref name="TValue"/> matches the specified condition.
             </summary>
@@ -973,7 +981,7 @@
         <member name="P:Narumikazuchi.Collections.BinaryTree`2.Count">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Add(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Add(`0)">
             <summary>
             Adds an element to the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>.
             </summary>
@@ -981,7 +989,7 @@
             <returns><see langword="true"/> if the element was added to the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>; otherwise, <see langword="false"/>.</returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.AddRange``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.AddRange``1(``0)">
             <summary>
             Adds the elements of the specified <typeparamref name="TEnumerable"/> to the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>.
             </summary>
@@ -993,7 +1001,7 @@
             Removes all elements from the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Remove(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Remove(`0)">
             <summary>
             Removes the first occurrence of an element from the <see cref="T:Narumikazuchi.Collections.BinaryTree`2"/>.
             </summary>
@@ -1004,18 +1012,18 @@
         <member name="P:Narumikazuchi.Collections.BinaryTree`2.Comparer">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Contains(`0)">
             <inheritdoc/>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.Contains``1(`0,``0)">
             <inheritdoc/>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.CopyTo(`0[])">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.BinaryTree`2.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.BinaryTree`2.CopyTo(`0[],System.Int32)">
             <inheritdoc/>
         </member>
         <member name="T:Narumikazuchi.Collections.ObservableList`1">
@@ -1023,7 +1031,7 @@
             Represents a strongly typed list of objects of type <typeparamref name="TElement"/>, which reports changes and can be accessed by index. 
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CreateFrom``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.CreateFrom``1(``0)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
             </summary>
@@ -1038,10 +1046,10 @@
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.IndexOf``1(`0,``0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.ObservableList`1.Item(System.Int32)">
@@ -1056,25 +1064,25 @@
         <member name="P:Narumikazuchi.Collections.ObservableList`1.Count">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Insert(System.Int32,Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Insert(System.Int32,`0)">
             <inheritdoc />
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.InsertRange``1(System.Int32,Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.InsertRange``1(System.Int32,``0)">
             <inheritdoc />
         </member>
         <member name="M:Narumikazuchi.Collections.ObservableList`1.RemoveAt(System.Int32)">
             <inheritdoc />
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Add(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Add(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.AddRange``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.AddRange``1(``0)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.ObservableList`1.Clear">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Remove(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Remove(`0)">
             <inheritdoc/>
         </member>
         <member name="E:Narumikazuchi.Collections.ObservableList`1.CollectionChanged">
@@ -1086,19 +1094,19 @@
         <member name="E:Narumikazuchi.Collections.ObservableList`1.PropertyChanging">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Contains(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.Contains``1(`0,``0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(`0[])">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.CopyTo(`0[],System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor(Narumikazuchi.NotNull{System.Collections.Generic.List{`0}})">
+        <member name="M:Narumikazuchi.Collections.ObservableList`1.#ctor(System.Collections.Generic.List{`0})">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.ObservableList`1"/> class.
             </summary>
@@ -1110,7 +1118,7 @@
             Represents a strongly typed list of objects of type <typeparamref name="TElement"/>, which reports changes and can be accessed by index. 
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.CreateFrom``1(Narumikazuchi.NotNull{``0},Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.CreateFrom``1(``0,`1)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedList`2"/> class.
             </summary>
@@ -1121,15 +1129,15 @@
         <member name="M:Narumikazuchi.Collections.SortedList`2.GetEnumerator">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.#ctor(Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.#ctor(`1)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedList`2"/> class.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.IndexOf(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.IndexOf(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.IndexOf``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.IndexOf``1(`0,``0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.SortedList`2.Item(System.Int32)">
@@ -1144,16 +1152,16 @@
         <member name="P:Narumikazuchi.Collections.SortedList`2.Count">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.Add(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.Add(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.AddRange``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.AddRange``1(``0)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.SortedList`2.Clear">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.Remove(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.Remove(`0)">
             <inheritdoc/>
         </member>
         <member name="P:Narumikazuchi.Collections.SortedList`2.Comparer">
@@ -1161,19 +1169,19 @@
             Gets the <typeparamref name="TComparer"/> which is used by the <see cref="T:Narumikazuchi.Collections.SortedList`2"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.Contains(`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.Contains``1(`0,``0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.CopyTo(`0[])">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.CopyTo(`0[],System.Int32)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.SortedList`2.#ctor(Narumikazuchi.NotNull{System.Collections.Generic.List{`0}},Narumikazuchi.NotNull{`1})">
+        <member name="M:Narumikazuchi.Collections.SortedList`2.#ctor(System.Collections.Generic.List{`0},`1)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.SortedList`2"/> class.
             </summary>
@@ -1272,7 +1280,7 @@
         <member name="P:Narumikazuchi.Collections.TrieNode`1.Count">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.Add(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Add(`0)">
             <summary>
             Adds an object to the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
@@ -1280,7 +1288,7 @@
             <returns><see langword="true"/> if the item was added; otherwise, <see langword="false"/></returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.AddRange``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.AddRange``1(``0)">
             <summary>
             Adds the elements of the specified collection to the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
@@ -1292,7 +1300,7 @@
             Removes all elements from the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.Remove(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Remove(`0)">
             <summary>
             Removes the first occurrence of the specified item from the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
@@ -1300,7 +1308,7 @@
             <returns><see langword="true"/> if the item was found and removed; otherwise, <see langword="false"/></returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.Contains(Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Contains(`0)">
             <summary>
             Determines whether the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/> contains a specific value.
             </summary>
@@ -1308,7 +1316,7 @@
             <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>; otherwise, <see langword="false"/></returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.Contains``1(Narumikazuchi.NotNull{`0},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.Contains``1(`0,``0)">
             <summary>
             Determines whether the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/> contains a specific value.
             </summary>
@@ -1317,10 +1325,10 @@
             <returns><see langword="true"/> if <paramref name="item"/> is found in the <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>; otherwise, <see langword="false"/></returns>
             <exception cref="T:System.ArgumentNullException"/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.CopyTo(Narumikazuchi.NotNull{`0[]})">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.CopyTo(`0[])">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.TrieNode`1.CopyTo(Narumikazuchi.NotNull{`0[]},System.Int32)">
+        <member name="M:Narumikazuchi.Collections.TrieNode`1.CopyTo(`0[],System.Int32)">
             <inheritdoc/>
         </member>
         <member name="T:Narumikazuchi.Collections.Trie`1">
@@ -1328,7 +1336,7 @@
             Represents a very fast but memory costly word lookup data structure. Includes the attaching of objects of type <typeparamref name="TContent"/> to any individual <see cref="T:Narumikazuchi.Collections.TrieNode`1"/>.
             </summary>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.CreateFrom``1(Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.Trie`1.CreateFrom``1(``0)">
             <summary>
             Initializes a new instance of the <see cref="T:Narumikazuchi.Collections.Trie`1"/> type.
             </summary>
@@ -1358,16 +1366,16 @@
         <member name="M:Narumikazuchi.Collections.Trie`1.FindLast(System.Func{System.String,System.Boolean})">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(Narumikazuchi.NotNullOrEmpty{System.String},Narumikazuchi.NotNull{`0})">
+        <member name="M:Narumikazuchi.Collections.Trie`1.Insert(System.String,`0)">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``1(Narumikazuchi.NotNullOrEmpty{System.String},Narumikazuchi.NotNull{``0})">
+        <member name="M:Narumikazuchi.Collections.Trie`1.InsertRange``1(System.String,``0)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.Trie`1.Clear">
             <inheritdoc/>
         </member>
-        <member name="M:Narumikazuchi.Collections.Trie`1.Remove(Narumikazuchi.NotNullOrEmpty{System.String})">
+        <member name="M:Narumikazuchi.Collections.Trie`1.Remove(System.String)">
             <inheritdoc/>
         </member>
         <member name="M:Narumikazuchi.Collections.Trie`1.RemoveAll(System.Func{System.String,System.Boolean})">
@@ -1396,36 +1404,6 @@
         </member>
         <member name="E:Narumikazuchi.Collections.Trie`1.PropertyChanging">
             <inheritdoc />
-        </member>
-        <member name="T:Narumikazuchi.TypeExtensions.NotInitialized">
-            <summary>
-            The exception that is thrown when trying to use the value of an uninitialized union.
-            </summary>
-        </member>
-        <member name="M:Narumikazuchi.TypeExtensions.NotInitialized.#ctor">
-            <summary>
-            The exception that is thrown when trying to use the value of an uninitialized union.
-            </summary>
-        </member>
-        <member name="M:Narumikazuchi.TypeExtensions.NotInitialized.#ctor(System.String)">
-            <summary>
-            The exception that is thrown when trying to use the value of an uninitialized union.
-            </summary>
-        </member>
-        <member name="T:Narumikazuchi.TypeExtensions.UnionOfAttribute">
-            <summary>
-            Marks a struct as a tagged union of the specified types.
-            </summary>
-        </member>
-        <member name="M:Narumikazuchi.TypeExtensions.UnionOfAttribute.#ctor(System.Type,System.Type,System.Type[])">
-            <summary>
-            Marks a struct as a tagged union of the specified types.
-            </summary>
-        </member>
-        <member name="P:Narumikazuchi.TypeExtensions.UnionOfAttribute.Typename">
-            <summary>
-            The name to use for the generated type.
-            </summary>
         </member>
     </members>
 </doc>

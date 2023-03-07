@@ -20,49 +20,55 @@ public sealed partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer> 
     /// <param name="items">The items that the resulting collection shall hold.</param>
     /// <param name="equalityComparer">The comparer that will be used to compare two instances of type <typeparamref name="TKey"/> for equality.</param>
     /// <exception cref="ArgumentNullException" />
-    static public ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable>(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEnumerable> items,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TEqualityComparer> equalityComparer)
-            where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
+    static public ReadOnlyDictionary<TKey, TValue, TEqualityComparer> CreateFrom<TEnumerable>([DisallowNull] TEnumerable items,
+                                                                                              [DisallowNull] TEqualityComparer equalityComparer)
+        where TEnumerable : IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        TEnumerable source = items;
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(items);
+        ArgumentNullException.ThrowIfNull(equalityComparer);
+#else
+        if (items is null)
+        {
+            throw new ArgumentNullException(nameof(items));
+        }
+        
+        if (equalityComparer is null)
+        {
+            throw new ArgumentNullException(nameof(equalityComparer));
+        }
+#endif
 
-        if (source is KeyValuePair<TKey, TValue>[] array)
+        if (items is KeyValuePair<TKey, TValue>[] array)
         {
             return new(items: array,
                        equalityComparer: equalityComparer);
         }
-#if NETCOREAPP3_1_OR_GREATER
-        else if (source is ImmutableArray<KeyValuePair<TKey, TValue>> immutableArray)
+#if NET6_0_OR_GREATER
+        else if (items is ImmutableArray<KeyValuePair<TKey, TValue>> immutableArray)
         {
             return new(items: immutableArray.ToArray(),
                        equalityComparer: equalityComparer);
         }
 #endif
-        else if (source is List<KeyValuePair<TKey, TValue>> list)
+        else if (items is List<KeyValuePair<TKey, TValue>> list)
         {
             return new(items: list.ToArray(),
                        equalityComparer: equalityComparer);
         }
-        else if (source is Dictionary<TKey, TValue> dictionary)
+        else if (items is Dictionary<TKey, TValue> dictionary)
         {
             return new(items: dictionary,
                        equalityComparer: equalityComparer);
         }
-        else if (source is ICollection<KeyValuePair<TKey, TValue>> iCollection)
+        else if (items is ICollection<KeyValuePair<TKey, TValue>> iCollection)
         {
             KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iCollection.Count];
             iCollection.CopyTo(elements, 0);
             return new(items: elements,
                        equalityComparer: equalityComparer);
         }
-        else if (source is IReadOnlyList<KeyValuePair<TKey, TValue>> iReadOnlyList)
+        else if (items is IReadOnlyList<KeyValuePair<TKey, TValue>> iReadOnlyList)
         {
             KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[iReadOnlyList.Count];
             Int32 index = 0;
@@ -74,11 +80,11 @@ public sealed partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer> 
             return new(items: elements,
                        equalityComparer: equalityComparer);
         }
-        else if (source is IHasCount counted)
+        else if (items is IHasCount counted)
         {
             KeyValuePair<TKey, TValue>[] elements = new KeyValuePair<TKey, TValue>[counted.Count];
             Int32 index = 0;
-            foreach (KeyValuePair<TKey, TValue> element in source)
+            foreach (KeyValuePair<TKey, TValue> element in items)
             {
                 elements[index++] = element;
             }
@@ -88,7 +94,7 @@ public sealed partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer> 
         }
         else
         {
-            return new(items: source.ToArray(),
+            return new(items: items.ToArray(),
                        equalityComparer: equalityComparer);
         }
     }
@@ -99,37 +105,50 @@ public sealed partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer> 
         return new(elements: m_Entries,
                    count: this.Count);
     }
+
     /// <inheritdoc/>
-    public Boolean ContainsKey(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TKey> key)
+    public Boolean ContainsKey([DisallowNull] TKey key)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(key);
+#else
+        if (key is null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+#endif
+
         return this.FindEntry(key) > -1;
     }
 
     /// <inheritdoc/>
-    public Boolean ContainsValue(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TValue> value)
+    public Boolean ContainsValue([DisallowNull] TValue value)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(value);
+#else
+        if (value is null)
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
+#endif
+
         return this.Values.Contains(value);
     }
 
     /// <inheritdoc/>
-    public Boolean TryGetValue(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TKey> key,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [NotNullWhen(true)]
-#endif
-        out TValue? value)
+    public Boolean TryGetValue([DisallowNull] TKey key,
+                               [NotNullWhen(true)] out TValue? value)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(key);
+#else
+        if (key is null)
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+#endif
+
         Int32 index = this.FindEntry(key);
         if (index > -1)
         {
@@ -144,10 +163,19 @@ public sealed partial class ReadOnlyDictionary<TKey, TValue, TEqualityComparer> 
     }
 
     /// <inheritdoc/>
-    public NotNull<TValue> this[NotNull<TKey> key]
+    public TValue this[TKey key]
     {
         get
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(key);
+#else
+            if (key is null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+#endif
+
             Int32 index = this.FindEntry(key);
             if (index > -1)
             {

@@ -14,12 +14,8 @@ public interface IModifyableCollectionWithIndex<TElement, TEnumerator>
     /// <param name="index">The zer-based index of the location where to insert the element.</param>
     /// <param name="element">The element to insert.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    public void Insert(
-        Int32 index,
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TElement> element);
+    public void Insert(Int32 index,
+                       [DisallowNull] TElement element);
 
     /// <summary>
     /// Removes the element at the specified index.

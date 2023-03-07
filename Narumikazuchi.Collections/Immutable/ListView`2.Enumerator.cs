@@ -52,7 +52,7 @@ public partial class ListView<TElement, TList>
             }
         }
 
-#if !NETCOREAPP3_1_OR_GREATER
+#if !NET6_0_OR_GREATER
         void IDisposable.Dispose()
         { }
 

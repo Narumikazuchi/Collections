@@ -19,13 +19,13 @@ public sealed partial class ListView<TElement, TList> : BaseReadOnlyCollection<T
 #pragma warning disable CS1591 // Missing comments
     static public implicit operator ReadOnlyList<TElement>(ListView<TElement, TList> source)
     {
-        return ReadOnlyList<TElement>.CreateFrom<ListView<TElement, TList>>(source);
+        return ReadOnlyList<TElement>.CreateFrom(source);
     }
 
     static public implicit operator ReadOnlySortedList<TElement, Comparer<TElement>>(ListView<TElement, TList> source)
     {
-        return ReadOnlySortedList<TElement, Comparer<TElement>>.CreateFrom<ListView<TElement, TList>>(items: source,
-                                                                                                      comparer: Comparer<TElement>.Default);
+        return ReadOnlySortedList<TElement, Comparer<TElement>>.CreateFrom(items: source,
+                                                                           comparer: Comparer<TElement>.Default);
     }
 #pragma warning restore
 
@@ -36,17 +36,13 @@ public sealed partial class ListView<TElement, TList> : BaseReadOnlyCollection<T
     /// <param name="sectionStart">The first index in the source list to view.</param>
     /// <param name="sectionEnd">The last index in the source list to view.</param>
     /// <exception cref="ArgumentNullException" />
-    public ListView(
-#if NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        [DisallowNull]
-#endif
-        NotNull<TList> source,
-        Int32 sectionStart = default,
-        Int32 sectionEnd = -1)
-            : base(items: source,
-                   sectionStart: sectionStart,
-                   sectionEnd: sectionEnd)
-    {}
+    public ListView([DisallowNull] TList source,
+                    Int32 sectionStart = default,
+                    Int32 sectionEnd = -1)
+        : base(items: source,
+               sectionStart: sectionStart,
+               sectionEnd: sectionEnd)
+    { }
 
     /// <inheritdoc/>
     public sealed override ListView<TElement, TList>.Enumerator GetEnumerator()

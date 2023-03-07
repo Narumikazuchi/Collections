@@ -2,7 +2,7 @@
 
 public partial class Trie<TContent>
 {
-    private Trie(IEnumerable<Char> separators)
+    private Trie(Char[] separators)
     {
 #if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(separators);
@@ -16,7 +16,7 @@ public partial class Trie<TContent>
         m_Root = new(trie: this,
                      value: '^',
                      parent: null);
-        m_Separators = separators.ToArray();
+        m_Separators = separators;
     }
     internal Trie(IEnumerable<String> collection) :
         this()
@@ -28,8 +28,8 @@ public partial class Trie<TContent>
 
         foreach (String word in collection.Distinct())
         {
-            this.InsertRange<TContent[]>(index: word,
-                                         enumerable: Array.Empty<TContent>());
+            this.InsertRange(index: word,
+                             enumerable: Array.Empty<TContent>());
         }
     }
 
